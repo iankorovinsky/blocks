@@ -72,3 +72,17 @@ fn set(ref self: ContractState, x: u128) {
 fn get(self: @ContractState) -> u128 {
     self.stored_data.read()
 }
+
+// FUNCTION ATTRIBUTES
+
+#[constructor] 
+// Public
+
+#[abi(embed_v0)] -> all functions of the contract for the interface
+#[external(v0)] -> callable by anyone from outside the contract
+
+// Private
+#[generate_trait] -> private implementation of interface
+#[abi(per_item)] -> define entrypoints without an explicit interface
+
+
