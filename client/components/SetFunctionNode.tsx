@@ -33,7 +33,7 @@ const SetFunctionNode = ({ data, id }: Props) => {
       ) {
         setStorageVariable(connectedNode.data?.storage_variable as string);
       }
-    }, 500); // Check every 500ms
+    }, 1000); // Check every 500ms
 
     return () => clearInterval(interval); // Cleanup on unmount
   }, [getNodes, getEdges, id, storageVariable]);

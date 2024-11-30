@@ -16,6 +16,7 @@ import { Cursor } from "../components/Cursor";
 import { nodeTypes } from "./types/node";
 import { Navbar } from "@/components/Navbar";
 import { useNavbar } from "@/contexts/NavbarContext";
+import { NodeTemplate } from "@/components/SidebarNodePallette";
 
 const initialNodes = [
   {
@@ -72,6 +73,39 @@ export default function Home() {
     }),
   );
 
+  const onDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'move'
+  }, [])
+
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault()
+
+      const nodeInformation: NodeTemplate = JSON.parse(event.dataTransfer.getData('application/reactflow'));
+      
+      if (typeof nodeInformation.type === 'undefined' || !nodeInformation.type) {
+        return
+      }
+
+      const position = {
+        x: event.clientX - event.currentTarget.getBoundingClientRect().left,
+        y: event.clientY - event.currentTarget.getBoundingClientRect().top,
+      }
+
+      const newNode = {
+        id: `${nodeInformation.type}_${Date.now()}`,
+        type: nodeInformation.type,
+        position,
+        data: nodeInformation.data,
+      }
+
+      setNodes((nds) => nds.concat(newNode))
+    },
+    [setNodes],
+  )
+
+
   const onConnect = useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
@@ -119,6 +153,8 @@ export default function Home() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onDragOver={onDragOver}
+          onDrop={onDrop}
           nodeTypes={nodeTypes}
         >
           <Background color="#FFFFFFF" variant={BackgroundVariant.Dots} />
