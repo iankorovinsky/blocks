@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
-type Network = 'mainnet' | 'testnet';
+type Network = "mainnet" | "testnet";
 
 interface NavbarContextType {
   contractName: string;
@@ -14,11 +14,13 @@ interface NavbarContextType {
 const NavbarContext = createContext<NavbarContextType | undefined>(undefined);
 
 export function NavbarProvider({ children }: { children: ReactNode }) {
-  const [contractName, setContractName] = useState('');
-  const [network, setNetwork] = useState<Network>('testnet');
+  const [contractName, setContractName] = useState("");
+  const [network, setNetwork] = useState<Network>("testnet");
 
   return (
-    <NavbarContext.Provider value={{ contractName, setContractName, network, setNetwork }}>
+    <NavbarContext.Provider
+      value={{ contractName, setContractName, network, setNetwork }}
+    >
       {children}
     </NavbarContext.Provider>
   );
@@ -27,8 +29,7 @@ export function NavbarProvider({ children }: { children: ReactNode }) {
 export function useNavbar() {
   const context = useContext(NavbarContext);
   if (context === undefined) {
-    throw new Error('useNavbar must be used within a NavbarProvider');
+    throw new Error("useNavbar must be used within a NavbarProvider");
   }
   return context;
 }
-

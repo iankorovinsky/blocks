@@ -1,7 +1,13 @@
-"use client"
+"use client";
 
-import React from 'react'
-import { Database, Settings2, Hash, Boxes } from 'lucide-react'
+import React from "react";
+import {
+  Database,
+  Settings2,
+  Hash,
+  Boxes,
+  ArrowDownCircle,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -9,56 +15,82 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 export interface NodeTemplate {
-  type: string
-  data: { label?: string; type?: string; identifier?: string; name?: string, storage_variable?: string, primitiveType?: string }
-  label: string
-  icon: React.ElementType
-  color: string
-  description: string
+  type: string;
+  data: {
+    label?: string;
+    type?: string;
+    identifier?: string;
+    name?: string;
+    storage_variable?: string;
+    primitiveType?: string;
+  };
+  label: string;
+  icon: React.ElementType;
+  color: string;
+  description: string;
 }
 
 const nodeTemplates: NodeTemplate[] = [
   {
-    type: 'storage',
-    label: 'Storage',
-    data: { label: "Storage", type: "STORAGE_VAR", identifier: "", storage_variable: "" },
+    type: "storage",
+    label: "Storage",
+    data: {
+      label: "Storage",
+      type: "STORAGE_VAR",
+      identifier: "",
+      storage_variable: "",
+    },
     icon: Database,
-    color: 'bg-blue-500',
-    description: 'Storage variable node'
+    color: "bg-blue-500",
+    description: "Storage variable node",
   },
   {
-    type: 'setFunction',
+    type: "getFunction",
+    data: { label: "Get", type: "FUNCTION", identifier: "GET", name: "" },
+    label: "Get",
+    icon: ArrowDownCircle,
+    color: "bg-orange-500",
+    description: "Get function node",
+  },
+  {
+    type: "setFunction",
     data: { label: "Set", type: "FUNCTION", identifier: "SET", name: "" },
     label: "Set",
     icon: Settings2,
-    color: 'bg-orange-500',
-    description: 'Set function node'
+    color: "bg-orange-500",
+    description: "Set function node",
   },
   {
-    type: 'primitive',
-    label: 'Primitive',
+    type: "primitive",
+    label: "Primitive",
     data: { label: "Primitive", type: "PRIM_TYPE", identifier: "" },
     icon: Hash,
-    color: 'bg-purple-500',
-    description: 'Primitive type node'
+    color: "bg-purple-500",
+    description: "Primitive type node",
   },
   {
-    type: 'compound',
-    label: 'Compound',
+    type: "compound",
+    label: "Compound",
     data: { label: "Compound", type: "COMPOUND_TYPE", identifier: "" },
     icon: Boxes,
-    color: 'bg-purple-500',
-    description: 'Compound type node'
-  }
-]
+    color: "bg-purple-500",
+    description: "Compound type node",
+  },
+];
 
 export function NodePalette() {
-  const onDragStart = (event: React.DragEvent, nodeInformation: NodeTemplate) => {
-    event.dataTransfer.setData('application/reactflow', JSON.stringify(nodeInformation));
-    event.dataTransfer.effectAllowed = 'move';
+  const onDragStart = (
+    event: React.DragEvent,
+    nodeInformation: NodeTemplate,
+  ) => {
+    event.dataTransfer.setData(
+      "application/reactflow",
+      JSON.stringify(nodeInformation),
+    );
+    event.dataTransfer.effectAllowed = "move";
   };
 
   return (
@@ -97,6 +129,5 @@ export function NodePalette() {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }
-

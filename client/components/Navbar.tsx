@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import React from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { CuboidIcon as Cube } from 'lucide-react'
-import { useNavbar } from '@/contexts/NavbarContext'
+} from "@/components/ui/select";
+import { CuboidIcon as Cube } from "lucide-react";
+import { useNavbar } from "@/contexts/NavbarContext";
 
 export function Navbar() {
   const { contractName, setContractName, network, setNetwork } = useNavbar();
@@ -32,7 +32,12 @@ export function Navbar() {
               onChange={(e) => setContractName(e.target.value)}
               className="max-w-xs"
             />
-            <Select value={network} onValueChange={(value) => setNetwork(value as 'mainnet' | 'testnet')}>
+            <Select
+              value={network}
+              onValueChange={(value) =>
+                setNetwork(value as "mainnet" | "testnet")
+              }
+            >
               <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="Select network" />
               </SelectTrigger>
@@ -48,6 +53,5 @@ export function Navbar() {
         </div>
       </div>
     </nav>
-  )
+  );
 }
-

@@ -7,7 +7,7 @@ import {
   Panel,
   ReactFlow,
   useEdgesState,
-  useNodesState
+  useNodesState,
 } from "@xyflow/react";
 
 import { useMyPresence, useOthers } from "@liveblocks/react/suspense";
@@ -54,8 +54,8 @@ const initialNodes = [
     id: "7",
     position: { x: 400, y: 600 },
     data: { label: "Get", type: "FUNCTION", identifier: "" },
-    type: "getFunction"
-  }
+    type: "getFunction",
+  },
 ];
 
 const initialEdges = [
@@ -82,36 +82,41 @@ export default function Home() {
   );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault()
-    event.dataTransfer.dropEffect = 'move'
-  }, [])
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  }, []);
 
   const onDrop = useCallback(
     (event: React.DragEvent) => {
-      event.preventDefault()
+      event.preventDefault();
 
-      const nodeInformation: NodeTemplate = JSON.parse(event.dataTransfer.getData('application/reactflow'));
-      
-      if (typeof nodeInformation.type === 'undefined' || !nodeInformation.type) {
-        return
+      const nodeInformation: NodeTemplate = JSON.parse(
+        event.dataTransfer.getData("application/reactflow"),
+      );
+
+      if (
+        typeof nodeInformation.type === "undefined" ||
+        !nodeInformation.type
+      ) {
+        return;
       }
 
       const position = {
         x: event.clientX - event.currentTarget.getBoundingClientRect().left,
         y: event.clientY - event.currentTarget.getBoundingClientRect().top,
-      }
+      };
 
       const newNode = {
         id: `${nodeInformation.type}_${Date.now()}`,
         type: nodeInformation.type,
         position,
         data: nodeInformation.data,
-      }
+      };
 
-      setNodes((nds) => nds.concat(newNode))
+      setNodes((nds) => nds.concat(newNode));
     },
     [setNodes],
-  )
+  );
 
   const onConnect = useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),

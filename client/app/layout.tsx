@@ -23,9 +23,7 @@ export default function RootLayout({
             <SidebarProvider>
               <div className="flex h-screen w-screen">
                 <NodePalette />
-                <div className="grow overflow-hidden">
-                  {children}
-                </div>
+                <div className="grow overflow-hidden">{children}</div>
               </div>
             </SidebarProvider>
           </NavbarProvider>

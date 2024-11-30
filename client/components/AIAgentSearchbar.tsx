@@ -1,36 +1,36 @@
-'use client'
+"use client";
 
-import * as React from "react"
-import { Loader2, Send } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
+import * as React from "react";
+import { Loader2, Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function AISearch() {
-  const [input, setInput] = React.useState("")
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [input, setInput] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
 
   async function handleSubmit(e?: React.FormEvent) {
-    e?.preventDefault()
-    if (!input.trim() || isLoading) return
+    e?.preventDefault();
+    if (!input.trim() || isLoading) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       // Simulate API call - replace with your actual AI endpoint
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      console.log("Submitted:", input)
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log("Submitted:", input);
     } catch (error) {
-      console.error("Error:", error)
+      console.error("Error:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      handleSubmit()
+      e.preventDefault();
+      handleSubmit();
     }
-  }
+  };
 
   return (
     <div className="absolute bottom-0 left-0 right-0 bg-background border-t max-w-full">
@@ -60,5 +60,5 @@ export default function AISearch() {
         </div>
       </form>
     </div>
-  )
+  );
 }
