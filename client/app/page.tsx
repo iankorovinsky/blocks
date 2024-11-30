@@ -12,22 +12,24 @@ import {
 
 import { useMyPresence, useOthers } from "@liveblocks/react/suspense";
 import "@xyflow/react/dist/style.css";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Cursor } from "../components/Cursor";
-import { nodeTypes } from "./types/node";
+// import { nodeTypes } from "./types/node";
+import SetFunctionNode from "@/components/SetFunctionNode";
+import StorageNode from "@/components/StorageNode";
 
 
 const initialNodes = [
   {
     id: "3",
     position: { x: 0, y: 200 },
-    data: { label: "Set", type: "FUNCTION", identifier: "SET" },
+    data: { label: "Set", type: "FUNCTION", identifier: "SET", storage_variable: "" },
     type: "setFunction",
   },
   {
     id: "4",
     position: { x: 400, y: 200 },
-    data: { label: "Storage", type: "STORAGE_VAR", identifier: "" },
+    data: { label: "Storage", type: "STORAGE_VAR", identifier: "", storage_variable: "" },
     type: "storage",
   },
 ];
@@ -46,6 +48,29 @@ export default function Home() {
     (params: any) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
   );
+
+
+  const handleStorageNameChange = useCallback((id: string, name: string) => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === id) {
+          
+          node.data = { ...node.data, storage_variable: name };
+        }
+        return node;
+      })
+    );
+  }, [setNodes]);
+
+  const nodeTypes = useMemo(() => ({
+    setFunction: (props: any) => (
+      <SetFunctionNode {...props} />
+    ),
+    storage: (props: any) => (
+      <StorageNode {...props} onNameChange={handleStorageNameChange} />
+    ),
+  }), []);
+
 
   return (
     <>
@@ -87,12 +112,6 @@ export default function Home() {
           nodeTypes={nodeTypes}
         >
           <Background color="#FFFFFFF" variant={BackgroundVariant.Dots} />
-          {/* <Panel position="top-left">top-left</Panel>
-          <Panel position="top-center">top-center</Panel>
-          <Panel position="top-right">top-right</Panel>
-          <Panel position="bottom-left">bottom-left</Panel>
-          <Panel position="bottom-center">bottom-center</Panel>
-          <Panel position="bottom-right">bottom-right</Panel> */}
         </ReactFlow>
       </div>
     </>

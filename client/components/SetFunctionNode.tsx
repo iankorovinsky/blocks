@@ -1,21 +1,37 @@
-import { Handle, Position, useStore, useReactFlow } from "@xyflow/react";
-import React, { useCallback, useState } from "react";
-import { Settings2 } from 'lucide-react';
+import { Handle, Position, useReactFlow } from "@xyflow/react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Settings2 } from "lucide-react";
 
 type Props = {
-  data: { label: string };
+  data: { label: string; storage_variable: string };
   id: string;
 };
 
 const SetFunctionNode = ({ data, id }: Props) => {
   const [inputValue, setInputValue] = useState("");
-  const { getNode, getEdges } = useReactFlow();
+  const [storageVariable, setStorageVariable] = useState<string | undefined>("");
+  const { getNodes, getEdges } = useReactFlow();
 
-  const isConnected = useStore(useCallback((store) => {
-    const node = getNode(id);
-    const edges = getEdges();
-    return edges.some(edge => edge.source === id);
-  }, [id, getNode, getEdges]));
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nodes = getNodes();
+      const edges = getEdges();
+
+      const connectedNodeIds = edges
+        .filter((edge) => edge.source === id || edge.target === id)
+        .map((edge) => (edge.source === id ? edge.target : edge.source));
+
+      const connectedNode = nodes.find((node) =>
+        connectedNodeIds.includes(node.id)
+      );
+
+      if (connectedNode && connectedNode.data?.storage_variable !== storageVariable) {
+        setStorageVariable(connectedNode.data?.storage_variable as string);
+      }
+    }, 500); // Check every 500ms
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [getNodes, getEdges, id, storageVariable]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -24,10 +40,12 @@ const SetFunctionNode = ({ data, id }: Props) => {
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
       {/* Triangle with F label */}
-      <div className="absolute -top-px -right-px w-0 h-0 
+      <div
+        className="absolute -top-px -right-px w-0 h-0 
         border-t-[30px] border-l-[30px] 
         border-t-orange-500 border-l-transparent
-        overflow-visible rounded">
+        overflow-visible rounded"
+      >
         <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">
           F
         </span>
@@ -39,7 +57,7 @@ const SetFunctionNode = ({ data, id }: Props) => {
           <span className="font-medium">{data.label}</span>
         </div>
       </div>
-      
+
       <div className="p-4 space-y-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -60,9 +78,9 @@ const SetFunctionNode = ({ data, id }: Props) => {
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Storage Variable</label>
           </div>
-          {isConnected ? (
+          {storageVariable ? (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
-              {`storage_${id}`}
+              {storageVariable}
             </div>
           ) : (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
@@ -72,12 +90,12 @@ const SetFunctionNode = ({ data, id }: Props) => {
         </div>
       </div>
 
-      <Handle 
-        type="source" 
-        position={Position.Bottom} 
-        className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]" 
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
       />
-      <Handle 
+      <Handle
         type="target"
         position={Position.Bottom}
         className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
@@ -87,4 +105,3 @@ const SetFunctionNode = ({ data, id }: Props) => {
 };
 
 export default SetFunctionNode;
-

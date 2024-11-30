@@ -1,5 +1,5 @@
 import { Handle, Position, useReactFlow } from "@xyflow/react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Database } from 'lucide-react';
 import {
   Select,
@@ -13,14 +13,14 @@ type Props = {
   id: string;
   data: { 
     label: string;
-    onNameChange: (id: string, name: string) => void;
+    storage_variable: string;
   };
 };
 
 const StorageNode = ({ id, data }: Props) => {
-  const [name, setName] = useState("");
   const [typeValue, setTypeValue] = useState("string");
-  const { getNode, getEdges } = useReactFlow();
+  const { setNodes, getEdges } = useReactFlow();
+  const [variableName, setVariableName] = useState(data.storage_variable);
 
   const isConnected = useCallback(() => {
     const edges = getEdges();
@@ -29,15 +29,22 @@ const StorageNode = ({ id, data }: Props) => {
 
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newName = event.target.value;
-    setName(newName);
-    data.onNameChange(id, newName);
+    setVariableName(newName);
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === id) {
+          node.data = { ...node.data, storage_variable: newName };
+        }
+        if (node.type === 'setFunction') {
+          const connectedEdge = getEdges().find(edge => edge.target === node.id);
+          if (connectedEdge && connectedEdge.source === id) {
+            node.data = { ...node.data, storage_variable: newName };
+          }
+        }
+        return node;
+      })
+    );
   };
-
-  useEffect(() => {
-    if (name) {
-      data.onNameChange(id, name);
-    }
-  }, [id, name, data]);
 
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
@@ -65,7 +72,7 @@ const StorageNode = ({ id, data }: Props) => {
           </div>
           <input
             type="text"
-            value={name}
+            value={variableName}
             onChange={handleNameChange}
             className="nodrag w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700 focus:outline-none focus:border-blue-500 transition-colors"
             placeholder="Enter name..."
