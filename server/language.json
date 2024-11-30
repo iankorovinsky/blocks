@@ -23,9 +23,9 @@
                 ],
                 "return_type": "void",
                 "template": [
-                    "fn {function_name}(ref self: ContractState, {storage_var_type}) {",
-                    "    self.{storage_var}.write({param});",
-                    "}"
+                    "        fn {function_name}(ref self: ContractState, {storage_var_type}) {",
+                    "            self.{storage_var}.write({param});",
+                    "        }"
                 ]
             },
             "GET": {
@@ -46,9 +46,9 @@
                 ],
                 "return_type": "felt252",
                 "template": [
-                  "fn {function_name}(self: @ContractState) -> {storage_var_type} {",
-                  "    self.{storage_var}.read()",
-                  "}"
+                  "        fn {function_name}(self: @ContractState) -> {storage_var_type} {",
+                  "            self.{storage_var}.read()",
+                  "        }"
                 ]
             }
         },

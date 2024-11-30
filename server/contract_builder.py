@@ -3,6 +3,7 @@ from typing import List, Dict
 
 class ContractBuilder:
     def __init__(self, json_file_path: str):
+        self.contract_name = ""
         self.functions = []
         self.storage_vars = []
         self.interfaces = []
@@ -18,10 +19,30 @@ class ContractBuilder:
         except json.JSONDecodeError:
             raise ValueError(f"Invalid JSON format in file: {json_file_path}")
     
-    
+    # We need this added to the frontend its not in the json
+    def set_name(self, name: str):
+        self.contract_name = name
+
     def add_function(self, function_code):
         self.functions.append(function_code)
     
+    def build_implementation_block(self) -> str:
+        if not self.contract_name:
+            raise ValueError("Contract name must be set before building implementation block")
+            
+        impl_parts = []
+        # Add implementation header !! does this need to be in the json or is here fine?
+        impl_parts.append(f"    #[abi(embed_v0)]\n    impl {self.contract_name} of super::I{self.contract_name}<ContractState> {{")
+        
+        # Add all functions
+        if self.functions:
+            impl_parts.extend(self.functions)
+        
+        # Add closing brace
+        impl_parts.append("}")
+        
+        return "        \n\n".join(impl_parts)
+
     def build(self):
         # Combine all components into a complete contract
         contract_parts = []
@@ -29,9 +50,10 @@ class ContractBuilder:
             contract_parts.extend(self.storage_vars)
         if self.interfaces:
             contract_parts.extend(self.interfaces)
-        if self.functions:
-            contract_parts.extend(self.functions)
         
+        # Add the implementation block
+        contract_parts.append(self.build_implementation_block())
+    
         return "\n\n".join(contract_parts)
     
     # ------------------------------------------------------------------------------------------------
@@ -59,7 +81,8 @@ class ContractBuilder:
         }
 
     def get_function_label(self, function_id: str) -> str:
-        """Get the label of a function node"""
+        """Get the label of a function node""" 
+        # name/label?? idk in sample.json it's called label but i know we called it name
         nodes = self.parse_nodes()
         for node in nodes:
             if node['id'] == function_id:
@@ -68,6 +91,9 @@ class ContractBuilder:
                 return node['data']['label']
                 
         raise ValueError(f"No node found with ID: {function_id}")
+    
+    
+
     # ------------------------------------------------------------------------------------------------  
     # Generate function code
     def generate_function_with_return(self, language_json, function_name, storage_var, storage_var_type, params):
@@ -111,14 +137,18 @@ contract_builder = ContractBuilder('sample.json')
 def main():
     language_map = contract_builder._load_json('language.json')
     
-    params1 = {
+    # Add this line to set the contract name while we don't have a frontend for it
+    contract_builder.set_name("MyContract")
+    
+    params = {
         "function_name": "get",
         "param1": "u256",
         "param2": "u128"
     }
     
     # Now called as instance methods
-    contract_builder.generate_function_with_return(language_map, 'get', 'a', 'felt252', params1)
+    contract_builder.generate_function_with_return(language_map, 'get', 'a', 'felt252', params)
+    contract_builder.generate_function(language_map, 'set', '4', 'u8', params)
     final_contract = contract_builder.build()
 
     print(final_contract)
