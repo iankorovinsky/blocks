@@ -24,7 +24,7 @@
                 "return_type": "void",
                 "template": [
                     "fn {function_name}(ref self: ContractState, {param1}) {",
-                    "    self.{{param1}}.write({param2});",
+                    "    self.{param1}.write({param2});",
                     "}"
                 ]
             },
@@ -46,8 +46,8 @@
                 ],
                 "return_type": "felt252",
                 "template": [
-                  "fn {function_name}(self: @ContractState) -> {param1} {",
-                  "    self.{param2}.read()",
+                  "fn {function_name}(self: @ContractState) -> {return_type} {",
+                  "    self.{param1}.read()",
                   "}"
                 ]
             }

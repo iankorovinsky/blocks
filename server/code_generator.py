@@ -1,3 +1,4 @@
+# NOT IN USE, USED TO TEST CONTRACT BUILDER
 import json
 
 def load_json(filename):
@@ -26,12 +27,27 @@ def generate_cairo_code(language_json, type, name, params=None):
     
     return template_str
 
+def parse_param(param):
+    return ", ".join([f"{key}: {value}" for key, value in params.items()])  
+
+
+# def generate_contract():
+
+# def generate_function(language_json, function_name, return_type, params):
+
+# def generate_function(language_json, function_name, params):
+
+# def generate_functions(language_json, function_names, input_types, output_types):
+
+# def generate_storage():
+
+# def generate_interface():
 
 def main():
     # Load the language map from the JSON file
     language_map = load_json('language.json')
     
-    # FOR TESTING
+    # For generating functions
     # Example parameters passed dynamically
     params = {
         "function_name": "get",
