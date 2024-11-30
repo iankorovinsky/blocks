@@ -4,6 +4,7 @@ import {
   addEdge,
   Background,
   BackgroundVariant,
+  Panel,
   ReactFlow,
   useEdgesState,
   useNodesState
@@ -17,6 +18,7 @@ import { nodeTypes } from "./types/node";
 import { Navbar } from "@/components/Navbar";
 import { useNavbar } from "@/contexts/NavbarContext";
 import { NodeTemplate } from "@/components/SidebarNodePallette";
+import AISearch from "@/components/AIAgentSearchbar";
 
 const initialNodes = [
   {
@@ -105,7 +107,6 @@ export default function Home() {
     [setNodes],
   )
 
-
   const onConnect = useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
@@ -129,7 +130,8 @@ export default function Home() {
           };
           updateMyPresence(cursor);
         }}
-        style={{ width: "100vw", height: "93vh" }}
+        className="relative"
+        style={{ width: "100%", height: "93vh" }}
       >
         {/* print other player's cursors */}
         {others
@@ -159,6 +161,8 @@ export default function Home() {
         >
           <Background color="#FFFFFFF" variant={BackgroundVariant.Dots} />
         </ReactFlow>
+
+        <AISearch />
       </div>
     </>
   );
