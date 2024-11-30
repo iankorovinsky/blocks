@@ -2,10 +2,22 @@ import json
 from typing import List, Dict
 
 class ContractBuilder:
-    def __init__(self):
+    def __init__(self, json_file_path: str):
         self.functions = []
         self.storage_vars = []
         self.interfaces = []
+        self.json_data = self._load_json(json_file_path)
+
+    def _load_json(self, json_file_path: str) -> Dict:
+        """Load JSON file and store its content"""
+        try:
+            with open(json_file_path, 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Could not find JSON file at: {json_file_path}")
+        except json.JSONDecodeError:
+            raise ValueError(f"Invalid JSON format in file: {json_file_path}")
+    
     
     def add_function(self, function_code):
         self.functions.append(function_code)
@@ -21,173 +33,95 @@ class ContractBuilder:
             contract_parts.extend(self.functions)
         
         return "\n\n".join(contract_parts)
+    
+    # ------------------------------------------------------------------------------------------------
+    # Helper functions
+    def parse_nodes(self) -> List[Dict]:
+        """Get all nodes from the loaded JSON"""
+        if 'nodeData' not in self.json_data:
+            raise KeyError("JSON data does not contain 'nodeData' key")
+        return self.json_data['nodeData']
 
-# Create a global contract builder instance
-contract_builder = ContractBuilder()
+    def get_nodes_by_type(self, node_type: str) -> List[Dict]:
+        """Get all nodes of a specific type"""
+        nodes = self.parse_nodes()
+        return [node for node in nodes if node['type'] == node_type]
 
-def load_json(filename):
-    with open(filename, 'r') as file:
-        return json.load(file)
-    
-def generate_function_with_return(language_json, function_name, storage_var_type, params):
-    """
-    Generate Cairo code for a function with a return type.
-    
-    Args:
-        language_json: The loaded language template dictionary
-        function_name: Name of the function to generate (e.g., 'set')
-        params: Dictionary of parameters and their types
-        return_type: The return type of the function
-    """
-    template = language_json["type"]["FUNCTION"].get(function_name, {}).get("template", [])
-    if not template:
-        raise ValueError(f"No template found for function: {function_name}")
-    
-    template_str = "\n".join(template)
-
-    # Replace function name and return type
-    template_str = template_str.replace("{function_name}", function_name)
-    template_str = template_str.replace("{storage_var_type}", storage_var_type)
-    
-    if params:
-        # Replace other placeholders
-        for key, value in params.items():
-            template_str = template_str.replace(f"{{{key}}}", value)
-    
-    contract_builder.add_function(template_str)
-    return template_str
-
-def generate_function(language_json, function_name, storage_var_type, params):
-    """
-    Generate Cairo code for a function without a return type.
-    
-    Args:
-        language_json: The loaded language template dictionary
-        function_name: Name of the function to generate (e.g., 'get')
-        params: Dictionary of parameters and their types
-    """
-    template = language_json["type"]["FUNCTION"].get(function_name, {}).get("template", [])
-    if not template:
-        raise ValueError(f"No template found for function: {function_name}")
-    
-    template_str = "\n".join(template)
-
-    # Replace function name and return type
-    template_str = template_str.replace("{function_name}", function_name)
-    template_str = template_str.replace("{storage_var_type}", storage_var_type)
-    
-    if params:
-        # Replace other placeholders
-        for key, value in params.items():
-            template_str = template_str.replace(f"{{{key}}}", value)
-    
-    contract_builder.add_function(template_str)
-    return template_str
-
-
-def generate_contract():
-    return contract_builder.build()
-
-def parse_nodes_from_json(json_file_path: str) -> List[Dict]:
-    """
-    Parse a JSON file and extract all nodes.
-    
-    Args:
-        json_file_path: Path to the JSON file containing node data
-        
-    Returns:
-        List of node dictionaries
-        Ex. Node ID --> node['id']
-    """
-    try:
-        with open(json_file_path, 'r') as file:
-            data = json.load(file)
+    def get_node_edges(self, node_id: str) -> Dict[str, List[Dict]]:
+        """Get all edges connected to a specific node"""
+        if 'edgeData' not in self.json_data:
+            raise KeyError("JSON data does not contain 'edgeData' key")
             
-        if 'nodeData' not in data:
-            raise KeyError("JSON file does not contain 'nodeData' key")
-            
-        return data['nodeData']
-    except FileNotFoundError:
-        raise FileNotFoundError(f"Could not find JSON file at: {json_file_path}")
-    except json.JSONDecodeError:
-        raise ValueError(f"Invalid JSON format in file: {json_file_path}")
-
-
-def get_function_nodes(json_file_path: str) -> List[Dict]:
-    """
-    Parse a JSON file and extract all nodes that have type "FUNCTION".
-    
-    Args:
-        json_file_path: Path to the JSON file containing node data
-        
-    Returns:
-        List of function node dictionaries
-    """
-    nodes = parse_nodes_from_json(json_file_path)
-    return [node for node in nodes if node['data']['type'] == "FUNCTION"]
-
-def get_node_edges(json_file_path: str, node_id: str) -> Dict[str, List[Dict]]:
-    """
-    Get all edges connected to a specific node ID, separated by incoming and outgoing edges.
-    
-    Args:
-        json_file_path: Path to the JSON file containing edge data
-        node_id: The ID of the node to find edges for
-        
-    Returns:
-        Dictionary containing:
-            'incoming': List of edges where the node is the target
-            'outgoing': List of edges where the node is the source
-        
-        Ex. Incoming edges --> node_edges['incoming']
-    """
-    try:
-        with open(json_file_path, 'r') as file:
-            data = json.load(file)
-            
-        if 'edgeData' not in data:
-            raise KeyError("JSON file does not contain 'edgeData' key")
-            
-        edges = data['edgeData']
-        connected_edges = {
+        edges = self.json_data['edgeData']
+        return {
             'incoming': [edge for edge in edges if edge['target'] == node_id],
             'outgoing': [edge for edge in edges if edge['source'] == node_id]
         }
+
+    def get_function_label(self, function_id: str) -> str:
+        """Get the label of a function node"""
+        nodes = self.parse_nodes()
+        for node in nodes:
+            if node['id'] == function_id:
+                if node['data']['type'] != "FUNCTION":
+                    raise ValueError(f"Node {function_id} is not a function node")
+                return node['data']['label']
+                
+        raise ValueError(f"No node found with ID: {function_id}")
+    # ------------------------------------------------------------------------------------------------  
+    # Generate function code
+    def generate_function_with_return(self, language_json, function_name, storage_var, storage_var_type, params):
+        template = language_json["type"]["FUNCTION"].get('SET', {}).get("template", [])
+        if not template:
+            raise ValueError(f"No template found for function: {function_name}")
         
-        return connected_edges
-    except FileNotFoundError:
-        raise FileNotFoundError(f"Could not find JSON file at: {json_file_path}")
-    except json.JSONDecodeError:
-        raise ValueError(f"Invalid JSON format in file: {json_file_path}")
+        template_str = "\n".join(template)
+        template_str = template_str.replace("{function_name}", function_name)
+        template_str = template_str.replace("{storage_var}", storage_var)
+        template_str = template_str.replace("{storage_var_type}", storage_var_type)
+        
+        if params:
+            for key, value in params.items():
+                template_str = template_str.replace(f"{{{key}}}", value)
+        
+        self.add_function(template_str)
+        return template_str
+
+    def generate_function(self, language_json, function_name, storage_var, storage_var_type, params):
+        template = language_json["type"]["FUNCTION"].get('GET', {}).get("template", [])
+        if not template:
+            raise ValueError(f"No template found for function: {function_name}")
+        
+        template_str = "\n".join(template)
+        template_str = template_str.replace("{function_name}", function_name)
+        template_str = template_str.replace("{storage_var}", storage_var)
+        template_str = template_str.replace("{storage_var_type}", storage_var_type)
+        
+        if params:
+            for key, value in params.items():
+                template_str = template_str.replace(f"{{{key}}}", value)
+        
+        self.add_function(template_str)
+        return template_str
+
+
+# Create a global contract builder instance
+contract_builder = ContractBuilder('sample.json')
     
 def main():
-    language_map = load_json('language.json')
+    language_map = contract_builder._load_json('language.json')
     
-    # Generate multiple functions
     params1 = {
         "function_name": "get",
         "param1": "u256",
         "param2": "u128"
     }
     
-    params2 = {
-        "function_name": "set",
-        "param1": "u256",
-        "param2": "u128"
-    }
-    
-    # # Generate multiple functions
-    # generate_function_with_return(language_map, 'get', 'felt252', params1)
-    # generate_function(language_map, 'set', 'u256', params2)
-    
-    # # Get the complete contract
-    # final_contract = generate_contract()
-    # print(final_contract)
+    # Now called as instance methods
+    contract_builder.generate_function_with_return(language_map, 'get', 'a', 'felt252', params1)
+    final_contract = contract_builder.build()
 
-    # Example usage
-    node_edges = get_node_edges('sample.json', "2")
-    print("Incoming edges:", node_edges['incoming'])  # Shows edges where node 2 is the target
-    print("Outgoing edges:", node_edges['outgoing'])  # Shows edges where node 2 is the source
+    print(final_contract)
 
 
 if __name__ == "__main__":
