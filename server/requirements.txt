@@ -1,2 +1,7 @@
 flask
 flask-cors 
+langgraph
+langchain-groq
+groq
+langchain_community
+pymupdf
