@@ -9,11 +9,17 @@ import {
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
+import TextNode from "./components/TextNode";
+
+const nodeTypes = {
+  textUpdater: TextNode
+}
 
 const initialNodes = [
-  { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
+  { id: "1", position: { x: 0, y: 0 }, data: { label: "1" }, type: "input" },
   { id: "2", position: { x: 0, y: 100 }, data: { label: "2" } },
+  { id: "2", position: { x: 0, y: 200 }, data: { label: "2" }, type: "textUpdater" },
 ];
 const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
 
@@ -34,6 +40,7 @@ export default function Home() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        nodeTypes={nodeTypes}
       >
         <Panel position="top-left">top-left</Panel>
         <Panel position="top-center">top-center</Panel>
