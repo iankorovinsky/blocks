@@ -11,6 +11,8 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@liveblocks/client": "^2.13.0",
+    "@liveblocks/react": "^2.13.0",
     "@xyflow/react": "^12.3.5",
     "next": "15.0.3",
     "react": "^18.3.1",
