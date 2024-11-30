@@ -50,6 +50,12 @@ const initialNodes = [
     data: { label: "Compound", type: "COMPOUND_TYPE", identifier: "" },
     type: "compound",
   },
+  {
+    id: "7",
+    position: { x: 400, y: 600 },
+    data: { label: "Get", type: "FUNCTION", identifier: "" },
+    type: "getFunction"
+  }
 ];
 
 const initialEdges = [
@@ -112,9 +118,9 @@ export default function Home() {
     [setEdges],
   );
 
-  useEffect(() => {
-    console.log(nodes);
-  }, [nodes]);
+  // useEffect(() => {
+  //   console.log(nodes);
+  // }, [nodes]);
 
   return (
     <>
@@ -138,7 +144,6 @@ export default function Home() {
           .filter((other) => other.presence.cursor !== null)
           .map(({ connectionId, presence }) => {
             if (presence.cursor) {
-              console.log(`HI: ${JSON.stringify(presence.cursor)}`);
               return (
                 <Cursor
                   key={connectionId}
