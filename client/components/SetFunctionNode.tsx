@@ -73,7 +73,7 @@ const SetFunctionNode = ({ data, id }: Props) => {
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 relative">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Storage Variable</label>
@@ -87,19 +87,19 @@ const SetFunctionNode = ({ data, id }: Props) => {
               Connect to display storage variable
             </div>
           )}
+
+          <Handle
+            type="source"
+            position={Position.Right}
+            className="top-12 w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
+          />
+          <Handle
+            type="target"
+            position={Position.Right}
+            className="top-12 w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
+          />
         </div>
       </div>
-
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
-      />
-      <Handle
-        type="target"
-        position={Position.Bottom}
-        className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
-      />
     </div>
   );
 };
