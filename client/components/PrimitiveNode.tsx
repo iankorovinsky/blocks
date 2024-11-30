@@ -33,11 +33,7 @@ const SetFunctionNode = ({ data, id }: Props) => {
   const [typeValue, setTypeValue] = useState("");
   const { setNodes, getEdges } = useReactFlow();
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTypeValue(event.target.value);
-  };
-
-  const handleNameChange = useEffect(() => {
+  useEffect(() => {
     setNodes((nds) =>
       nds.map((node) => {
         if (node.id === id) {
@@ -77,9 +73,6 @@ const SetFunctionNode = ({ data, id }: Props) => {
             <label className="text-sm text-gray-400">Type</label>
           </div>
 
-          
-
-
           <Select
             value={typeValue}
             onValueChange={setTypeValue}
@@ -97,6 +90,17 @@ const SetFunctionNode = ({ data, id }: Props) => {
           </Select>
         </div>
       </div>
+
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
+      />
+      <Handle
+        type="target"
+        position={Position.Bottom}
+        className="bottom-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
+      />
     </div>
   );
 };

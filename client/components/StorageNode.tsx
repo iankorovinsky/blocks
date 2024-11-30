@@ -1,13 +1,6 @@
 import { Handle, Position, useReactFlow } from "@xyflow/react";
-import React, { useCallback, useState } from "react";
 import { Database } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import React, { useCallback, useEffect, useState } from "react";
 
 type Props = {
   id: string;
@@ -18,15 +11,11 @@ type Props = {
 };
 
 const StorageNode = ({ id, data }: Props) => {
-  const [typeValue, setTypeValue] = useState("string");
-  const { setNodes, getEdges } = useReactFlow();
+  const [typeValue, setTypeValue] = useState("");
+  const { setNodes, getEdges, getNodes } = useReactFlow();
   const [variableName, setVariableName] = useState(data.storage_variable);
 
-  const isConnected = useCallback(() => {
-    const edges = getEdges();
-    return edges.some(edge => edge.source === id || edge.target === id);
-  }, [id, getEdges]);
-
+  // changes storage_variable to the new name
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newName = event.target.value;
     setVariableName(newName);
@@ -45,6 +34,31 @@ const StorageNode = ({ id, data }: Props) => {
       })
     );
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nodes = getNodes();
+      const edges = getEdges();
+
+      const connectedNodeIds = edges
+        .filter((edge) => edge.source === id || edge.target === id)
+        .map((edge) => (edge.source === id ? edge.target : edge.source));
+
+      const connectedNode = nodes.find((node) =>
+        connectedNodeIds.includes(node.id)
+      );
+
+      if (connectedNode && connectedNode.type === "primitive") {
+        console.log(connectedNode.data?.identifier);
+        setTypeValue(connectedNode.data?.identifier as string);
+      } else if (connectedNode && connectedNode.type === "compound") {
+        console.log(connectedNode.data?.identifier);
+        setTypeValue(`${connectedNode.data?.identifier as string}<${connectedNode.data?.primitiveType}>`);
+      }
+    }, 500); // Check every 500ms
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [getNodes, getEdges, id, typeValue]);
 
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
@@ -79,38 +93,49 @@ const StorageNode = ({ id, data }: Props) => {
           />
         </div>
 
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
+        <div className="space-y-2 relative">
+        <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-orange-400" />
-            <label className="text-sm text-gray-400">Type</label>
+            <label className="text-sm text-gray-400">Storage Variable</label>
           </div>
-          <Select
-            value={typeValue}
-            onValueChange={setTypeValue}
-          >
-            <SelectTrigger className="w-full bg-[#2a2a2a] border-gray-700 text-sm focus:ring-0 focus:ring-offset-0">
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#2a2a2a] border-gray-700 text-white">
-              <SelectItem value="string">String</SelectItem>
-              <SelectItem value="number">Number</SelectItem>
-              <SelectItem value="boolean">Boolean</SelectItem>
-              <SelectItem value="array">Array</SelectItem>
-              <SelectItem value="object">Object</SelectItem>
-            </SelectContent>
-          </Select>
+
+          {typeValue !== "" ? (
+            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
+              {typeValue}
+            </div>
+          ) : (
+            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
+              Connect to a type
+            </div>
+          )}
+
+          <Handle 
+            type="source" 
+            position={Position.Right} 
+            className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
+            id="a"
+          />
+          <Handle 
+            type="target"
+            position={Position.Right}
+            className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
+            id="a"
+          />
+
         </div>
       </div>
 
       <Handle 
         type="source" 
-        position={Position.Top} 
-        className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]" 
+        position={Position.Bottom} 
+        className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
+        id="b"
       />
       <Handle 
         type="target"
-        position={Position.Top}
+        position={Position.Bottom}
         className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
+        id="b"
       />
     </div>
   );

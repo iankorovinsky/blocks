@@ -12,7 +12,7 @@ import {
 
 import { useMyPresence, useOthers } from "@liveblocks/react/suspense";
 import "@xyflow/react/dist/style.css";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Cursor } from "../components/Cursor";
 import { nodeTypes } from "./types/node";
 import SetFunctionNode from "@/components/SetFunctionNode";
@@ -37,12 +37,20 @@ const initialNodes = [
     position: { x: 800, y: 200 },
     data: { label: "Primitive", type: "PRIM_TYPE", identifier: "" },
     type: "primitive",
+  },
+  {
+    id: "6",
+    position: { x: 0, y: 600 },
+    data: { label: "Compound", type: "COMPOUND_TYPE", identifier: "" },
+    type: "compound",
   }
 ];
 
 const initialEdges = [{ id: "e1-2", source: "1", target: "2" }, { id: "e2-3", source: "2", target: "3" }];
 
 export default function Home() {
+  
+
   const [myPresence, updateMyPresence] = useMyPresence();
   const others = useOthers();
   const userCount = others.length;
@@ -50,33 +58,20 @@ export default function Home() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
+  // print json data of nodes, edges
+  console.log(JSON.stringify({
+    nodeData: nodes,
+    edgeData: edges
+  }))
+
   const onConnect = useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
   );
 
-
-  const handleStorageNameChange = useCallback((id: string, name: string) => {
-    setNodes((nds) =>
-      nds.map((node) => {
-        if (node.id === id) {
-          
-          node.data = { ...node.data, storage_variable: name };
-        }
-        return node;
-      })
-    );
-  }, [setNodes]);
-
-  // const nodeTypes = useMemo(() => ({
-  //   setFunction: (props: any) => (
-  //     <SetFunctionNode {...props} />
-  //   ),
-  //   storage: (props: any) => (
-  //     <StorageNode {...props} />
-  //   ),
-  // }), []);
-
+  useEffect(() => {
+    console.log(nodes);
+  }, [nodes]);
 
   return (
     <>
@@ -91,7 +86,7 @@ export default function Home() {
           };
           updateMyPresence(cursor);
         }}
-        style={{ width: "100vw", height: "100vh" }}
+        style={{ width: "100vw", height: "90vh" }}
       >
         {/* print other player's cursors */}
         {others
