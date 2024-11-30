@@ -23,9 +23,63 @@ class ContractBuilder:
     def set_name(self, name: str):
         self.contract_name = name
 
-    def add_function(self, function_code):
-        self.functions.append(function_code)
+    def add_function(self, function_data: dict):
+        self.functions.append(function_data)
     
+    def build_interface_block(self) -> str:
+        """Builds the interface section of the contract."""
+        if not self.contract_name:
+            raise ValueError("Contract name must be set before building interface block")
+        
+        interface_name = f"I{self.contract_name}"
+        
+        # Start the interface block
+        interface_block = [
+            "#[starknet::interface]",
+            f"trait {interface_name}<TContractState> {{",
+        ]
+        
+        # Add function declarations from templates
+        for func in self.functions:
+            template = func['template']
+            if template:
+                # Get just the function signature from the first line
+                signature = template[0].strip()
+                # Replace ContractState with TContractState
+                signature = signature.replace("ContractState", "TContractState")
+                # Remove the opening brace if it exists
+                signature = signature.rstrip(" {")
+                # Add semicolon
+                signature = f"    {signature};"
+                interface_block.append(signature)
+        
+        # Close the interface block
+        interface_block.append("}")
+        
+        return "\n".join(interface_block)
+
+    def build_contract_block(self) -> str:
+        """Builds the main contract block including storage and implementation."""
+        if not self.contract_name:
+            raise ValueError("Contract name must be set before building contract block")
+        
+        # Start the contract block
+        contract_parts = [
+            "#[starknet::contract]",
+            f"mod {self.contract_name} {{",
+            "    use core::starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};",
+            ""
+        ]
+        
+        # Add implementation block
+        impl_block = self.build_implementation_block()
+        contract_parts.append(impl_block)
+        
+        # Close the contract block
+        contract_parts.append("}")
+        
+        return "\n".join(contract_parts)
+
     def build_implementation_block(self) -> str:
         if not self.contract_name:
             raise ValueError("Contract name must be set before building implementation block")
@@ -34,10 +88,11 @@ class ContractBuilder:
         # Add implementation header !! does this need to be in the json or is here fine?
         impl_parts.append(f"    #[abi(embed_v0)]\n    impl {self.contract_name} of super::I{self.contract_name}<ContractState> {{")
         
-        # Add all functions
+        # Add all functions - extract the template strings from the function dictionaries
         if self.functions:
-            impl_parts.extend(self.functions)
-        
+            for func in self.functions:
+                impl_parts.extend(func['template'])
+            
         # Add closing brace
         impl_parts.append("}")
         
@@ -48,12 +103,11 @@ class ContractBuilder:
         contract_parts = []
         if self.storage_vars:
             contract_parts.extend(self.storage_vars)
-        if self.interfaces:
-            contract_parts.extend(self.interfaces)
         
-        # Add the implementation block
-        contract_parts.append(self.build_implementation_block())
-    
+        # Add the interface block
+        contract_parts.append(self.build_interface_block())
+        # Add the contract block (includes implementation block)
+        contract_parts.append(self.build_contract_block())
         return "\n\n".join(contract_parts)
     
     # ------------------------------------------------------------------------------------------------
@@ -95,40 +149,56 @@ class ContractBuilder:
     
 
     # ------------------------------------------------------------------------------------------------  
-    # Generate function code
+    # Generate smart contract
     def generate_function_with_return(self, language_json, function_name, storage_var, storage_var_type, params):
-        template = language_json["type"]["FUNCTION"].get('SET', {}).get("template", [])
+        template = language_json["type"]["FUNCTION"].get('SET', {})
         if not template:
             raise ValueError(f"No template found for function: {function_name}")
         
-        template_str = "\n".join(template)
-        template_str = template_str.replace("{function_name}", function_name)
-        template_str = template_str.replace("{storage_var}", storage_var)
-        template_str = template_str.replace("{storage_var_type}", storage_var_type)
+        # Create a copy of the template
+        function_data = template.copy()
         
-        if params:
-            for key, value in params.items():
-                template_str = template_str.replace(f"{{{key}}}", value)
+        # Process the template strings
+        processed_template = []
+        for line in template['template']:
+            line = line.replace("{function_name}", function_name)
+            line = line.replace("{storage_var}", storage_var)
+            line = line.replace("{storage_var_type}", storage_var_type)
+            
+            if params:
+                for key, value in params.items():
+                    line = line.replace(f"{{{key}}}", value)
+            
+            processed_template.append(line)
         
-        self.add_function(template_str)
-        return template_str
+        function_data['template'] = processed_template
+        self.add_function(function_data)
+        return "\n".join(processed_template)
 
     def generate_function(self, language_json, function_name, storage_var, storage_var_type, params):
-        template = language_json["type"]["FUNCTION"].get('GET', {}).get("template", [])
+        template = language_json["type"]["FUNCTION"].get('GET', {})
         if not template:
             raise ValueError(f"No template found for function: {function_name}")
         
-        template_str = "\n".join(template)
-        template_str = template_str.replace("{function_name}", function_name)
-        template_str = template_str.replace("{storage_var}", storage_var)
-        template_str = template_str.replace("{storage_var_type}", storage_var_type)
+        # Create a copy of the template
+        function_data = template.copy()
         
-        if params:
-            for key, value in params.items():
-                template_str = template_str.replace(f"{{{key}}}", value)
+        # Process the template strings
+        processed_template = []
+        for line in template['template']:
+            line = line.replace("{function_name}", function_name)
+            line = line.replace("{storage_var}", storage_var)
+            line = line.replace("{storage_var_type}", storage_var_type)
+            
+            if params:
+                for key, value in params.items():
+                    line = line.replace(f"{{{key}}}", value)
+            
+            processed_template.append(line)
         
-        self.add_function(template_str)
-        return template_str
+        function_data['template'] = processed_template
+        self.add_function(function_data)
+        return "\n".join(processed_template)
 
 
 # Create a global contract builder instance

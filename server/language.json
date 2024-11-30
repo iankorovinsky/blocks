@@ -38,13 +38,8 @@
                     "name": "self",
                     "type": "ContractState",
                     "mode": "snapshot"
-                  },
-                  {
-                    "name": "key",
-                    "type": "felt252"
                   }
                 ],
-                "return_type": "felt252",
                 "template": [
                   "        fn {function_name}(self: @ContractState) -> {storage_var_type} {",
                   "            self.{storage_var}.read()",
@@ -53,21 +48,24 @@
             }
         },
         "STORAGE_VAR": {
-            
+            "type": "{param}"
 
         },
         "PRIM_TYPE": {
-            "u8": "",
-            "u16": "",
-            "u32": "",
-            "u64": "",
-            "u128": "",
-            "u256": "",
-            "usize": "",
-            "bool": "",
-            "felt252": "",
-            "bytes31": "",
-            "ByteArray": ""
+            "u8": "u8",
+            "u16": "u16",
+            "u32": "u32",
+            "u64": "u64",
+            "u128": "u128",
+            "u256": "u256",
+            "usize": "usize",
+            "bool": "bool",
+            "felt252": "felt252",
+            "bytes31": "bytes31",
+            "ByteArray": "ByteArray"
+        },
+        "COMPOUND_TYPE": {
+            "type": "{param}"
         }
     }
 }
