@@ -1,0 +1,90 @@
+import { Handle, Position, useStore, useReactFlow } from "@xyflow/react";
+import React, { useCallback, useState } from "react";
+import { Settings2 } from 'lucide-react';
+
+type Props = {
+  data: { label: string };
+  id: string;
+};
+
+const SetFunctionNode = ({ data, id }: Props) => {
+  const [inputValue, setInputValue] = useState("");
+  const { getNode, getEdges } = useReactFlow();
+
+  const isConnected = useStore(useCallback((store) => {
+    const node = getNode(id);
+    const edges = getEdges();
+    return edges.some(edge => edge.source === id);
+  }, [id, getNode, getEdges]));
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+  };
+
+  return (
+    <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
+      {/* Triangle with F label */}
+      <div className="absolute -top-px -right-px w-0 h-0 
+        border-t-[30px] border-l-[30px] 
+        border-t-orange-500 border-l-transparent
+        overflow-visible rounded">
+        <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">
+          F
+        </span>
+      </div>
+
+      <div className="p-3 border-b border-gray-800">
+        <div className="flex items-center gap-2">
+          <Settings2 className="w-4 h-4 text-blue-400" />
+          <span className="font-medium">{data.label}</span>
+        </div>
+      </div>
+      
+      <div className="p-4 space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-green-400" />
+            <label className="text-sm text-gray-400">Name</label>
+          </div>
+          <input
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+            className="nodrag w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700 focus:outline-none focus:border-blue-500 transition-colors"
+            placeholder="Enter value..."
+          />
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-orange-400" />
+            <label className="text-sm text-gray-400">Storage Variable</label>
+          </div>
+          {isConnected ? (
+            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
+              {`storage_${id}`}
+            </div>
+          ) : (
+            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
+              Connect to display storage variable
+            </div>
+          )}
+        </div>
+      </div>
+
+      <Handle 
+        type="source" 
+        position={Position.Bottom} 
+        className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]" 
+      />
+      <Handle 
+        type="target"
+        position={Position.Bottom}
+        className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
+      />
+    </div>
+  );
+};
+
+export default SetFunctionNode;
+
