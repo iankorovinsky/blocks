@@ -1,0 +1,73 @@
+{
+    "type": {
+        "FUNCTION": {
+            "set": {
+                "description": "Write a value to the contract storage.",
+                "visibility": "public",
+                "modifier": "ref",
+                "annotations": ["#[external(v0)]"],
+                "parameters": [
+                    {
+                        "name": "self",
+                        "type": "ContractState",
+                        "mode": "ref"
+                    },
+                    {
+                        "name": "key",
+                        "type": "felt252"
+                    },
+                    {
+                        "name": "value",
+                        "type": "felt252"
+                    }
+                ],
+                "return_type": "void",
+                "template": [
+                    "fn {function_name}(ref self: ContractState, {param1}) {",
+                    "    self.{{param1}}.write({param2});",
+                    "}"
+                ]
+            },
+            "get": {
+                "description": "Read a value from the contract storage.",
+                "visibility": "public",
+                "modifier": "@",
+                "annotations": ["#[external(v0)]"],
+                "parameters": [
+                  {
+                    "name": "self",
+                    "type": "ContractState",
+                    "mode": "snapshot"
+                  },
+                  {
+                    "name": "key",
+                    "type": "felt252"
+                  }
+                ],
+                "return_type": "felt252",
+                "template": [
+                  "fn {function_name}(self: @ContractState) -> {param1} {",
+                  "    self.{param2}.read()",
+                  "}"
+                ]
+            }
+        },
+        "STORAGE_VAR": {
+            
+
+        },
+        "PRIM_TYPE": {
+            "u8": "",
+            "u16": "",
+            "u32": "",
+            "u64": "",
+            "u128": "",
+            "u256": "",
+            "usize": "",
+            "bool": "",
+            "felt252": "",
+            "bytes31": "",
+            "ByteArray": ""
+        }
+    }
+}
