@@ -9,7 +9,9 @@ type Props = {
 
 const SetFunctionNode = ({ data, id }: Props) => {
   const [inputValue, setInputValue] = useState("");
-  const [storageVariable, setStorageVariable] = useState<string | undefined>("");
+  const [storageVariable, setStorageVariable] = useState<string | undefined>(
+    "",
+  );
   const { getNodes, getEdges } = useReactFlow();
 
   useEffect(() => {
@@ -22,10 +24,13 @@ const SetFunctionNode = ({ data, id }: Props) => {
         .map((edge) => (edge.source === id ? edge.target : edge.source));
 
       const connectedNode = nodes.find((node) =>
-        connectedNodeIds.includes(node.id)
+        connectedNodeIds.includes(node.id),
       );
 
-      if (connectedNode && connectedNode.data?.storage_variable !== storageVariable) {
+      if (
+        connectedNode &&
+        connectedNode.data?.storage_variable !== storageVariable
+      ) {
         setStorageVariable(connectedNode.data?.storage_variable as string);
       }
     }, 500); // Check every 500ms

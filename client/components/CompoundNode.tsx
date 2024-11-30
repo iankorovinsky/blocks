@@ -10,15 +10,11 @@ import {
 } from "@/components/ui/select";
 
 type Props = {
-  data: { label: string; type: string, identifier: string };
+  data: { label: string; type: string; identifier: string };
   id: string;
 };
 
-const COMPOUNDS = [
-  "array",
-  "tuple",
-];
-
+const COMPOUNDS = ["array", "tuple"];
 
 const SetFunctionNode = ({ data, id }: Props) => {
   const [compoundType, setCompoundType] = useState("");
@@ -30,13 +26,17 @@ const SetFunctionNode = ({ data, id }: Props) => {
     setNodes((nds) =>
       nds.map((node) => {
         if (node.id === id) {
-          node.data = { ...node.data, identifier: compoundType, primitiveType: primitiveType };
+          node.data = {
+            ...node.data,
+            identifier: compoundType,
+            primitiveType: primitiveType,
+          };
         }
 
         return node;
-      })
+      }),
     );
-  }, [compoundType, primitiveType])
+  }, [compoundType, primitiveType]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -48,7 +48,7 @@ const SetFunctionNode = ({ data, id }: Props) => {
         .map((edge) => (edge.source === id ? edge.target : edge.source));
 
       const allConnectedNodes = nodes.filter((node) =>
-        connectedNodeIds.includes(node.id)
+        connectedNodeIds.includes(node.id),
       );
 
       for (const connectedNode of allConnectedNodes) {
@@ -89,10 +89,7 @@ const SetFunctionNode = ({ data, id }: Props) => {
             <label className="text-sm text-gray-400">Data structure</label>
           </div>
 
-          <Select
-            value={compoundType}
-            onValueChange={setCompoundType}
-          >
+          <Select value={compoundType} onValueChange={setCompoundType}>
             <SelectTrigger className="w-full bg-[#2a2a2a] border-gray-700 text-sm focus:ring-0 focus:ring-offset-0">
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
@@ -105,7 +102,6 @@ const SetFunctionNode = ({ data, id }: Props) => {
             </SelectContent>
           </Select>
         </div>
-
 
         <div className="space-y-2 relative">
           <div className="flex items-center gap-2">

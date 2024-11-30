@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 
 type Props = {
-  data: { label: string; type: string, identifier: string };
+  data: { label: string; type: string; identifier: string };
   id: string;
 };
 
@@ -25,9 +25,8 @@ const PRIMITIVES = [
   "bool",
   "felt252",
   "bytes31",
-  "ByteArray"
+  "ByteArray",
 ];
-
 
 const SetFunctionNode = ({ data, id }: Props) => {
   const [typeValue, setTypeValue] = useState("");
@@ -41,9 +40,9 @@ const SetFunctionNode = ({ data, id }: Props) => {
         }
 
         return node;
-      })
+      }),
     );
-  }, [typeValue])
+  }, [typeValue]);
 
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
@@ -73,10 +72,7 @@ const SetFunctionNode = ({ data, id }: Props) => {
             <label className="text-sm text-gray-400">Type</label>
           </div>
 
-          <Select
-            value={typeValue}
-            onValueChange={setTypeValue}
-          >
+          <Select value={typeValue} onValueChange={setTypeValue}>
             <SelectTrigger className="w-full bg-[#2a2a2a] border-gray-700 text-sm focus:ring-0 focus:ring-offset-0">
               <SelectValue placeholder="Select type" />
             </SelectTrigger>

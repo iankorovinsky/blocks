@@ -7,7 +7,7 @@ import {
   Panel,
   ReactFlow,
   useEdgesState,
-  useNodesState
+  useNodesState,
 } from "@xyflow/react";
 
 import { useMyPresence, useOthers } from "@liveblocks/react/suspense";
@@ -18,18 +18,22 @@ import { nodeTypes } from "./types/node";
 import SetFunctionNode from "@/components/SetFunctionNode";
 import StorageNode from "@/components/StorageNode";
 
-
 const initialNodes = [
   {
     id: "3",
     position: { x: 0, y: 200 },
-    data: { label: "Set", type: "FUNCTION", identifier: "SET", name: "" },  // todo: set name
+    data: { label: "Set", type: "FUNCTION", identifier: "SET", name: "" }, // todo: set name
     type: "setFunction",
   },
   {
     id: "4",
     position: { x: 400, y: 200 },
-    data: { label: "Storage", type: "STORAGE_VAR", identifier: "", storage_variable: "" },
+    data: {
+      label: "Storage",
+      type: "STORAGE_VAR",
+      identifier: "",
+      storage_variable: "",
+    },
     type: "storage",
   },
   {
@@ -43,14 +47,15 @@ const initialNodes = [
     position: { x: 0, y: 600 },
     data: { label: "Compound", type: "COMPOUND_TYPE", identifier: "" },
     type: "compound",
-  }
+  },
 ];
 
-const initialEdges = [{ id: "e1-2", source: "1", target: "2" }, { id: "e2-3", source: "2", target: "3" }];
+const initialEdges = [
+  { id: "e1-2", source: "1", target: "2" },
+  { id: "e2-3", source: "2", target: "3" },
+];
 
 export default function Home() {
-  
-
   const [myPresence, updateMyPresence] = useMyPresence();
   const others = useOthers();
   const userCount = others.length;
@@ -59,10 +64,12 @@ export default function Home() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   // print json data of nodes, edges
-  console.log(JSON.stringify({
-    nodeData: nodes,
-    edgeData: edges
-  }))
+  console.log(
+    JSON.stringify({
+      nodeData: nodes,
+      edgeData: edges,
+    }),
+  );
 
   const onConnect = useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),

@@ -1,6 +1,6 @@
-import React from 'react';
-import { BaseEdge, EdgeProps, getBezierPath } from '@xyflow/react';
-import { X } from 'lucide-react';
+import React from "react";
+import { BaseEdge, EdgeProps, getBezierPath } from "@xyflow/react";
+import { X } from "lucide-react";
 
 const CustomEdge = ({
   id,
@@ -49,4 +49,3 @@ const CustomEdge = ({
 };
 
 export default CustomEdge;
-

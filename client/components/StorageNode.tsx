@@ -1,10 +1,10 @@
 import { Handle, Position, useReactFlow } from "@xyflow/react";
-import { Database } from 'lucide-react';
+import { Database } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 
 type Props = {
   id: string;
-  data: { 
+  data: {
     label: string;
     storage_variable: string;
   };
@@ -24,14 +24,16 @@ const StorageNode = ({ id, data }: Props) => {
         if (node.id === id) {
           node.data = { ...node.data, storage_variable: newName };
         }
-        if (node.type === 'setFunction') {
-          const connectedEdge = getEdges().find(edge => edge.target === node.id);
+        if (node.type === "setFunction") {
+          const connectedEdge = getEdges().find(
+            (edge) => edge.target === node.id,
+          );
           if (connectedEdge && connectedEdge.source === id) {
             node.data = { ...node.data, storage_variable: newName };
           }
         }
         return node;
-      })
+      }),
     );
   };
 
@@ -45,7 +47,7 @@ const StorageNode = ({ id, data }: Props) => {
         .map((edge) => (edge.source === id ? edge.target : edge.source));
 
       const connectedNode = nodes.find((node) =>
-        connectedNodeIds.includes(node.id)
+        connectedNodeIds.includes(node.id),
       );
 
       if (connectedNode && connectedNode.type === "primitive") {
@@ -53,7 +55,9 @@ const StorageNode = ({ id, data }: Props) => {
         setTypeValue(connectedNode.data?.identifier as string);
       } else if (connectedNode && connectedNode.type === "compound") {
         console.log(connectedNode.data?.identifier);
-        setTypeValue(`${connectedNode.data?.identifier as string}<${connectedNode.data?.primitiveType}>`);
+        setTypeValue(
+          `${connectedNode.data?.identifier as string}<${connectedNode.data?.primitiveType}>`,
+        );
       }
     }, 500); // Check every 500ms
 
@@ -62,10 +66,12 @@ const StorageNode = ({ id, data }: Props) => {
 
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
-      <div className="absolute -top-px -right-px w-0 h-0 
+      <div
+        className="absolute -top-px -right-px w-0 h-0 
         border-t-[30px] border-l-[30px] 
         border-t-blue-500 border-l-transparent
-        overflow-visible rounded">
+        overflow-visible rounded"
+      >
         <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">
           S
         </span>
@@ -77,7 +83,7 @@ const StorageNode = ({ id, data }: Props) => {
           <span className="font-medium">{data.label}</span>
         </div>
       </div>
-      
+
       <div className="p-4 space-y-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -94,7 +100,7 @@ const StorageNode = ({ id, data }: Props) => {
         </div>
 
         <div className="space-y-2 relative">
-        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Storage Variable</label>
           </div>
@@ -109,29 +115,28 @@ const StorageNode = ({ id, data }: Props) => {
             </div>
           )}
 
-          <Handle 
-            type="source" 
-            position={Position.Right} 
+          <Handle
+            type="source"
+            position={Position.Right}
             className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
             id="a"
           />
-          <Handle 
+          <Handle
             type="target"
             position={Position.Right}
             className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
             id="a"
           />
-
         </div>
       </div>
 
-      <Handle 
-        type="source" 
-        position={Position.Bottom} 
+      <Handle
+        type="source"
+        position={Position.Bottom}
         className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
         id="b"
       />
-      <Handle 
+      <Handle
         type="target"
         position={Position.Bottom}
         className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
@@ -142,4 +147,3 @@ const StorageNode = ({ id, data }: Props) => {
 };
 
 export default StorageNode;
-
