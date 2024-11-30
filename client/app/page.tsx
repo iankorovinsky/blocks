@@ -3,42 +3,37 @@
 import {
   addEdge,
   Background,
+  BackgroundVariant,
   Panel,
   ReactFlow,
   useEdgesState,
-  useNodesState,
+  useNodesState
 } from "@xyflow/react";
 
-import "@xyflow/react/dist/style.css";
-import React, { useCallback, useMemo } from "react";
-import TextNode from "./components/TextNode";
-import { Room } from "./Room";
 import { useMyPresence, useOthers } from "@liveblocks/react/suspense";
+import "@xyflow/react/dist/style.css";
+import React, { useCallback } from "react";
 import { Cursor } from "./components/Cursor";
+import { nodeTypes } from "./types/node";
 
-const nodeTypes = {
-  textUpdater: TextNode,
-};
 
 const initialNodes = [
   { id: "1", position: { x: 0, y: 0 }, data: { label: "1" }, type: "input" },
   { id: "2", position: { x: 0, y: 100 }, data: { label: "2" } },
   {
-    id: "2",
+    id: "3",
     position: { x: 0, y: 200 },
     data: { label: "2" },
-    type: "textUpdater",
+    type: "setFunction",
   },
 ];
+
 const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
 
 export default function Home() {
   const [myPresence, updateMyPresence] = useMyPresence();
   const others = useOthers();
   const userCount = others.length;
-
-  console.log(`There are ${userCount} other user(s) online`);
-  console.log(JSON.stringify(myPresence));
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -63,6 +58,7 @@ export default function Home() {
         }}
         style={{ width: "100vw", height: "100vh" }}
       >
+        {/* print other player's cursors */}
         {others
           .filter((other) => other.presence.cursor !== null)
           .map(({ connectionId, presence }) => {
@@ -77,6 +73,7 @@ export default function Home() {
               );
             }
           })}
+
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -85,12 +82,13 @@ export default function Home() {
           onConnect={onConnect}
           nodeTypes={nodeTypes}
         >
-          <Panel position="top-left">top-left</Panel>
+          <Background color="#FFFFFFF" variant={BackgroundVariant.Dots} />
+          {/* <Panel position="top-left">top-left</Panel>
           <Panel position="top-center">top-center</Panel>
           <Panel position="top-right">top-right</Panel>
           <Panel position="bottom-left">bottom-left</Panel>
           <Panel position="bottom-center">bottom-center</Panel>
-          <Panel position="bottom-right">bottom-right</Panel>
+          <Panel position="bottom-right">bottom-right</Panel> */}
         </ReactFlow>
       </div>
     </>
