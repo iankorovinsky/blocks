@@ -14,7 +14,7 @@ import { useMyPresence, useOthers } from "@liveblocks/react/suspense";
 import "@xyflow/react/dist/style.css";
 import React, { useCallback, useMemo, useState } from "react";
 import { Cursor } from "../components/Cursor";
-// import { nodeTypes } from "./types/node";
+import { nodeTypes } from "./types/node";
 import SetFunctionNode from "@/components/SetFunctionNode";
 import StorageNode from "@/components/StorageNode";
 
@@ -23,7 +23,7 @@ const initialNodes = [
   {
     id: "3",
     position: { x: 0, y: 200 },
-    data: { label: "Set", type: "FUNCTION", identifier: "SET", storage_variable: "" },
+    data: { label: "Set", type: "FUNCTION", identifier: "SET", name: "" },  // todo: set name
     type: "setFunction",
   },
   {
@@ -32,6 +32,12 @@ const initialNodes = [
     data: { label: "Storage", type: "STORAGE_VAR", identifier: "", storage_variable: "" },
     type: "storage",
   },
+  {
+    id: "5",
+    position: { x: 800, y: 200 },
+    data: { label: "Primitive", type: "PRIM_TYPE", identifier: "" },
+    type: "primitive",
+  }
 ];
 
 const initialEdges = [{ id: "e1-2", source: "1", target: "2" }, { id: "e2-3", source: "2", target: "3" }];
@@ -62,14 +68,14 @@ export default function Home() {
     );
   }, [setNodes]);
 
-  const nodeTypes = useMemo(() => ({
-    setFunction: (props: any) => (
-      <SetFunctionNode {...props} />
-    ),
-    storage: (props: any) => (
-      <StorageNode {...props} onNameChange={handleStorageNameChange} />
-    ),
-  }), []);
+  // const nodeTypes = useMemo(() => ({
+  //   setFunction: (props: any) => (
+  //     <SetFunctionNode {...props} />
+  //   ),
+  //   storage: (props: any) => (
+  //     <StorageNode {...props} />
+  //   ),
+  // }), []);
 
 
   return (
