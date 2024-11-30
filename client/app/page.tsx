@@ -59,9 +59,10 @@ const initialNodes = [
 ];
 
 const initialEdges = [
-  { id: "e1-2", source: "1", target: "2" },
+  { id: "e1-2", source: "3", target: "2" },
   { id: "e2-3", source: "2", target: "3" },
 ];
+
 
 export default function Home() {
   const { contractName, network } = useNavbar();
@@ -72,6 +73,20 @@ export default function Home() {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  const handleDeploy = useCallback(() => {
+    const deploymentData = {
+      nodeData: nodes,
+      edgeData: edges,
+      contractName: contractName,
+      network: network,
+    };
+
+    window.alert("Deploying contract with data: " +  JSON.stringify(deploymentData, null, 2));
+    console.log("Deploying contract with data: ", deploymentData);
+
+    // Add your deployment logic here (e.g., API call or contract deployment)
+  }, [contractName, network, nodes, edges]);
 
   // print json data of nodes, edges
   console.log(
@@ -106,6 +121,7 @@ export default function Home() {
         y: event.clientY - event.currentTarget.getBoundingClientRect().top,
       };
 
+
       const newNode = {
         id: `${nodeInformation.type}_${Date.now()}`,
         type: nodeInformation.type,
@@ -129,7 +145,7 @@ export default function Home() {
 
   return (
     <>
-      <Navbar />
+      <Navbar onDeploy={handleDeploy} />
       <div
         onPointerMove={(e: React.PointerEvent<HTMLDivElement>) => {
           const cursor = { x: Math.floor(e.clientX), y: Math.floor(e.clientY) };

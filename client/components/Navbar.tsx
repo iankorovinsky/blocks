@@ -13,7 +13,11 @@ import {
 import { CuboidIcon as Cube } from "lucide-react";
 import { useNavbar } from "@/contexts/NavbarContext";
 
-export function Navbar() {
+type Props = {
+  onDeploy: () => void;
+};
+
+export function Navbar({ onDeploy }: Props) {
   const { contractName, setContractName, network, setNetwork } = useNavbar();
 
   return (
@@ -48,7 +52,7 @@ export function Navbar() {
             </Select>
           </div>
           <div>
-            <Button>Deploy</Button>
+            <Button onClick={onDeploy}>Deploy</Button>
           </div>
         </div>
       </div>
