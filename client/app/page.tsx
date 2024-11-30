@@ -4,19 +4,18 @@ import {
   addEdge,
   Background,
   BackgroundVariant,
-  Panel,
   ReactFlow,
   useEdgesState,
-  useNodesState,
+  useNodesState
 } from "@xyflow/react";
 
 import { useMyPresence, useOthers } from "@liveblocks/react/suspense";
 import "@xyflow/react/dist/style.css";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Cursor } from "../components/Cursor";
 import { nodeTypes } from "./types/node";
-import SetFunctionNode from "@/components/SetFunctionNode";
-import StorageNode from "@/components/StorageNode";
+import { Navbar } from "@/components/Navbar";
+import { useNavbar } from "@/contexts/NavbarContext";
 
 const initialNodes = [
   {
@@ -56,6 +55,8 @@ const initialEdges = [
 ];
 
 export default function Home() {
+  const { contractName, network } = useNavbar();
+
   const [myPresence, updateMyPresence] = useMyPresence();
   const others = useOthers();
   const userCount = others.length;
@@ -82,6 +83,7 @@ export default function Home() {
 
   return (
     <>
+      <Navbar />
       <div
         onPointerMove={(e: React.PointerEvent<HTMLDivElement>) => {
           const cursor = { x: Math.floor(e.clientX), y: Math.floor(e.clientY) };
@@ -93,7 +95,7 @@ export default function Home() {
           };
           updateMyPresence(cursor);
         }}
-        style={{ width: "100vw", height: "90vh" }}
+        style={{ width: "100vw", height: "93vh" }}
       >
         {/* print other player's cursors */}
         {others

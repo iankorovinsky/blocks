@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Room } from "./Room";
+import { NavbarProvider } from "@/contexts/NavbarContext";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,7 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Room>{children}</Room>
+        <Room>
+          <NavbarProvider>
+            {children}
+          </NavbarProvider>
+        </Room>
       </body>
     </html>
   );
