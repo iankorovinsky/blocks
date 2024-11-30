@@ -23,9 +23,9 @@
                 ],
                 "return_type": "void",
                 "template": [
-                    "        fn {function_name}(ref self: ContractState, {storage_var_type}) {",
-                    "            self.{storage_var}.write({param});",
-                    "        }"
+                    "fn {function_name}(ref self: ContractState, {storage_var_type}) {",
+                    "\tself.{storage_var_name}.write({param});",
+                    "}"
                 ]
             },
             "GET": {
@@ -41,9 +41,9 @@
                   }
                 ],
                 "template": [
-                  "        fn {function_name}(self: @ContractState) -> {storage_var_type} {",
-                  "            self.{storage_var}.read()",
-                  "        }"
+                  "fn {function_name}(self: @ContractState) -> {storage_var_type} {",
+                  "\tself.{storage_var_name}.read()",
+                  "}"
                 ]
             }
         },
