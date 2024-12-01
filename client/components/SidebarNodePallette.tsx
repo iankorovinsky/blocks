@@ -103,6 +103,70 @@ const nodeTemplates: NodeTemplate[] = [
     color: "bg-purple-500",
     description: "Decrement function node",
   },
+  {
+    type: "assert",
+    label: "Assert",
+    data: { label: "Assert", type: "CONDITION", identifier: "" },
+    icon: Settings2,
+    color: "bg-orange-500",
+    description: "Assert condition",
+  },
+  {
+    type: "isNotZeroCondition",
+    label: "Is Not Zero?",
+    data: { label: "is_not_zero", type: "CONDITION", identifier: "" },
+    icon: Settings2,
+    color: "bg-orange-500",
+    description: "Is Not Zero Condition",
+  },
+  {
+    type: "functionCall",
+    label: "Function Call",
+    data: { label: "function_call", type: "FUNCTION", identifier: "" },
+    icon: Settings2,
+    color: "bg-orange-500",
+    description: "Calls a function and is a parameter",
+  },
+  {
+    type: "getCallerAddress",
+    label: "Get Caller Address",
+    data: { label: "get_caller_address", type: "FUNCTION", identifier: "" },
+    icon: Settings2,
+    color: "bg-orange-500",
+    description: "Gets the address of the caller",
+  },
+  {
+    type: "additionNode",
+    label: "Addition",
+    data: { label: "Addition", type: "FUNCTION", identifier: "" },
+    icon: Settings2,
+    color: "bg-orange-500",
+    description: "Adds two values togethe",
+  },
+  {
+    type: "subtractionNode",
+    label: "Subtraction",
+    data: { label: "Subtraction", type: "FUNCTION", identifier: "" },
+    icon: Settings2,
+    color: "bg-orange-500",
+    description: "Subtracts two values togethe",
+  },
+  {
+    type: "emitNode",
+    label: "Emit Event",
+    data: { label: "Emit", type: "EVENT", identifier: "" },
+    icon: Settings2,
+    color: "bg-orange-500",
+    description: "Emits an event"
+  },
+  {
+    type: "legacyMap",
+    label: "LegacyMap",
+    data: { label: "LegacyMap", type: "TYPE", identifier: "" },
+    icon: Settings2,
+    color: "bg-orange-500",
+    description: "Dictionary type"
+  },
 ];
 
 export function NodePalette() {
