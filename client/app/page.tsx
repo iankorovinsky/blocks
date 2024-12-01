@@ -70,9 +70,11 @@ function FlowContent({
 
   const updateNodePosition = useMutation(({ storage }, update: { id: string, position: { x: number, y: number } }) => {
     const list = storage.get("nodes") as LiveList<SerializedNode>;
-    const nodeIndex = list.findIndex(n => n.id === update.id);
+    const nodes = Array.from(list);
+    const nodeIndex = nodes.findIndex(n => n.id === update.id);
+    
     if (nodeIndex !== -1) {
-      const node = list.get(nodeIndex);
+      const node = nodes[nodeIndex];
       if (node) {
         list.set(nodeIndex, { ...node, position: update.position });
       }

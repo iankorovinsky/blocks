@@ -57,14 +57,14 @@ class ContractBuilder:
             f"mod {self.contractName} {{",
         ]
 
-        hasGet = any(func.get('template', [None])[0].strip().startswith('fn get') for func in self.functions)
-        hasSet = any(func.get('template', [None])[0].strip().startswith('fn set') for func in self.functions)
+        hasRead = any(func.get('template', [None])[0].strip().startswith('fn get') for func in self.functions)
+        hasWrite = any(func.get('template', [None])[0].strip().startswith(('fn set', 'fn increment', 'fn decrement')) for func in self.functions)
 
-        if hasGet or hasSet:
+        if hasRead or hasWrite:
             storageTraits = []
-            if hasGet:
+            if hasRead:
                 storageTraits.append("StoragePointerReadAccess")
-            if hasSet:
+            if hasWrite:
                 storageTraits.append("StoragePointerWriteAccess")
             contractParts.append(f"\tuse core::starknet::storage::{{{', '.join(storageTraits)}}};")
 
@@ -109,6 +109,16 @@ class ContractBuilder:
         implParts.append("\t}")
         
         return "\n".join(implParts)
+
+    def build(self):
+        # Combine all components into a complete contract
+        contract_parts = []
+
+        # Add the interface block
+        contract_parts.append(self.buildInterfaceBlock())
+        # Add the contract block (includes storage block and implementation block)
+        contract_parts.append(self.buildContractBlock())
+        return "\n\n".join(contract_parts)
 
     def parseNodes(self) -> List[Dict]:
         if 'nodeData' not in self.jsonData:
@@ -189,9 +199,9 @@ class ContractBuilder:
         
         processedTemplate = []
         for line in template['template']:
-            line = line.replace("{function_name}", functionName)
-            line = line.replace("{storage_var_name}", storageVarName)
-            line = line.replace("{storage_var_type}", storageVarType)
+            line = line.replace("{functionName}", functionName)
+            line = line.replace("{storageVarName}", storageVarName)
+            line = line.replace("{storageVarType}", storageVarType)
             
             if params:
                 for key, value in params.items():
@@ -215,9 +225,9 @@ class ContractBuilder:
         
         processedTemplate = []
         for line in template['template']:
-            line = line.replace("{function_name}", functionName)
-            line = line.replace("{storage_var_name}", storageVarName)
-            line = line.replace("{storage_var_type}", storageVarType)
+            line = line.replace("{functionName}", functionName)
+            line = line.replace("{storageVarName}", storageVarName)
+            line = line.replace("{storageVarRype}", storageVarType)
             
             if params:
                 for key, value in params.items():
@@ -228,13 +238,59 @@ class ContractBuilder:
         functionData['template'] = processedTemplate
         self.addFunction(functionData)
         return "\n".join(processedTemplate)
-    
+
+    def generateIncrementFunction(self, languageJson, functionName, storageNode, amount):
+        template = languageJson["type"]["FUNCTION"].get('INCREMENT', {})
+        if not template:
+            raise ValueError(f"No template found for function: {functionName}")
+        
+        storageVarName = self.getStorageVarName(storageNode)
+        storageVarType = self.getStorageVarType(storageNode)
+        
+        functionData = template.copy()
+        
+        processedTemplate = []
+        for line in template['template']:
+            line = line.replace("{functionName}", functionName)
+            line = line.replace("{storageVarName}", storageVarName)
+            line = line.replace("{storageVarType}", storageVarType)
+            line = line.replace("{amount}", amount)
+            
+            processedTemplate.append(line)
+        
+        functionData['template'] = processedTemplate
+        self.addFunction(functionData)
+        return "\n".join(processedTemplate)
+
+    def generateDecrementFunction(self, languageJson, functionName, storageNode, amount):
+            template = languageJson["type"]["FUNCTION"].get('DECREMENT', {})
+            if not template:
+                raise ValueError(f"No template found for function: {functionName}")
+            
+            storageVarName = self.getStorageVarName(storageNode)
+            storageVarType = self.getStorageVarType(storageNode)
+            
+            functionData = template.copy()
+            
+            processedTemplate = []
+            for line in template['template']:
+                line = line.replace("{functionName}", functionName)
+                line = line.replace("{storageVarName}", storageVarName)
+                line = line.replace("{storageVarType}", storageVarType)
+                line = line.replace("{amount}", amount)
+                
+                processedTemplate.append(line)
+            
+            functionData['template'] = processedTemplate
+            self.addFunction(functionData)
+            return "\n".join(processedTemplate)
+
     def generateFunctions(self, languageJson):
         functionNodes = self.getNodesByType('FUNCTION')
         
         for functionNode in functionNodes:
             identifier = functionNode.get('data', {}).get('identifier')
-            
+            function_name = functionNode.get('data', {}).get('name', 'unnamed_function')
             edges = self.getNodeEdges(functionNode['id'])
             
             storageNode = None
@@ -252,10 +308,8 @@ class ContractBuilder:
             if not storageNode:
                 print(f"Warning: No storage node found for function {functionNode.get('id')}")
                 continue
-            params = {
-                "function_name": functionNode.get('data', {}).get('name', 'unnamed_function')
-            }
-            
+
+            params = {}
             for connectedNodeId in edges['connectedNodes']:
                 paramNode = next(
                     (node for node in self.jsonData.get('nodeData', [])
@@ -270,19 +324,37 @@ class ContractBuilder:
                     params[paramName] = paramType
             
             if identifier == 'SET':
-                self.generateFunction(languageJson, 'set', storageNode, params)
+                self.generateFunction(languageJson, function_name, storageNode, params)
             elif identifier == 'GET':
-                self.generateFunctionWithReturn(languageJson, 'get', storageNode, params)
-    
+                self.generateFunctionWithReturn(languageJson, function_name, storageNode, params)
+            elif identifier == 'INCREMENT':
+                amount = functionNode.get('data', {}).get('amount', '1')
+                self.generateIncrementFunction(
+                    languageJson,
+                    function_name,
+                    storageNode,
+                    amount
+                )
+            elif identifier == 'DECREMENT':
+                amount = functionNode.get('data', {}).get('amount', '1')
+                self.generateDecrementFunction(
+                    languageJson,
+                    function_name,
+                    storageNode,
+                    amount
+                )
+                
     def generateStorageVars(self):
         storageNodes = self.getNodesByType('STORAGE_VAR')
         for node in storageNodes:
             storageVarName = self.getStorageVarName(node)
             storageVarType = self.getStorageVarType(node)
             self.storageVars.append(f"{storageVarName}: {storageVarType},")
-
+    
     def invoke(self, contractName: str):
         languageMap = self.loadJson('language.json')
+
+        # self.jsonData = self.loadJson('sample4.json')
     
         self.setName(contractName)
         
@@ -292,11 +364,18 @@ class ContractBuilder:
 
         finalContract = self.build()
 
-        outputFilePath = '/home/appuser/blocks/server/src/lib.cairo'
+        outputFilePath = '/home/appuser/blocks-1/server/src/lib.cairo'
 
         with open(outputFilePath, 'w') as file:
             file.write(finalContract)
             
         print(f"Contract written to {outputFilePath}")
         
-        print(finalContract)
+        # print(finalContract)
+
+# if __name__ == "__main__":
+#     # Create an empty dictionary as initial jsonData
+#     builder = ContractBuilder({})
+    
+#     # You can change this to any contract name you want
+#     builder.invoke("MyContract")
