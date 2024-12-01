@@ -1,5 +1,5 @@
 import { Handle, Position, useReactFlow } from "@xyflow/react";
-import { FolderTree } from "lucide-react";
+import { List } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
   id: string;
 };
 
-const StructNode = ({ data, id }: Props) => {
+const EnumNode = ({ data, id }: Props) => {
   const [inputValue, setInputValue] = useState("");
   const [storageVariable, setStorageVariable] = useState<string | undefined>(
     "",
@@ -46,17 +46,17 @@ const StructNode = ({ data, id }: Props) => {
       <div
         className="absolute -top-px -right-px w-0 h-0 
         border-t-[30px] border-l-[30px] 
-        border-t-yellow-500 border-l-transparent
+        border-t-purple-500 border-l-transparent
         overflow-visible rounded"
       >
         <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">
-          S
+          E
         </span>
       </div>
 
       <div className="p-3 border-b border-gray-800">
         <div className="flex items-center gap-2">
-          <FolderTree className="w-4 h-4 text-blue-400" />
+          <List className="w-4 h-4 text-blue-400" />
           <span className="font-medium">{data.label}</span>
         </div>
       </div>
@@ -79,7 +79,7 @@ const StructNode = ({ data, id }: Props) => {
         <div className="space-y-2 relative">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-orange-400" />
-            <label className="text-sm text-gray-400">Typed Variables</label>
+            <label className="text-sm text-gray-400">Variables</label>
           </div>
           {storageVariable ? (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
@@ -87,7 +87,7 @@ const StructNode = ({ data, id }: Props) => {
             </div>
           ) : (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect to add typed variables
+              Connect to add variables
             </div>
           )}
 
@@ -107,4 +107,4 @@ const StructNode = ({ data, id }: Props) => {
   );
 };
 
-export default StructNode; 
+export default EnumNode; 

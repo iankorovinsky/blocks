@@ -1,5 +1,5 @@
 import { Handle, Position, useReactFlow } from "@xyflow/react";
-import { FolderTree } from "lucide-react";
+import { FileEdit } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
   id: string;
 };
 
-const StructNode = ({ data, id }: Props) => {
+const WriteWithParamsNode = ({ data, id }: Props) => {
   const [inputValue, setInputValue] = useState("");
   const [storageVariable, setStorageVariable] = useState<string | undefined>(
     "",
@@ -46,40 +46,26 @@ const StructNode = ({ data, id }: Props) => {
       <div
         className="absolute -top-px -right-px w-0 h-0 
         border-t-[30px] border-l-[30px] 
-        border-t-yellow-500 border-l-transparent
+        border-t-red-500 border-l-transparent
         overflow-visible rounded"
       >
         <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">
-          S
+          W
         </span>
       </div>
 
       <div className="p-3 border-b border-gray-800">
         <div className="flex items-center gap-2">
-          <FolderTree className="w-4 h-4 text-blue-400" />
+          <FileEdit className="w-4 h-4 text-blue-400" />
           <span className="font-medium">{data.label}</span>
         </div>
       </div>
 
       <div className="p-4 space-y-4">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-400" />
-            <label className="text-sm text-gray-400">Name</label>
-          </div>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            className="nodrag w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700 focus:outline-none focus:border-blue-500 transition-colors"
-            placeholder="Enter value..."
-          />
-        </div>
-
         <div className="space-y-2 relative">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-orange-400" />
-            <label className="text-sm text-gray-400">Typed Variables</label>
+            <div className="w-2 h-2 rounded-full bg-green-400" />
+            <label className="text-sm text-gray-400">Storage Variable</label>
           </div>
           {storageVariable ? (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
@@ -87,19 +73,55 @@ const StructNode = ({ data, id }: Props) => {
             </div>
           ) : (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect to add typed variables
+              Connect storage variable
             </div>
           )}
-
           <Handle
-            type="source"
-            position={Position.Right}
-            className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
+            type="target"
+            position={Position.Top}
+            className="top-[-12px] w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
           />
+        </div>
+
+        <div className="space-y-2 relative">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-orange-400" />
+            <label className="text-sm text-gray-400">Parameter 1</label>
+          </div>
+          {storageVariable ? (
+            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
+              {storageVariable}
+            </div>
+          ) : (
+            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
+              Connect parameter 1
+            </div>
+          )}
+          <Handle
+            type="target"
+            position={Position.Left}
+            className="left-[-13px] top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
+          />
+        </div>
+
+        <div className="space-y-2 relative">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-pink-400" />
+            <label className="text-sm text-gray-400">Parameter 2</label>
+          </div>
+          {storageVariable ? (
+            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
+              {storageVariable}
+            </div>
+          ) : (
+            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
+              Connect parameter 2
+            </div>
+          )}
           <Handle
             type="target"
             position={Position.Right}
-            className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
+            className="right-[-13px] top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
           />
         </div>
       </div>
@@ -107,4 +129,4 @@ const StructNode = ({ data, id }: Props) => {
   );
 };
 
-export default StructNode; 
+export default WriteWithParamsNode; 
