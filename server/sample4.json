@@ -1,0 +1,132 @@
+{
+    "nodeData": [
+      {
+        "id": "storage_1733049099000",
+        "type": "storage",
+        "position": {
+          "x": 336,
+          "y": 244.3515625
+        },
+        "data": {
+          "label": "Storage",
+          "type": "STORAGE_VAR",
+          "identifier": "",
+          "storage_variable": "value"
+        },
+        "measured": {
+          "width": 280,
+          "height": 223
+        },
+        "selected": false
+      },
+      {
+        "id": "primitive_1733049106182",
+        "type": "primitive",
+        "position": {
+          "x": 674.4713670632282,
+          "y": 201.69971518629197
+        },
+        "data": {
+          "label": "Primitive",
+          "type": "PRIM_TYPE",
+          "identifier": "u64"
+        },
+        "measured": {
+          "width": 280,
+          "height": 147
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "getFunction_1733049117615",
+        "type": "getFunction",
+        "position": {
+          "x": -4.227257847800217,
+          "y": -42.88333419781867
+        },
+        "data": {
+          "label": "Get",
+          "type": "FUNCTION",
+          "identifier": "GET",
+          "name": "get"
+        },
+        "measured": {
+          "width": 280,
+          "height": 223
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "incrementFunction_1733049319215",
+        "type": "incrementFunction",
+        "position": {
+          "x": -71,
+          "y": 219.3515625
+        },
+        "data": {
+          "label": "Increment",
+          "type": "FUNCTION",
+          "identifier": "INCREMENT",
+          "name": "increment_value",
+          "amount": "1"
+        },
+        "measured": {
+          "width": 280,
+          "height": 301
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "decrementFunction_1733049371744",
+        "type": "decrementFunction",
+        "position": {
+          "x": -98,
+          "y": 543.3515625
+        },
+        "data": {
+          "label": "Decrement",
+          "type": "FUNCTION",
+          "identifier": "DECREMENT",
+          "name": "decrement_value",
+          "amount": "1"
+        },
+        "measured": {
+          "width": 280,
+          "height": 301
+        },
+        "selected": true,
+        "dragging": false
+      }
+    ],
+    "edgeData": [
+      {
+        "source": "primitive_1733049106182",
+        "target": "storage_1733049099000",
+        "targetHandle": "a",
+        "id": "xy-edge__primitive_1733049106182-storage_1733049099000a"
+      },
+      {
+        "source": "storage_1733049099000",
+        "sourceHandle": "b",
+        "target": "getFunction_1733049117615",
+        "id": "xy-edge__storage_1733049099000b-getFunction_1733049117615"
+      },
+      {
+        "source": "storage_1733049099000",
+        "sourceHandle": "b",
+        "target": "incrementFunction_1733049319215",
+        "id": "xy-edge__storage_1733049099000b-incrementFunction_1733049319215"
+      },
+      {
+        "source": "storage_1733049099000",
+        "sourceHandle": "b",
+        "target": "decrementFunction_1733049371744",
+        "id": "xy-edge__storage_1733049099000b-decrementFunction_1733049371744"
+      }
+    ],
+    "contractName": "",
+    "network": "testnet"
+  }

@@ -27,5 +27,13 @@ def deploy():
     result = handle_deploy_request(network, contract_name)
     return {"hash": result}
 
+@app.route('/populate', methods=['POST'])
+def populate():
+    data = request.get_json(force=True)
+    prompt = data.get('prompt')
+    result = handle_populate_request(prompt)
+    return {"result": result}
+
+
 if __name__ == '__main__':
     app.run(debug=True) 
