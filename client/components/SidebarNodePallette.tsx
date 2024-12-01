@@ -88,6 +88,57 @@ const nodeTemplates: NodeTemplate[] = [
     description: "Read function node",
   },
   {
+    type: "typedVar",
+    label: "Typed Variable",
+    data: { 
+      label: "Typed Variable", 
+      type: "TYPED_VAR",
+      name: "",
+      varType: "" 
+    },
+    icon: Hash,
+    color: "bg-green-500",
+    description: "Typed variable node",
+  },
+  {
+    type: "struct",
+    label: "Struct",
+    data: { 
+      label: "Struct", 
+      type: "STRUCT",
+      name: "",
+      variables: [] 
+    },
+    icon: Boxes,
+    color: "bg-yellow-500",
+    description: "Struct definition node",
+  },
+  {
+    type: "write",
+    label: "Write",
+    data: { 
+      label: "Write", 
+      type: "WRITE",
+      storageVar: "",
+      param1: "",
+      param2: "" 
+    },
+    icon: ArrowDownCircle,
+    color: "bg-red-500",
+    description: "Write function node",
+  },
+  {
+    type: "readWithParam",
+    label: "Read With Param",
+    data: { 
+      label: "Read With Param", 
+      type: "READ_PARAM",
+      storageVar: "",
+      paramType: "" 
+    },
+    icon: Boxes,
+    color: "bg-indigo-500",
+    description: "Parameterized read node",
     type: "incrementFunction",
     label: "Increment",
     data: { label: "Increment", type: "FUNCTION", identifier: "INCREMENT" },

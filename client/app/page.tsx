@@ -9,7 +9,11 @@ import {
   Node,
   ReactFlow,
   useEdgesState,
-  useNodesState
+  useNodesState,
+  applyNodeChanges,
+  NodeChange,
+  useReactFlow,
+  ReactFlowInstance
 } from "@xyflow/react";
 
 import AISearch from "@/components/AIAgentSearchbar";
@@ -18,12 +22,15 @@ import { NodeTemplate } from "@/components/SidebarNodePallette";
 import { useNavbar } from "@/contexts/NavbarContext";
 import { useMutation, useMyPresence, useOthers, useStorage } from "@liveblocks/react/suspense";
 import "@xyflow/react/dist/style.css";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Cursor } from "../components/Cursor";
 import { nodeTypes } from "./types/node";
 
 import axios from "axios";
 import { ChatBot } from "@/components/Chatbot";
+import { LiveList, LiveObject } from "@liveblocks/client";
+import { SerializedNode } from "@/liveblocks.config";
+import { FlowCursors } from '@/components/FlowCursors';
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
@@ -31,40 +38,75 @@ const initialEdges: Edge[] = [];
 
 export default function Home() {
   const { contractName, network } = useNavbar();
-
-  const [, updateMyPresence] = useMyPresence();
   const others = useOthers();
+  
+  const [myPresence, updateMyPresence] = useMyPresence<Presence>();
+  
+  const nodes = useStorage((root) => root.nodes);
+  const edges = useStorage((root) => root.edges);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [localNodes, setNodes] = useNodesState(nodes ? Array.from(nodes) as Node[] : []);
+  const [localEdges, setEdges, onEdgesChange] = useEdgesState(edges ? Array.from(edges) as Edge[] : []);
 
-  const nodeStorage = useStorage(() => initialNodes);
-  const edgeStorage = useStorage(() => initialEdges);
-
-  const storage = useStorage(() => {
-    return {
-      nodeData: nodeStorage,
-      edgeData: edgeStorage,
-    };
-  })
-
-  console.log("FROM STORAGE", storage);
-
-
-  const updateNodeStorage = useMutation(({ storage }, newNodeData) => {
-    storage.set("nodeData", newNodeData);
+  const updateNodes = useMutation(({ storage }) => {
+    storage.set("nodes", nodes);
   }, []);
 
-  // update node storage
-  useEffect(() => {
-    updateNodeStorage({ nodeData: nodes });
-  }, [nodes, updateNodeStorage]);
+  const updateEdges = useMutation(({ storage }) => {
+    storage.set("edges", edges);
+  }, []);
 
+  const onNodesChange = useCallback((changes: NodeChange[]) => {
+    changes.forEach((change) => {
+      if (change.type === 'position' && 'position' in change) {
+        if (change.dragging) {
+          updateMyPresence({
+            ...myPresence,
+            draggedNode: { id: change.id, position: change.position }
+          });
+        } else {
+          updateNodes((root) => {
+            const nodeIndex = root.nodes.findIndex(n => n.id === change.id);
+            if (nodeIndex !== -1) {
+              const node = root.nodes.get(nodeIndex);
+              if (node) {
+                root.nodes.set(nodeIndex, {
+                  ...node,
+                  position: change.position
+                });
+              }
+            }
+          });
+          updateMyPresence({
+            ...myPresence,
+            draggedNode: null
+          });
+        }
+      }
+    });
+
+    setNodes((nds) => applyNodeChanges(changes, nds));
+  }, [setNodes, updateNodes, updateMyPresence, myPresence]);
+
+  useEffect(() => {
+    others.forEach((other) => {
+      const draggedNode = other.presence?.draggedNode;
+      if (draggedNode) {
+        setNodes((nds) => 
+          nds.map((n) => 
+            n.id === draggedNode.id 
+              ? { ...n, position: draggedNode.position }
+              : n
+          )
+        );
+      }
+    });
+  }, [others, setNodes]);
 
   const handleDeploy = useCallback(() => {
     const deploymentData = {
-      nodeData: nodes,
-      edgeData: edges,
+      nodeData: localNodes,
+      edgeData: localEdges,
       contractName: contractName,
       network: network,
     };
@@ -83,13 +125,13 @@ export default function Home() {
       });
 
 
-  }, [contractName, network, nodes, edges]);
+  }, [contractName, network, localNodes, localEdges]);
 
   // print json data of nodes, edges
   // console.log(
   //   JSON.stringify({
-  //     nodeData: nodes,
-  //     edgeData: edges,
+  //     nodeData: localNodes,
+  //     edgeData: localEdges,
   //   }),
   // );
 
@@ -106,20 +148,14 @@ export default function Home() {
         event.dataTransfer.getData("application/reactflow"),
       );
 
-      if (
-        typeof nodeInformation.type === "undefined" ||
-        !nodeInformation.type
-      ) { 
-        return;
-      }
+      if (!nodeInformation.type) return;
 
       const position = {
         x: event.clientX - event.currentTarget.getBoundingClientRect().left,
         y: event.clientY - event.currentTarget.getBoundingClientRect().top,
       };
 
-
-      const newNode = {
+      const newNode: SerializedNode = {
         id: `${nodeInformation.type}_${Date.now()}`,
         type: nodeInformation.type,
         position,
@@ -127,69 +163,77 @@ export default function Home() {
           label: nodeInformation.data.label || "",
           type: nodeInformation.data.type || "",
           identifier: nodeInformation.data.identifier || "",
-          name: nodeInformation.data.name as undefined,
           storage_variable: nodeInformation.data.storage_variable as string,
           primitiveType: nodeInformation.data.primitiveType as string,
         },
       };
+
+      // Update Liveblocks storage
+      updateNodes((root) => {
+        root.nodes.push(newNode);
+      });
       
+      // Update local state
       setNodes((nds) => nds.concat(newNode));
     },
-    [setNodes],
+    [setNodes, updateNodes],
   );
 
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges],
-  );
+  const onConnect = useCallback((params: Connection) => {
+    const newEdge = { id: `e${params.source}-${params.target}`, ...params };
+    updateEdges((root) => {
+      root.edges.push(newEdge);
+    });
+    setEdges((eds) => addEdge(params, eds));
+  }, [updateEdges, setEdges]);
 
   // useEffect(() => {
-  //   console.log(nodes);
-  // }, [nodes]);
+  //   console.log(localNodes);
+  // }, [localNodes]);
+
+  const flowRef = useRef<HTMLDivElement>(null);
+  const { project, getViewport } = useReactFlow();
 
   return (
     <>
       <Navbar onDeploy={handleDeploy} />
       <div
-        onPointerMove={(e: React.PointerEvent<HTMLDivElement>) => {
-          const cursor = { x: Math.floor(e.clientX), y: Math.floor(e.clientY) };
-          updateMyPresence({ cursor });
-        }}
-        onPointerLeave={() => {
-          const cursor = {
-            cursor: null,
-          };
-          updateMyPresence(cursor);
-        }}
+        ref={flowRef}
         className="relative"
         style={{ width: "100%", height: "93vh" }}
       >
-        {/* print other player's cursors */}
-        {others
-          .filter((other) => other.presence.cursor !== null)
-          .map(({ connectionId, presence }) => {
-            if (presence.cursor) {
-              return (
-                <Cursor
-                  key={connectionId}
-                  x={presence.cursor.x}
-                  y={presence.cursor.y}
-                />
-              );
-            }
-          })}
-
         <ReactFlow
-          nodes={nodes}
-          edges={edges}
+          nodes={localNodes}
+          edges={localEdges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onDragOver={onDragOver}
           onDrop={onDrop}
           nodeTypes={nodeTypes}
+          onMouseMove={(e) => {
+            if (flowRef.current) {
+              const bounds = flowRef.current.getBoundingClientRect();
+              const { zoom, x: vpX, y: vpY } = getViewport();
+              
+              // Get position relative to the viewport
+              const x = (e.clientX - bounds.left - vpX) / zoom;
+              const y = (e.clientY - bounds.top - vpY) / zoom;
+              
+              updateMyPresence({
+                ...myPresence,
+                cursor: { x, y },
+                lastActive: Date.now()
+              });
+            }
+          }}
+          onMouseLeave={() => updateMyPresence({
+            ...myPresence,
+            cursor: null
+          })}
         >
-          <Background color="#FFFFFFF" variant={BackgroundVariant.Dots} />
+          <Background color="#FFFFFF" variant={BackgroundVariant.Dots} />
+          <FlowCursors others={others} />
         </ReactFlow>
 
         <AISearch />
