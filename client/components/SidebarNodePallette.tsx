@@ -80,25 +80,68 @@ const nodeTemplates: NodeTemplate[] = [
     description: "Compound type node",
   },
   {
-    type: "basicFunction",
-    label: "Basic Function",
-    data: { label: "Basic Function", type: "FUNCTION", identifier: "BASIC" },
-    icon: ArrowDownCircle,
-    color: "bg-orange-500",
-    description: "Basic function node",
-  },
-  {
     type: "readFunction",
     label: "Read",
     data: { label: "Read", type: "READ", identifier: "" },
-    icon: Settings2,
+    icon: Boxes,
     color: "bg-orange-500",
     description: "Read function node",
   },
   {
+    type: "typedVar",
+    label: "Typed Variable",
+    data: { 
+      label: "Typed Variable", 
+      type: "TYPED_VAR",
+      name: "",
+      varType: "" 
+    },
+    icon: Hash,
+    color: "bg-green-500",
+    description: "Typed variable node",
+  },
+  {
+    type: "struct",
+    label: "Struct",
+    data: { 
+      label: "Struct", 
+      type: "STRUCT",
+      name: "",
+      variables: [] 
+    },
+    icon: Boxes,
+    color: "bg-yellow-500",
+    description: "Struct definition node",
+  },
+  {
+    type: "write",
+    label: "Write",
+    data: { 
+      label: "Write", 
+      type: "WRITE",
+      storageVar: "",
+      param1: "",
+      param2: "" 
+    },
+    icon: ArrowDownCircle,
+    color: "bg-red-500",
+    description: "Write function node",
+  },
+  {
+    type: "readWithParam",
+    label: "Read With Param",
+    data: { 
+      label: "Read With Param", 
+      type: "READ_PARAM",
+      storageVar: "",
+      paramType: "" 
+    },
+    icon: Boxes,
+    color: "bg-indigo-500",
+    description: "Parameterized read node",
     type: "incrementFunction",
     label: "Increment",
-    data: { label: "Increment", type: "FUNCTION", identifier: "" },
+    data: { label: "Increment", type: "FUNCTION", identifier: "INCREMENT" },
     icon: Settings2,
     color: "bg-orange-500",
     description: "Increment function node",
@@ -106,9 +149,9 @@ const nodeTemplates: NodeTemplate[] = [
   {
     type: "decrementFunction",
     label: "Decrement",
-    data: { label: "Decrement", type: "FUNCTION", identifier: "" },
+    data: { label: "Decrement", type: "FUNCTION", identifier: "DECREMENT" },
     icon: Settings2,
-    color: "bg-orange-500",
+    color: "bg-purple-500",
     description: "Decrement function node",
   },
   {

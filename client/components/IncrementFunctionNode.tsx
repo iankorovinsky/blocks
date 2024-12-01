@@ -3,13 +3,18 @@ import { Settings2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 type Props = {
-  data: { label: string; storage_variable: string };
+  data: {
+    label: string;
+    storage_variable: string;
+    name?: string;
+    amount?: string;
+  };
   id: string;
 };
 
 const IncrementFunctionNode = ({ data, id }: Props) => {
-  const [inputValue, setInputValue] = useState("");
-  const [amountValue, setAmountValue] = useState("");
+  const [inputValue, setInputValue] = useState(data.name || "");
+  const [amountValue, setAmountValue] = useState(data.amount || "");
   const [storageVariable, setStorageVariable] = useState<string | undefined>(
     "",
   );
@@ -38,6 +43,11 @@ const IncrementFunctionNode = ({ data, id }: Props) => {
 
     return () => clearInterval(interval); // Cleanup on unmount
   }, [getNodes, getEdges, id, storageVariable]);
+
+  useEffect(() => {
+    data.name = inputValue;
+    data.amount = amountValue;
+  }, [inputValue, amountValue, data]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);

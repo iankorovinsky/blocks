@@ -12,7 +12,7 @@ const GetFunctionNode = ({ data, id }: Props) => {
   const [storageVariable, setStorageVariable] = useState<string | undefined>(
     "",
   );
-  const { getNodes, getEdges } = useReactFlow();
+  const { getNodes, getEdges, setNodes } = useReactFlow();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,7 +39,18 @@ const GetFunctionNode = ({ data, id }: Props) => {
   }, [getNodes, getEdges, id, storageVariable]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
+    const newName = event.target.value;
+    setInputValue(newName);
+    
+    // Update the node data with the new name
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === id) {
+          node.data = { ...node.data, name: newName };
+        }
+        return node;
+      }),
+    );
   };
 
   return (
