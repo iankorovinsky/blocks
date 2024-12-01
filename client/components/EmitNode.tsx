@@ -8,7 +8,6 @@ type Props = {
 };
 
 const EmitNode = ({ data, id }: Props) => {
-  const [inputValue, setInputValue] = useState("");
   const [storageVariable, setStorageVariable] = useState<string | undefined>(
     "",
   );
@@ -36,10 +35,6 @@ const EmitNode = ({ data, id }: Props) => {
 
     return () => clearInterval(interval); // Cleanup on unmount
   }, [getNodes, getEdges, id, storageVariable]);
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
-  };
 
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
