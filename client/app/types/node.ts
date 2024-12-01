@@ -4,6 +4,7 @@ import PrimitiveNode from "@/components/PrimitiveNode";
 import StorageNode from "@/components/StorageNode";
 import SetFunctionNode from "../../components/SetFunctionNode";
 import BasicFunctionNode from "@/components/BasicFunctionNode";
+import ReadFunctionNode from "../../components/ReadFunctionNode";
 
 export const nodeTypes = {
   setFunction: SetFunctionNode,
@@ -12,4 +13,5 @@ export const nodeTypes = {
   compound: CompoundNode,
   getFunction: GetFunctionNode,
   basicFunction: BasicFunctionNode,
+  readFunction: ReadFunctionNode,
 };
