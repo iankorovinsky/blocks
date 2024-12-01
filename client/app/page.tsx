@@ -4,21 +4,20 @@ import {
   addEdge,
   Background,
   BackgroundVariant,
-  Panel,
   ReactFlow,
   useEdgesState,
-  useNodesState,
+  useNodesState
 } from "@xyflow/react";
 
+import AISearch from "@/components/AIAgentSearchbar";
+import { Navbar } from "@/components/Navbar";
+import { NodeTemplate } from "@/components/SidebarNodePallette";
+import { useNavbar } from "@/contexts/NavbarContext";
 import { useMyPresence, useOthers } from "@liveblocks/react/suspense";
 import "@xyflow/react/dist/style.css";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { Cursor } from "../components/Cursor";
 import { nodeTypes } from "./types/node";
-import { Navbar } from "@/components/Navbar";
-import { useNavbar } from "@/contexts/NavbarContext";
-import { NodeTemplate } from "@/components/SidebarNodePallette";
-import AISearch from "@/components/AIAgentSearchbar";
 
 const initialNodes = [
   {
@@ -89,12 +88,12 @@ export default function Home() {
   }, [contractName, network, nodes, edges]);
 
   // print json data of nodes, edges
-  console.log(
-    JSON.stringify({
-      nodeData: nodes,
-      edgeData: edges,
-    }),
-  );
+  // console.log(
+  //   JSON.stringify({
+  //     nodeData: nodes,
+  //     edgeData: edges,
+  //   }),
+  // );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -112,7 +111,7 @@ export default function Home() {
       if (
         typeof nodeInformation.type === "undefined" ||
         !nodeInformation.type
-      ) {
+      ) { 
         return;
       }
 

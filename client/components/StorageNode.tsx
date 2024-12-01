@@ -24,7 +24,7 @@ const StorageNode = ({ id, data }: Props) => {
         if (node.id === id) {
           node.data = { ...node.data, storage_variable: newName };
         }
-        if (node.type === "setFunction") {
+        if (node.type === "setFunction" || node.type === "getFunction") {
           const connectedEdge = getEdges().find(
             (edge) => edge.target === node.id,
           );
@@ -46,18 +46,20 @@ const StorageNode = ({ id, data }: Props) => {
         .filter((edge) => edge.source === id || edge.target === id)
         .map((edge) => (edge.source === id ? edge.target : edge.source));
 
-      const connectedNode = nodes.find((node) =>
+      const allConnectedNodes = nodes.filter((node) =>
         connectedNodeIds.includes(node.id),
       );
 
-      if (connectedNode && connectedNode.type === "primitive") {
-        console.log(connectedNode.data?.identifier);
-        setTypeValue(connectedNode.data?.identifier as string);
-      } else if (connectedNode && connectedNode.type === "compound") {
-        console.log(connectedNode.data?.identifier);
-        setTypeValue(
-          `${connectedNode.data?.identifier as string}<${connectedNode.data?.primitiveType}>`,
-        );
+      for (const connectedNode of allConnectedNodes) {
+        if (connectedNode && connectedNode.type === "primitive") {
+          console.log(connectedNode.data?.identifier);
+          setTypeValue(connectedNode.data?.identifier as string);
+        } else if (connectedNode && connectedNode.type === "compound") {
+          console.log(connectedNode.data?.identifier);
+          setTypeValue(
+            `${connectedNode.data?.identifier as string}<${connectedNode.data?.primitiveType}>`,
+          );
+        }
       }
     }, 500); // Check every 500ms
 
