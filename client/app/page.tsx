@@ -11,7 +11,9 @@ import {
   useEdgesState,
   useNodesState,
   applyNodeChanges,
-  NodeChange
+  NodeChange,
+  useReactFlow,
+  ReactFlowInstance
 } from "@xyflow/react";
 
 import AISearch from "@/components/AIAgentSearchbar";
@@ -20,7 +22,7 @@ import { NodeTemplate } from "@/components/SidebarNodePallette";
 import { useNavbar } from "@/contexts/NavbarContext";
 import { useMutation, useMyPresence, useOthers, useStorage } from "@liveblocks/react/suspense";
 import "@xyflow/react/dist/style.css";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Cursor } from "../components/Cursor";
 import { nodeTypes } from "./types/node";
 
@@ -28,6 +30,7 @@ import axios from "axios";
 import { ChatBot } from "@/components/Chatbot";
 import { LiveList, LiveObject } from "@liveblocks/client";
 import { SerializedNode } from "@/liveblocks.config";
+import { FlowCursors } from '@/components/FlowCursors';
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
@@ -188,38 +191,17 @@ export default function Home() {
   //   console.log(localNodes);
   // }, [localNodes]);
 
+  const flowRef = useRef<HTMLDivElement>(null);
+  const { project, getViewport } = useReactFlow();
+
   return (
     <>
       <Navbar onDeploy={handleDeploy} />
       <div
-        onPointerMove={(e) => {
-          updateMyPresence({
-            ...myPresence,
-            cursor: { x: Math.floor(e.clientX), y: Math.floor(e.clientY) },
-            lastActive: Date.now()
-          });
-        }}
-        onPointerLeave={() => updateMyPresence({
-          ...myPresence,
-          cursor: null
-        })}
+        ref={flowRef}
         className="relative"
         style={{ width: "100%", height: "93vh" }}
       >
-        {others.map(({ connectionId, presence }) => {
-          if (presence.cursor) {
-            return (
-              <Cursor
-                key={connectionId}
-                x={presence.cursor.x}
-                y={presence.cursor.y}
-                lastActive={presence.lastActive || Date.now()}
-              />
-            );
-          }
-          return null;
-        })}
-
         <ReactFlow
           nodes={localNodes}
           edges={localEdges}
@@ -229,8 +211,29 @@ export default function Home() {
           onDragOver={onDragOver}
           onDrop={onDrop}
           nodeTypes={nodeTypes}
+          onMouseMove={(e) => {
+            if (flowRef.current) {
+              const bounds = flowRef.current.getBoundingClientRect();
+              const { zoom, x: vpX, y: vpY } = getViewport();
+              
+              // Get position relative to the viewport
+              const x = (e.clientX - bounds.left - vpX) / zoom;
+              const y = (e.clientY - bounds.top - vpY) / zoom;
+              
+              updateMyPresence({
+                ...myPresence,
+                cursor: { x, y },
+                lastActive: Date.now()
+              });
+            }
+          }}
+          onMouseLeave={() => updateMyPresence({
+            ...myPresence,
+            cursor: null
+          })}
         >
           <Background color="#FFFFFF" variant={BackgroundVariant.Dots} />
+          <FlowCursors others={others} />
         </ReactFlow>
 
         <AISearch />
