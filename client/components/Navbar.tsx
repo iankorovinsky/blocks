@@ -12,24 +12,27 @@ import {
 } from "@/components/ui/select";
 import { CuboidIcon as Cube } from "lucide-react";
 import { useNavbar } from "@/contexts/NavbarContext";
-import { Edge } from "@xyflow/react";
+import { Edge, Node as FlowNode } from "@xyflow/react";
 import { useAuth0 } from '@auth0/auth0-react';
-import { useFlow } from "@/contexts/FlowContext";
-import axios from "axios";
+import { useStorage } from "@liveblocks/react/suspense";
+import { LiveList } from "@liveblocks/client";
+import type { SerializedNode, SerializedEdge } from '../liveblocks.config';
+import axios from 'axios';
 
-interface NavbarProps {
-  onDeploy: () => void;
-}
 
-export function Navbar({ onDeploy }: NavbarProps) {
+export function Navbar() {
   const { contractName, setContractName, network, setNetwork } = useNavbar();
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
-  const { localNodes, localEdges } = useFlow();
+  const nodes = useStorage((root) => root.nodes);
+  const edges = useStorage((root) => root.edges);
 
   const handleDeploy = () => {
+    const actualNodes = nodes ? Array.from(nodes as unknown as LiveList<SerializedNode>) : [];
+    const actualEdges = edges ? Array.from(edges as unknown as LiveList<SerializedEdge>) : [];
+
     const deploymentData = {
-      nodeData: localNodes,
-      edgeData: localEdges,
+      nodeData: actualNodes,
+      edgeData: actualEdges,
       contractName,
       network,
     };
