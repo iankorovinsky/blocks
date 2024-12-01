@@ -217,9 +217,11 @@ def search_collections (
         return {"error": str(e)}
 
 def cairo_rag():
-
-    file_path="blocks/server/documents/cairo_programming_language.pdf"
+    file_path = "blocks/server/documents/cairo_programming_language.pdf"
     
+    if not os.path.exists(file_path):
+        raise Exception(f"Cairo documentation PDF not found at {file_path}")
+        
     def document_ingestion(file_path):
         documents = []
         pdf_reader = PyMuPDFLoader(file_path=file_path).load()
@@ -253,17 +255,18 @@ def cairo_rag():
     def conversation_chain(vectordb):
         basic_retriever = vectordb.as_retriever(search_kwargs={'k': 3})
 
-        qa_system_prompt = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>As an AI tool assisting an AI agent helping a Starknet developer.
-        If the documents are relevant to the question, give the information from the documents to the AI agent.
-        You are connected to a RAG system that gave you the provided documents, and it is a complete database of all the information you need to know.
-        Your response should adhere to the following guidelines:
-        - Answer the question by only using the provided documents.
-        - Do not fabricate any information or data.
-        - Be straightforward.<|eot_id|>
-        <|start_header_id|>user<|end_header_id|> 
-        Question: {input} 
+        qa_system_prompt = """You are an AI assistant helping with Cairo programming questions.
+        You MUST use the provided context from the RAG system to answer questions.
+        
+        Rules:
+        1. ONLY use information from the provided context
+        2. If you can't find the answer in the context, say "I need to search the Cairo documentation" and use the cairo documentation tool
+        3. Do not make up or infer information
+        4. Be direct and specific
+        5. NEVER give general advice without using the documentation
+        
         Context: {context}
-        <|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
+        Question: {input}"""
 
         qa_prompt = ChatPromptTemplate.from_messages(
             [
@@ -310,12 +313,13 @@ def cairo_rag():
 
 
 def cairo_rag_tool(query: str):
-    """Use this tool to get any information related to Cairo programming.
+    """This tool is used to get information related to Cairo programming. This tool is to be used no matter what. Use this tool to answer any question the user asks.
     Arg: query"""
     rag_chain = cairo_rag()
     response = rag_chain.invoke({"input": query})
     context = response['context']
     document_data = str([document.page_content for document in context])
+    print(document_data)
     return document_data
 
 TOOLS = {
@@ -404,7 +408,7 @@ def invoke(requested_tools, prompt):
 
     response = ""
     for chunk in app.stream(
-        {"messages": [("human", prompt)]},
+        {"messages": initial_messages},
         {"configurable": {"thread_id": "thread-1"}},
         stream_mode="values"):
         response = chunk["messages"][-1]
