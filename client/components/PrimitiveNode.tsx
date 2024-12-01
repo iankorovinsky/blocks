@@ -1,6 +1,3 @@
-import { Handle, Position, useReactFlow } from "@xyflow/react";
-import React, { useEffect, useMemo, useState } from "react";
-import { Hash } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -8,6 +5,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Handle, Position, useReactFlow } from "@xyflow/react";
+import { Hash } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type Props = {
   data: { label: string; type: string; identifier: string };
@@ -30,7 +30,7 @@ const PRIMITIVES = [
 
 const SetFunctionNode = ({ data, id }: Props) => {
   const [typeValue, setTypeValue] = useState("");
-  const { setNodes, getEdges } = useReactFlow();
+  const { setNodes } = useReactFlow();
 
   useEffect(() => {
     setNodes((nds) =>

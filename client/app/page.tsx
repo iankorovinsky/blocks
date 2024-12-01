@@ -4,6 +4,7 @@ import {
   addEdge,
   Background,
   BackgroundVariant,
+  Connection,
   ReactFlow,
   useEdgesState,
   useNodesState
@@ -13,7 +14,7 @@ import AISearch from "@/components/AIAgentSearchbar";
 import { Navbar } from "@/components/Navbar";
 import { NodeTemplate } from "@/components/SidebarNodePallette";
 import { useNavbar } from "@/contexts/NavbarContext";
-import { useMutation, useMyPresence, useOthers, useStorage } from "@liveblocks/react/suspense";
+import { useMyPresence, useOthers } from "@liveblocks/react/suspense";
 import "@xyflow/react/dist/style.css";
 import React, { useCallback } from "react";
 import { Cursor } from "../components/Cursor";
@@ -66,20 +67,20 @@ const initialEdges = [
 export default function Home() {
   const { contractName, network } = useNavbar();
 
-  const [myPresence, updateMyPresence] = useMyPresence();
+  const [, updateMyPresence] = useMyPresence();
   const others = useOthers();
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-  const nodeStorage = useStorage(() => initialNodes);
-  const edgeStorage = useStorage(() => initialEdges);
+  // const nodeStorage = useStorage(() => initialNodes);
+  // const edgeStorage = useStorage(() => initialEdges);
 
 
-  const updateNodeStorage = useMutation(({ storage }, newNodeData) => {
-    const nodeData = storage.get("nodeData");
-    storage.set("nodeData", newNodeData);
-  }, []);  
+  // const updateNodeStorage = useMutation(({ storage }, newNodeData) => {
+  //   const nodeData = storage.get("nodeData");
+  //   storage.set("nodeData", newNodeData);
+  // }, []);  
 
 
   const handleDeploy = useCallback(() => {
@@ -134,16 +135,24 @@ export default function Home() {
         id: `${nodeInformation.type}_${Date.now()}`,
         type: nodeInformation.type,
         position,
-        data: nodeInformation.data,
+        data: {
+          label: nodeInformation.data.label || "",
+          type: nodeInformation.data.type || "",
+          identifier: nodeInformation.data.identifier || "",
+          name: nodeInformation.data.name as undefined,
+          storage_variable: nodeInformation.data.storage_variable as string,
+          primitiveType: nodeInformation.data.primitiveType as string,
+        },
       };
-
+      
+      // 
       setNodes((nds) => nds.concat(newNode));
     },
     [setNodes],
   );
 
   const onConnect = useCallback(
-    (params: any) => setEdges((eds) => addEdge(params, eds)),
+    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
   );
 

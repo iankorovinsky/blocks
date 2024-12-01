@@ -3,7 +3,7 @@ import { BaseEdge, EdgeProps, getBezierPath } from "@xyflow/react";
 import { X } from "lucide-react";
 
 const CustomEdge = ({
-  id,
+  // id,
   sourceX,
   sourceY,
   targetX,
@@ -12,7 +12,7 @@ const CustomEdge = ({
   targetPosition,
   style = {},
   markerEnd,
-  data,
+  // data,
 }: EdgeProps) => {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,

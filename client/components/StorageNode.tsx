@@ -1,6 +1,6 @@
 import { Handle, Position, useReactFlow } from "@xyflow/react";
 import { Database } from "lucide-react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type Props = {
   id: string;

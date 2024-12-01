@@ -20,8 +20,8 @@ import {
 export interface NodeTemplate {
   type: string;
   data: {
-    label?: string;
-    type?: string;
+    label: string;
+    type: string;
     identifier?: string;
     name?: string;
     storage_variable?: string;
