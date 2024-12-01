@@ -21,7 +21,7 @@ def chatbot():
     data = request.get_json(force=True)
     tools = data.get('tools')
     prompt = data.get('prompt')
-    return invoke(tools, prompt)
+    return {"response": invoke(tools, prompt)}
 
 
 # @app.route('/deploy')

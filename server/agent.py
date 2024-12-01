@@ -243,9 +243,9 @@ def cairo_rag():
         if os.path.exists(db_path):
             vectordb = Chroma(persist_directory=db_path, embedding_function=embedding_function)
             print("vectorstore loaded from local")
-        else:
-            vectordb = Chroma.from_documents(documents=chunks, embedding=embedding_function, persist_directory=db_path)
-            print("vectorstore saved to local")
+        #else:
+        vectordb = Chroma.from_documents(documents=chunks, embedding=embedding_function, persist_directory=db_path)
+        print("vectorstore saved to local")
 
         return vectordb
     
@@ -290,11 +290,11 @@ def cairo_rag():
         vectorstore = store_into_vectorstore(chunks=None)
         chain = conversation_chain(vectorstore)
         return chain
-    else:
-        documents = document_ingestion(file_path)
-        chunks = text_splitting(documents)
-        vectorstore = store_into_vectorstore(chunks=chunks)
-        chain = conversation_chain(vectorstore)
+    # else:
+    documents = document_ingestion(file_path)
+    chunks = text_splitting(documents)
+    vectorstore = store_into_vectorstore(chunks=chunks)
+    chain = conversation_chain(vectorstore)
     return chain
 
 
@@ -305,7 +305,7 @@ def cairo_rag_tool(query: str):
     response = rag_chain.invoke({"input": query})
     context = response['context']
     document_data = str([document.page_content for document in context])
-    return document_data;
+    return document_data
 
 TOOLS = {
     "add": add,
@@ -321,7 +321,7 @@ TOOLS = {
 }   
 
 @traceable
-def invoke(requested_tools):
+def invoke(requested_tools, prompt):
     agent_tools = []
     for tool in requested_tools:
         if tool in TOOLS.keys():
@@ -389,15 +389,15 @@ def invoke(requested_tools):
 
     # agent = create_react_agent(model, agent_tools)
     # response = agent.invoke({"messages": [("human", "what's 2 + 2")]})
-    return response
+    return response.content
 
 def handle_agent_request():
 
     return "Agent endpoint reached" 
 
 if __name__ == "__main__":
-    response = invoke_agent(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"], "what is the best way to write smart contracts in Cairo?")
-    print(response.content)
+    response = invoke(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"], "what is the best way to write smart contracts in Cairo?")
+    print(response)
 
     
     
