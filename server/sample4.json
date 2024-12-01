@@ -127,6 +127,6 @@
         "id": "xy-edge__storage_1733049099000b-decrementFunction_1733049371744"
       }
     ],
-    "contractName": "",
+    "contract_name": "MyContract",
     "network": "testnet"
   }

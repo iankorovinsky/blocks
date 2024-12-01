@@ -1,1 +1,1 @@
-{"version":1,"contracts":[{"id":"reinites4ku5q","package_name":"server","contract_name":"MyContract","module_path":"server::MyContract","artifacts":{"sierra":"sample_contract_MyContract.contract_class.json","casm":"sample_contract_MyContract.compiled_contract_class.json"}}]}
+{"version":1,"contracts":[{"id":"n2hm1iencskb2","package_name":"server","contract_name":"SimpleContract","module_path":"server::SimpleContract","artifacts":{"sierra":"sample_contract_SimpleContract.contract_class.json","casm":"sample_contract_SimpleContract.compiled_contract_class.json"}}]}

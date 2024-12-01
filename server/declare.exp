@@ -1,0 +1,5 @@
+#!/usr/bin/expect -f
+spawn starkli declare target/dev/sample_contract_SimpleContract.contract_class.json --rpc https://free-rpc.nethermind.io/sepolia-juno --account account_testnet_ian_account.json --keystore account_testnet_ian_keystore.json
+expect "Enter keystore password:"
+send "Olala123!\r"
+expect eof
