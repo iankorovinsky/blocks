@@ -1,13 +1,13 @@
 import json
-from typing import List, Dict
+from typing import List, Dict, Any
 
 class ContractBuilder:
-    def __init__(self, json_file_path: str):
+    def __init__(self, json_data: Dict[str, Any]):
         self.contract_name = ""
         self.functions = []
         self.storage_vars = []
         self.interfaces = []
-        self.json_data = self._load_json(json_file_path)
+        self.json_data = json_data
 
     def _load_json(self, json_file_path: str) -> Dict:
         """Load JSON file and store its content"""
@@ -338,36 +338,36 @@ class ContractBuilder:
             storage_var_type = self.get_storage_var_type(node)
             self.storage_vars.append(f"{storage_var_name}: {storage_var_type},")
 
+    def invoke(self, contract_name: str):
+        language_map = self._load_json('language.json')
     
-    
+        # Add this line to set the contract name while we don't have a frontend for it
+        self.set_name(contract_name)
+        
+        self..generate_storage_vars()
+
+        # Generate all functions - this populates self.functions
+        self.generate_functions(language_map)
+
+        final_contract = self.build()
+
+        # Define the output file path
+        output_file_path = '/home/appuser/blocks/server/src/lib.cairo'
+
+        # Write the final contract to the specified file
+        with open(output_file_path, 'w') as file:
+            file.write(final_contract)
+            
+        print(f"Contract written to {output_file_path}")
+        
+        print(final_contract)
 
 
+    
 # Create a global contract builder instance
 contract_builder = ContractBuilder('sample3.json')
     
 def main():
-    language_map = contract_builder._load_json('language.json')
     
-    # Add this line to set the contract name while we don't have a frontend for it
-    contract_builder.set_name("MyContract")
-    
-    contract_builder.generate_storage_vars()
-
-    # Generate all functions - this populates self.functions
-    contract_builder.generate_functions(language_map)
-
-    final_contract = contract_builder.build()
-
-    # Define the output file path
-    output_file_path = '/home/appuser/blocks-1/server/src/lib.cairo'
-
-    # Write the final contract to the specified file
-    with open(output_file_path, 'w') as file:
-        file.write(final_contract)
-    
-    print(f"Contract written to {output_file_path}")
-    
-    print(final_contract)
-
 if __name__ == "__main__":
     main()
