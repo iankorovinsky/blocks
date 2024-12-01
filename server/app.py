@@ -1,7 +1,9 @@
 from flask import Flask
 from flask_cors import CORS
+from agent import invoke
+from flask import request
+
 from deployer import handle_deploy_request
-from agent import handle_agent_request
 import os
 from flask import request
 from contract_builder import ContractBuilder
@@ -16,6 +18,13 @@ def hello():
 @app.route('/agent')
 def agent():
     return handle_agent_request()
+
+@app.route('/chatbot', methods=['POST'])
+def chatbot():
+    data = request.get_json(force=True)
+    tools = data.get('tools')
+    prompt = data.get('prompt')
+    return {"response": invoke(tools, prompt)}
 
 @app.route('/deploy', methods=['POST'])
 def deploy():
@@ -33,7 +42,6 @@ def populate():
     prompt = data.get('prompt')
     result = handle_populate_request(prompt)
     return {"result": result}
-
 
 if __name__ == '__main__':
     app.run(debug=True) 
