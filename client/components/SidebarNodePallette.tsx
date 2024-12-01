@@ -79,6 +79,14 @@ const nodeTemplates: NodeTemplate[] = [
     color: "bg-purple-500",
     description: "Compound type node",
   },
+  {
+    type: "basicFunction",
+    label: "Basic Function",
+    data: { label: "Basic Function", type: "FUNCTION", identifier: "BASIC" },
+    icon: ArrowDownCircle,
+    color: "bg-orange-500",
+    description: "Basic function node",
+  },
 ];
 
 export function NodePalette() {
