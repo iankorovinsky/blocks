@@ -79,6 +79,14 @@ const nodeTemplates: NodeTemplate[] = [
     color: "bg-purple-500",
     description: "Compound type node",
   },
+  {
+    type: "readFunction",
+    label: "Read",
+    data: { label: "Read", type: "READ", identifier: "" },
+    icon: Boxes,
+    color: "bg-purple-500",
+    description: "Read function node",
+  },
 ];
 
 export function NodePalette() {
