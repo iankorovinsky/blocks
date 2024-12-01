@@ -14,7 +14,6 @@ import {
   NodeChange,
   useReactFlow,
   ReactFlowInstance,
-  ReactFlowProvider
 } from "@xyflow/react";
 
 import AISearch from "@/components/AIAgentSearchbar";
@@ -35,11 +34,21 @@ import { LiveList, LiveObject } from "@liveblocks/client";
 // Import types from liveblocks config
 import type { Presence, SerializedNode, SerializedEdge } from '../liveblocks.config';
 
+import { FlowWrapper } from "@/components/FlowWrapper";
+
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
 
 // Create a new component for the flow content
-function FlowContent({ onDeploy }: { onDeploy: () => void }) {
+function FlowContent({ 
+  onDeploy, 
+  updatePresence, 
+  presence 
+}: { 
+  onDeploy: () => void;
+  updatePresence: (presence: Partial<Presence>) => void;
+  presence: Presence;
+}) {
   const flowRef = useRef<HTMLDivElement>(null);
   const { getViewport } = useReactFlow();
 
@@ -216,22 +225,29 @@ function FlowContent({ onDeploy }: { onDeploy: () => void }) {
           if (flowRef.current) {
             const bounds = flowRef.current.getBoundingClientRect();
             const { zoom, x: vpX, y: vpY } = getViewport();
-            const x = (e.clientX - bounds.left - vpX) / zoom;
-            const y = (e.clientY - bounds.top - vpY) / zoom;
-            updateMyPresence({
-              ...myPresence,
-              cursor: { x, y },
-              lastActive: Date.now()
+            
+            // Convert screen coordinates to flow coordinates
+            const flowX = (e.clientX - bounds.left - vpX) / zoom;
+            const flowY = (e.clientY - bounds.top - vpY) / zoom;
+            
+            updatePresence({
+              cursor: { 
+                x: flowX,  // Use flow coordinates instead of screen coordinates
+                y: flowY,
+                flowX,
+                flowY
+              },
+              lastActive: Date.now(),
             });
           }
         }}
-        onMouseLeave={() => updateMyPresence({
-          ...myPresence,
-          cursor: null
-        })}
+        onMouseLeave={() => {
+          updatePresence({
+            cursor: null,
+          });
+        }}
       >
         <Background color="#FFFFFF" variant={BackgroundVariant.Dots} />
-        {/* <FlowCursors others={others} /> */}
       </ReactFlow>
 
       <AISearch />
@@ -243,17 +259,25 @@ function FlowContent({ onDeploy }: { onDeploy: () => void }) {
 // Main component now just handles the provider setup
 export default function Home() {
   const { contractName, network } = useNavbar();
+  const [myPresence, updateMyPresence] = useMyPresence();
+  const others = useOthers();
 
   const handleDeploy = useCallback(() => {
-    // ... your deploy logic ...
+    // ... deploy logic remains the same
   }, [contractName, network]);
 
   return (
-    <div className="h-screen w-screen">
+    <>
       <Navbar onDeploy={handleDeploy} />
-      <ReactFlowProvider>
-        <FlowContent onDeploy={handleDeploy} />
-      </ReactFlowProvider>
-    </div>
+      <div className="relative" style={{ width: "100%", height: "93vh" }}>
+        <FlowWrapper>
+          <FlowContent 
+            onDeploy={handleDeploy}
+            updatePresence={updateMyPresence}
+            presence={myPresence}
+          />
+        </FlowWrapper>
+      </div>
+    </>
   );
 }

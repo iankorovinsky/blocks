@@ -9,22 +9,27 @@ const client = createClient({
   publicApiKey: "your_public_key_here",
 });
 
-// Presence represents the cursor position
-type Presence = {
-  cursor: { x: number; y: number } | null;
+// Presence represents the cursor position and dragged node state
+export type Presence = {
+  cursor: { 
+    x: number;       // Absolute screen position
+    y: number;       // Absolute screen position
+    flowX: number;   // Flow-relative position
+    flowY: number;   // Flow-relative position
+  } | null;
   draggedNode: { id: string; position: { x: number; y: number } } | null;
   lastActive: number;
 };
 
 // Serializable versions of Node and Edge
-type SerializedNode = JsonObject & {
+export type SerializedNode = JsonObject & {
   id: string;
   type: string;
   position: { x: number; y: number };
   data: Record<string, any>;
 };
 
-type SerializedEdge = JsonObject & {
+export type SerializedEdge = JsonObject & {
   id: string;
   source: string;
   target: string;
@@ -35,6 +40,8 @@ type SerializedEdge = JsonObject & {
 type Storage = {
   nodes: LiveList<SerializedNode>;
   edges: LiveList<SerializedEdge>;
+  network: string;
+  contractName: string;
 };
 
 export const {
@@ -43,5 +50,4 @@ export const {
   useStorage,
   useMutation,
   useOthers,
-  /* ...other hooks... */
 } = createRoomContext<Presence, Storage>(client);

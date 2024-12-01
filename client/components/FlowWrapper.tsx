@@ -1,12 +1,26 @@
 'use client';
 
-import dynamic from 'next/dynamic';
+import { ReactFlowProvider } from '@xyflow/react';
+import { Cursor } from './Cursor';
+import { useOthers } from '@liveblocks/react/suspense';
 
-const Flow = dynamic(() => import('./Flow'), {
-  ssr: false,
-  loading: () => <div>Loading...</div>
-});
+export function FlowWrapper({ children }: { children: React.ReactNode }) {
+  const others = useOthers();
 
-export function FlowWrapper() {
-  return <Flow />;
+  return (
+    <ReactFlowProvider>
+      {others.map(({ connectionId, presence }) => {
+        if (!presence.cursor) return null;
+        return (
+          <Cursor
+            key={connectionId}
+            x={presence.cursor.x}
+            y={presence.cursor.y}
+            lastActive={presence.lastActive}
+          />
+        );
+      })}
+      {children}
+    </ReactFlowProvider>
+  );
 } 

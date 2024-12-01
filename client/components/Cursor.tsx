@@ -1,66 +1,60 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useReactFlow } from '@xyflow/react';
 
 interface CursorProps {
   x: number;
   y: number;
-  lastActive: number;
+  lastActive?: number;
 }
 
 export function Cursor({ x, y, lastActive }: CursorProps) {
+  const { getViewport } = useReactFlow();
   const [isVisible, setIsVisible] = useState(true);
+
+  const { zoom, x: vpX, y: vpY } = getViewport();
+  const screenX = x * zoom + vpX;
+  const screenY = y * zoom + vpY;
 
   useEffect(() => {
     const checkActivity = () => {
+      if (!lastActive) return;
       const timeSinceActive = Date.now() - lastActive;
       setIsVisible(timeSinceActive < 2000);
     };
 
-    // Check immediately when lastActive changes
     checkActivity();
-    
-    // Set up interval to keep checking
     const interval = setInterval(checkActivity, 100);
     return () => clearInterval(interval);
   }, [lastActive]);
 
   return (
     <div
+      className="pointer-events-none absolute w-4 h-4 transition-transform duration-100 z-[9999]"
       style={{
-        position: "absolute",
-        left: 0,
-        top: 0,
-        transform: `translateX(${x}px) translateY(${y}px)`,
-        zIndex: 9999,
-        pointerEvents: 'none',
+        transform: `translate(${screenX}px, ${screenY}px)`,
+        willChange: 'transform',
       }}
     >
       <svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
+        className="absolute top-0 left-0"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="m13.67 6.03-11-4a.5.5 0 0 0-.64.64l4 11a.5.5 0 0 0 .935.015l1.92-4.8 4.8-1.92a.5.5 0 0 0 0-.935h-.015Z"
-          fill="#FF4D4D"
+          d="M5.65376 12.3673H5.46026L5.31717 12.4976L0.500002 16.8829L0.500002 1.19841L11.7841 12.3673H5.65376Z"
+          fill="#FF0000"
+          stroke="white"
         />
       </svg>
       <div
+        className="absolute left-4 -top-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap transition-opacity duration-200"
         style={{
-          position: 'absolute',
-          left: '20px',
-          top: '-10px',
-          background: '#FF4D4D',
-          padding: '2px 6px',
-          borderRadius: '4px',
-          fontSize: '12px',
-          color: 'white',
-          whiteSpace: 'nowrap',
-          opacity: isVisible ? 1 : 0,
-          transition: 'opacity 0.2s ease-in-out'
+          opacity: isVisible ? 1 : 0
         }}
       >
         adam
