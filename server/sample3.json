@@ -1,0 +1,102 @@
+{
+    "nodeData": [
+      {
+        "id": "4",
+        "position": {
+          "x": 428.7530715809906,
+          "y": 112.4108477332014
+        },
+        "data": {
+          "label": "Storage",
+          "type": "STORAGE_VAR",
+          "identifier": "",
+          "storage_variable": "storage name 1"
+        },
+        "type": "storage",
+        "measured": {
+          "width": 280,
+          "height": 221
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "5",
+        "position": {
+          "x": 800,
+          "y": 200
+        },
+        "data": {
+          "label": "Primitive",
+          "type": "PRIM_TYPE",
+          "identifier": "u64"
+        },
+        "type": "primitive",
+        "measured": {
+          "width": 280,
+          "height": 146
+        },
+        "selected": false
+      },
+      {
+        "id": "6",
+        "position": {
+          "x": 688.8768462064431,
+          "y": 468.6162715998022
+        },
+        "data": {
+          "label": "Compound",
+          "type": "COMPOUND_TYPE",
+          "identifier": "array",
+          "primitiveType": "u64"
+        },
+        "type": "compound",
+        "measured": {
+          "width": 280,
+          "height": 223
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "7",
+        "position": {
+          "x": 265.06536002141837,
+          "y": 497.0235642268718
+        },
+        "data": {
+          "label": "Get",
+          "type": "FUNCTION",
+          "identifier": "GET"
+        },
+        "type": "getFunction",
+        "measured": {
+          "width": 280,
+          "height": 221
+        },
+        "selected": true,
+        "dragging": false
+      }
+    ],
+    "edgeData": [
+      {
+        "source": "4",
+        "sourceHandle": "b",
+        "target": "7",
+        "id": "xy-edge__4b-7"
+      },
+      {
+        "source": "6",
+        "sourceHandle": "c",
+        "target": "4",
+        "targetHandle": "a",
+        "id": "xy-edge__6c-4a"
+      },
+      {
+        "source": "5",
+        "target": "6",
+        "targetHandle": "b",
+        "id": "xy-edge__5-6b"
+      }
+    ]
+  }
