@@ -357,7 +357,7 @@ class ContractBuilder:
         # Add this line to set the contract name while we don't have a frontend for it
         self.set_name(contract_name)
         
-        self..generate_storage_vars()
+        self.generate_storage_vars()
 
         # Generate all functions - this populates self.functions
         self.generate_functions(language_map)
@@ -374,13 +374,3 @@ class ContractBuilder:
         print(f"Contract written to {output_file_path}")
         
         print(final_contract)
-
-
-    
-# Create a global contract builder instance
-contract_builder = ContractBuilder('sample3.json')
-    
-def main():
-    
-if __name__ == "__main__":
-    main()
