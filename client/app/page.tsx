@@ -194,10 +194,15 @@ export default function Home() {
       <div
         onPointerMove={(e) => {
           updateMyPresence({
+            ...myPresence,
             cursor: { x: Math.floor(e.clientX), y: Math.floor(e.clientY) },
+            lastActive: Date.now()
           });
         }}
-        onPointerLeave={() => updateMyPresence({ cursor: null })}
+        onPointerLeave={() => updateMyPresence({
+          ...myPresence,
+          cursor: null
+        })}
         className="relative"
         style={{ width: "100%", height: "93vh" }}
       >
@@ -208,6 +213,7 @@ export default function Home() {
                 key={connectionId}
                 x={presence.cursor.x}
                 y={presence.cursor.y}
+                lastActive={presence.lastActive || Date.now()}
               />
             );
           }

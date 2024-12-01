@@ -13,6 +13,7 @@ const client = createClient({
 type Presence = {
   cursor: { x: number; y: number } | null;
   draggedNode: { id: string; position: { x: number; y: number } } | null;
+  lastActive: number;
 };
 
 // Serializable versions of Node and Edge
