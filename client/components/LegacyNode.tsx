@@ -7,7 +7,7 @@ type Props = {
   id: string;
 };
 
-const AssertFunctionNode = ({ data, id }: Props) => {
+const LegacyNode = ({ data, id }: Props) => {
   const [inputValue, setInputValue] = useState("");
   const [storageVariable, setStorageVariable] = useState<string | undefined>(
     "",
@@ -47,11 +47,11 @@ const AssertFunctionNode = ({ data, id }: Props) => {
       <div
         className="absolute -top-px -right-px w-0 h-0 
         border-t-[30px] border-l-[30px] 
-        border-t-pink-500 border-l-transparent
+        border-t-orange-500 border-l-transparent
         overflow-visible rounded"
       >
         <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">
-          C
+          F
         </span>
       </div>
 
@@ -64,11 +64,10 @@ const AssertFunctionNode = ({ data, id }: Props) => {
 
       <div className="p-4 space-y-4">
         
-
-        <div className="space-y-2 relative">
+      <div className="space-y-2 relative">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-pink-400" />
-            <label className="text-sm text-gray-400">Assert</label>
+            <div className="w-2 h-2 rounded-full bg-orange-400" />
+            <label className="text-sm text-gray-400">Key</label>
           </div>
           {storageVariable ? (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
@@ -76,39 +75,53 @@ const AssertFunctionNode = ({ data, id }: Props) => {
             </div>
           ) : (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect to add logic
+              Key type of map
             </div>
           )}
 
-          <Handle
-            type="source"
-            position={Position.Right}
-            className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
-          />
           <Handle
             type="target"
             position={Position.Right}
             className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
           />
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-400" />
-            <label className="text-sm text-gray-400">Error Message</label>
-          </div>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            className="nodrag w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700 focus:outline-none focus:border-blue-500 transition-colors"
-            placeholder="Enter value..."
+          <Handle
+            type="source"
+            position={Position.Right}
+            className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
           />
+          
         </div>
 
+        <div className="space-y-2 relative">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-orange-400" />
+            <label className="text-sm text-gray-400">Value</label>
+          </div>
+          {storageVariable ? (
+            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
+              {storageVariable}
+            </div>
+          ) : (
+            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
+              Value type of map
+            </div>
+          )}
+
+          <Handle
+            type="target"
+            position={Position.Right}
+            className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
+          />
+          <Handle
+            type="source"
+            position={Position.Right}
+            className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
+          />
+          
+        </div>
       </div>
     </div>
   );
 };
 
-export default AssertFunctionNode;
+export default LegacyNode;

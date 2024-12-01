@@ -3,12 +3,18 @@ import { Settings2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 type Props = {
-  data: { label: string; storage_variable: string };
+  data: {
+    label: string;
+    storage_variable: string;
+    name?: string;
+    amount?: string;
+  };
   id: string;
 };
 
-const AssertFunctionNode = ({ data, id }: Props) => {
-  const [inputValue, setInputValue] = useState("");
+const IncrementFunctionNode = ({ data, id }: Props) => {
+  const [inputValue, setInputValue] = useState(data.name || "");
+  const [amountValue, setAmountValue] = useState(data.amount || "");
   const [storageVariable, setStorageVariable] = useState<string | undefined>(
     "",
   );
@@ -28,17 +34,27 @@ const AssertFunctionNode = ({ data, id }: Props) => {
       );
 
       if (
-        connectedNode 
+        connectedNode && 
+        connectedNode.data?.storage_variable !== storageVariable
       ) {
-        setStorageVariable(connectedNode.data?.target as string);
+        setStorageVariable(connectedNode.data?.storage_variable as string);
       }
     }, 1000); // Check every 500ms
 
     return () => clearInterval(interval); // Cleanup on unmount
   }, [getNodes, getEdges, id, storageVariable]);
 
+  useEffect(() => {
+    data.name = inputValue;
+    data.amount = amountValue;
+  }, [inputValue, amountValue, data]);
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
+  };
+
+  const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAmountValue(event.target.value);
   };
 
   return (
@@ -47,11 +63,11 @@ const AssertFunctionNode = ({ data, id }: Props) => {
       <div
         className="absolute -top-px -right-px w-0 h-0 
         border-t-[30px] border-l-[30px] 
-        border-t-pink-500 border-l-transparent
+        border-t-orange-500 border-l-transparent
         overflow-visible rounded"
       >
         <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">
-          C
+          F
         </span>
       </div>
 
@@ -63,12 +79,38 @@ const AssertFunctionNode = ({ data, id }: Props) => {
       </div>
 
       <div className="p-4 space-y-4">
-        
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-green-400" />
+            <label className="text-sm text-gray-400">Name</label>
+          </div>
+          <input
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+            className="nodrag w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700 focus:outline-none focus:border-blue-500 transition-colors"
+            placeholder="Enter value..."
+          />
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-yellow-400" />
+            <label className="text-sm text-gray-400">Amount</label>
+          </div>
+          <input
+            type="number"
+            value={amountValue}
+            onChange={handleAmountChange}
+            className="nodrag w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700 focus:outline-none focus:border-blue-500 transition-colors"
+            placeholder="Enter amount..."
+          />
+        </div>
 
         <div className="space-y-2 relative">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-pink-400" />
-            <label className="text-sm text-gray-400">Assert</label>
+            <div className="w-2 h-2 rounded-full bg-orange-400" />
+            <label className="text-sm text-gray-400">Storage Variable</label>
           </div>
           {storageVariable ? (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
@@ -76,7 +118,7 @@ const AssertFunctionNode = ({ data, id }: Props) => {
             </div>
           ) : (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect to add logic
+              Connect to display storage variable
             </div>
           )}
 
@@ -91,24 +133,9 @@ const AssertFunctionNode = ({ data, id }: Props) => {
             className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
           />
         </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-400" />
-            <label className="text-sm text-gray-400">Error Message</label>
-          </div>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            className="nodrag w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700 focus:outline-none focus:border-blue-500 transition-colors"
-            placeholder="Enter value..."
-          />
-        </div>
-
       </div>
     </div>
   );
 };
 
-export default AssertFunctionNode;
+export default IncrementFunctionNode;
