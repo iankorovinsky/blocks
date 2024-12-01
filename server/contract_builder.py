@@ -358,7 +358,7 @@ class ContractBuilder:
     
         self.setName(contractName)
         
-        self.generateStorageVars()
+        self.gefnerateStorageVars()
 
         self.generateFunctions(languageMap)
 
@@ -371,7 +371,7 @@ class ContractBuilder:
             
         print(f"Contract written to {outputFilePath}")
         
-        # print(finalContract)
+        #print(finalContract)
 
 # if __name__ == "__main__":
 #     # Create an empty dictionary as initial jsonData
