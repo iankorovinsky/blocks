@@ -45,6 +45,24 @@
                   "\tself.{storageVarName}.read()",
                   "}"
                 ]
+            },
+            "INCREMENT": {
+                "description": "Increment a numeric value in the contract storage.",
+                "visibility": "public",
+                "modifier": "ref",
+                "annotations": ["#[external(v0)]"],
+                "parameters": [
+                    {
+                        "name": "self",
+                        "type": "ContractState",
+                        "mode": "ref"
+                    }
+                ],
+                "template": [
+                    "fn increment_{functionName}(ref self: ContractState, amount: {storageVarType}) {",
+                    "\tself.{storageVarName}.write(self.{storageVarName}.read() + {amount});",
+                    "}"
+                ]
             }
         },
         "STORAGE_VAR": {
