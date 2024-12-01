@@ -344,17 +344,6 @@ def invoke(requested_tools, prompt):
 
     tool_node = ToolNode(agent_tools)
 
-    # groq_api_key = os.getenv('GROQ_API_KEY', None)
-    # if groq_api_key is None:
-    #     raise Exception("Groq api key not found.")
-
-    # model = ChatGroq(
-    #     model="llama-3.1-70b-versatile",
-    #     temperature=0.0,
-    #     max_tokens=8000,
-    #     api_key=groq_api_key
-    #     )
-    
     open_api_key = os.getenv('OPENAI_API_KEY', None)
     if open_api_key is None:
         raise Exception("OpenAI api key not found.")
@@ -364,7 +353,6 @@ def invoke(requested_tools, prompt):
         temperature=0,
         timeout=None,
         max_retries=2)
-
 
     model_with_tools = model.bind_tools(agent_tools)
 
@@ -406,6 +394,15 @@ def invoke(requested_tools, prompt):
     checkpointer = MemorySaver()
     app = workflow.compile(checkpointer=checkpointer)
 
+    # Initialize messages with system prompt and user prompt
+    initial_messages = [
+        {"role": "system", "content": """You are a helpful AI assistant specialized in Cairo programming and Starknet. 
+You have access to various tools including Cairo documentation, Starknet ID tools, and NFT tools.
+Always use the cairo documentation tool first when answering questions about Cairo programming.
+Be direct and specific in your answers. DO NOT GIVE LISTS, give short paragraphs instead specific to the user's question. Under no conditions are you to say that you do not have access to documents. Give as much hyperspecific information as posible."""},
+        {"role": "user", "content": prompt}
+    ]
+
     response = ""
     for chunk in app.stream(
         {"messages": initial_messages},
@@ -413,8 +410,6 @@ def invoke(requested_tools, prompt):
         stream_mode="values"):
         response = chunk["messages"][-1]
 
-    # agent = create_react_agent(model, agent_tools)
-    # response = agent.invoke({"messages": [("human", "what's 2 + 2")]})
     return response.content
 
 def handle_agent_request():
