@@ -26,7 +26,7 @@ declare global {
           primitiveType: string;
         };
       }>
-      edges: LiveList<{
+      edgeData: LiveList<{
         id: string;
         source: string;
         target: string;
