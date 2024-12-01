@@ -1,0 +1,71 @@
+{
+    "type": {
+        "FUNCTION": {
+            "SET": {
+                "description": "Write a value to the contract storage.",
+                "visibility": "public",
+                "modifier": "ref",
+                "annotations": ["#[external(v0)]"],
+                "parameters": [
+                    {
+                        "name": "self",
+                        "type": "ContractState",
+                        "mode": "ref"
+                    },
+                    {
+                        "name": "key",
+                        "type": "felt252"
+                    },
+                    {
+                        "name": "value",
+                        "type": "felt252"
+                    }
+                ],
+                "return_type": "void",
+                "template": [
+                    "fn set_{functionName}(ref self: ContractState, value: {storageVarType}) {",
+                    "\tself.{storageVarName}.write(value);",
+                    "}"
+                ]
+            },
+            "GET": {
+                "description": "Read a value from the contract storage.",
+                "visibility": "public",
+                "modifier": "@",
+                "annotations": ["#[external(v0)]"],
+                "parameters": [
+                  {
+                    "name": "self",
+                    "type": "ContractState",
+                    "mode": "snapshot"
+                  }
+                ],
+                "template": [
+                  "fn get_{functionName}(self: @ContractState) -> {storageVarType} {",
+                  "\tself.{storageVarName}.read()",
+                  "}"
+                ]
+            }
+        },
+        "STORAGE_VAR": {
+            "type": "{param}"
+
+        },
+        "PRIM_TYPE": {
+            "u8": "u8",
+            "u16": "u16",
+            "u32": "u32",
+            "u64": "u64",
+            "u128": "u128",
+            "u256": "u256",
+            "usize": "usize",
+            "bool": "bool",
+            "felt252": "felt252",
+            "bytes31": "bytes31",
+            "ByteArray": "ByteArray"
+        },
+        "COMPOUND_TYPE": {
+            "type": "{param}"
+        }
+    }
+}

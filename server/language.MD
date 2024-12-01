@@ -57,6 +57,51 @@ mod `{NAME}` {
 
 // TYPES
 
+integers:
+
+u8
+u16
+u32
+u64
+u128
+u256
+usize
+
+booleans:
+
+bool
+
+strings:
+
+felt252
+bytes31
+ByteArray
+
+arrays:
+
+Array<T>
+
+
+enums:
+
+#[derive(Copy, Drop)]
+enum Data {
+    Integer: u128,
+    Felt: felt252,
+    Tuple: (u32, u32),
+}
+
+tuples: (type_1, type_2, type_3, ...., type_n)
+
+
+dictionaries:
+
+use core::dict::Felt252Dict;
+let mut balances: Felt252Dict<u64> = Default::default();
+
+
+
+Felt252DictEntry<T>
 
 
 
@@ -72,3 +117,17 @@ fn set(ref self: ContractState, x: u128) {
 fn get(self: @ContractState) -> u128 {
     self.stored_data.read()
 }
+
+// FUNCTION ATTRIBUTES
+
+#[constructor] 
+// Public
+
+#[abi(embed_v0)] -> all functions of the contract for the interface
+#[external(v0)] -> callable by anyone from outside the contract
+
+// Private
+#[generate_trait] -> private implementation of interface
+#[abi(per_item)] -> define entrypoints without an explicit interface
+
+

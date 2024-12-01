@@ -4,6 +4,15 @@
 
 __pycache__/
 
+.snfoundry_cache/
+
 .env
-account_testnet_ian_account.json
 account_testnet_ian_keystore.json
+account_mainnet_ian_keystore.json
+account_testnet_ian_account.json
+account_mainnet_ian_account.json
+
+
+# Added by cargo
+
+/target
