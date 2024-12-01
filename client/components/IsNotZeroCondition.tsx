@@ -7,7 +7,7 @@ type Props = {
   id: string;
 };
 
-const AssertFunctionNode = ({ data, id }: Props) => {
+const IsNotZeroCondition = ({ data, id }: Props) => {
   const [inputValue, setInputValue] = useState("");
   const [storageVariable, setStorageVariable] = useState<string | undefined>(
     "",
@@ -76,7 +76,7 @@ const AssertFunctionNode = ({ data, id }: Props) => {
             </div>
           ) : (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect to add logic
+              Is Not Zero?
             </div>
           )}
 
@@ -92,23 +92,9 @@ const AssertFunctionNode = ({ data, id }: Props) => {
           />
         </div>
 
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-400" />
-            <label className="text-sm text-gray-400">Error Message</label>
-          </div>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            className="nodrag w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700 focus:outline-none focus:border-blue-500 transition-colors"
-            placeholder="Enter value..."
-          />
-        </div>
-
       </div>
     </div>
   );
 };
 
-export default AssertFunctionNode;
+export default IsNotZeroCondition;

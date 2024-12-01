@@ -26,6 +26,7 @@ const PRIMITIVES = [
   "felt252",
   "bytes31",
   "ByteArray",
+  "ContractAddress"
 ];
 
 const SetFunctionNode = ({ data, id }: Props) => {
