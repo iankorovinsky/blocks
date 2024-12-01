@@ -67,9 +67,22 @@ class ContractBuilder:
         contract_parts = [
             "#[starknet::contract]",
             f"mod {self.contract_name} {{",
-            "\tuse core::starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};",
-            ""
         ]
+
+        # Check for GET and SET functions
+        has_get = any(func.get('template', [None])[0].strip().startswith('fn get') for func in self.functions)
+        has_set = any(func.get('template', [None])[0].strip().startswith('fn set') for func in self.functions)
+
+        # Add storage traits only if needed
+        if has_get or has_set:
+            storage_traits = []
+            if has_get:
+                storage_traits.append("StoragePointerReadAccess")
+            if has_set:
+                storage_traits.append("StoragePointerWriteAccess")
+            contract_parts.append(f"\tuse core::starknet::storage::{{{', '.join(storage_traits)}}};")
+
+        contract_parts.append("")
         # Add storage block inside the contract
         storage_block = self.build_storage_block()
         # Indent the storage block lines
