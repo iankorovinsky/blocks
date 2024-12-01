@@ -42,7 +42,7 @@ const SetFunctionNode = ({ data, id }: Props) => {
         return node;
       }),
     );
-  }, [typeValue]);
+  }, [typeValue, id, setNodes]);
 
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">

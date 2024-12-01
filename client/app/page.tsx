@@ -23,6 +23,7 @@ import { Cursor } from "../components/Cursor";
 import { nodeTypes } from "./types/node";
 
 import axios from "axios";
+import { ChatBot } from "@/components/Chatbot";
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
@@ -51,14 +52,13 @@ export default function Home() {
 
 
   const updateNodeStorage = useMutation(({ storage }, newNodeData) => {
-    const nodeData = storage.get("nodeData");
     storage.set("nodeData", newNodeData);
   }, []);
 
   // update node storage
   useEffect(() => {
     updateNodeStorage({ nodeData: nodes });
-  }, [nodes]);
+  }, [nodes, updateNodeStorage]);
 
 
   const handleDeploy = useCallback(() => {
@@ -193,6 +193,7 @@ export default function Home() {
         </ReactFlow>
 
         <AISearch />
+        <ChatBot />
       </div>
     </>
   );

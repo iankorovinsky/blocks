@@ -36,7 +36,7 @@ const SetFunctionNode = ({ data, id }: Props) => {
         return node;
       }),
     );
-  }, [compoundType, primitiveType]);
+  }, [compoundType, primitiveType, id, setNodes]);
 
   useEffect(() => {
     const interval = setInterval(() => {
