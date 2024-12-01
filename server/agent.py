@@ -321,7 +321,7 @@ TOOLS = {
 }   
 
 @traceable
-def invoke(requested_tools, prompt):
+def invoke(requested_tools):
     agent_tools = []
     for tool in requested_tools:
         if tool in TOOLS.keys():
@@ -396,7 +396,7 @@ def handle_agent_request():
     return "Agent endpoint reached" 
 
 if __name__ == "__main__":
-    response = invoke_agent(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"])
+    response = invoke_agent(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"], "what is the best way to write smart contracts in Cairo?")
     print(response.content)
 
     
