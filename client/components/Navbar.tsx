@@ -13,13 +13,40 @@ import {
 import { CuboidIcon as Cube } from "lucide-react";
 import { useNavbar } from "@/contexts/NavbarContext";
 import { Edge } from "@xyflow/react";
+import { useAuth0 } from '@auth0/auth0-react';
+import { useFlow } from "@/contexts/FlowContext";
+import axios from "axios";
 
 interface NavbarProps {
-  onDeploy: (nodes: Node[], edges: Edge[]) => void;
+  onDeploy: () => void;
 }
 
 export function Navbar({ onDeploy }: NavbarProps) {
   const { contractName, setContractName, network, setNetwork } = useNavbar();
+  const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
+  const { localNodes, localEdges } = useFlow();
+
+  const handleDeploy = () => {
+    const deploymentData = {
+      nodeData: localNodes,
+      edgeData: localEdges,
+      contractName,
+      network,
+    };
+
+    window.alert("Deploying contract with data: " + JSON.stringify(deploymentData, null, 2));
+    console.log("Deploying contract with data: ", deploymentData);
+
+    axios.post("https://apt-polished-raptor.ngrok-free.app/deploy", deploymentData)
+      .then(response => {
+        const hash = response.data.hash;
+        console.log("Deployment hash: ", hash);
+        window.open(`https://sepolia.starkscan.co/contract/${hash}`, "_blank");
+      })
+      .catch(error => {
+        console.error("Error deploying contract: ", error);
+      });
+  };
 
   return (
     <nav className="bg-background border-b h-[7vh] flex items-center">
@@ -52,8 +79,18 @@ export function Navbar({ onDeploy }: NavbarProps) {
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <Button onClick={() => onDeploy([], [])}>Deploy</Button>
+          <div className="flex items-center gap-4">
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm">{user?.email}</span>
+                <Button variant="outline" onClick={() => logout()}>
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Button onClick={() => loginWithRedirect()}>Login</Button>
+            )}
+            <Button onClick={handleDeploy}>Deploy</Button>
           </div>
         </div>
       </div>

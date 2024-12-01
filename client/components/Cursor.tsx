@@ -7,9 +7,10 @@ interface CursorProps {
   x: number;
   y: number;
   lastActive?: number;
+  name: string;
 }
 
-export function Cursor({ x, y, lastActive }: CursorProps) {
+export function Cursor({ x, y, lastActive, name }: CursorProps) {
   const { getViewport } = useReactFlow();
   const [isVisible, setIsVisible] = useState(true);
 
@@ -57,7 +58,7 @@ export function Cursor({ x, y, lastActive }: CursorProps) {
           opacity: isVisible ? 1 : 0
         }}
       >
-        adam
+        {name}
       </div>
     </div>
   );
