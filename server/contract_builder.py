@@ -144,14 +144,19 @@ class ContractBuilder:
         return [node for node in nodes if node['data']['type'] == node_type]
 
     def get_node_edges(self, node_id: str) -> Dict[str, List[Dict]]:
-        """Get all edges connected to a specific node"""
+        """Get all edges connected to a specific node, treating the graph as undirected"""
         if 'edgeData' not in self.json_data:
             raise KeyError("JSON data does not contain 'edgeData' key")
             
         edges = self.json_data['edgeData']
+        connected_edges = [edge for edge in edges if edge['source'] == node_id or edge['target'] == node_id]
+        
         return {
-            'incoming': [edge for edge in edges if edge['target'] == node_id],
-            'outgoing': [edge for edge in edges if edge['source'] == node_id]
+            'connections': connected_edges,
+            'connected_nodes': [
+                edge['target'] if edge['source'] == node_id else edge['source']
+                for edge in connected_edges
+            ]
         }
     
     def get_primitive_type(self, primitive_node: Dict) -> str:
@@ -187,37 +192,33 @@ class ContractBuilder:
         return clean_name
     
     def get_storage_var_type(self, storage_var_node) -> str:
-        # Find the edge where this storage node is the source
-        target_node_id = None
-        # Use self.json_data['edgeData'] instead of self.edge_data
-        for edge in self.json_data['edgeData']:
-            if edge['source'] == storage_var_node['id']:
-                target_node_id = edge['target']
-                break
+        edges = self.get_node_edges(storage_var_node['id'])
+
+         # Look through all connected nodes for type definitions
+        for connected_node_id in edges['connected_nodes']:
+            # Find the connected node in nodeData
+            connected_node = next(
+                (node for node in self.json_data['nodeData'] if node['id'] == connected_node_id), 
+                None
+            )
+            
+            if not connected_node:
+                continue
+
+            # Check if this is a type node
+            if connected_node['data']['type'] == 'PRIM_TYPE':
+                return self.get_primitive_type(connected_node)
+            elif connected_node['data']['type'] == 'COMPOUND_TYPE':
+                return connected_node['data']['primitiveType']
+   
+        raise ValueError(f"No type definition found for storage variable {storage_var_node['id']}")
+
+
         
-        if not target_node_id:
-            raise ValueError(f"No target found for storage variable {storage_var_node['id']}")
-
-        # Find the target node in nodeData
-        # Use self.json_data['nodeData'] instead of self.node_data
-        target_node = next((node for node in self.json_data['nodeData'] if node['id'] == target_node_id), None)
-        if not target_node:
-            raise ValueError(f"Target node {target_node_id} not found")
-
-        # If it's a primitive type, return its identifier directly
-        if target_node['data']['type'] == 'PRIM_TYPE':
-            return self.get_primitive_type(target_node)
-        
-        # If it's a compound type, find its target (primitive type)
-        elif target_node['data']['type'] == 'COMPOUND_TYPE':
-            return target_node['data']['primitiveType']
-
-        raise ValueError(f"Unexpected node type: {target_node['data']['type']}")
-
     # ------------------------------------------------------------------------------------------------  
     # Generate smart contract
     def generate_function_with_return(self, language_json, function_name, storage_node, params):
-        template = language_json["type"]["FUNCTION"].get('SET', {})
+        template = language_json["type"]["FUNCTION"].get('GET', {})
         if not template:
             raise ValueError(f"No template found for function: {function_name}")
         
@@ -246,7 +247,7 @@ class ContractBuilder:
         return "\n".join(processed_template)
 
     def generate_function(self, language_json, function_name, storage_node, params):
-        template = language_json["type"]["FUNCTION"].get('GET', {})
+        template = language_json["type"]["FUNCTION"].get('SET', {})
         if not template:
             raise ValueError(f"No template found for function: {function_name}")
         
@@ -288,37 +289,37 @@ class ContractBuilder:
             # Get edges for this function node
             edges = self.get_node_edges(function_node['id'])
             
-            # Find the storage node (outgoing edge)
+            # Find the storage node among connected nodes
             storage_node = None
-            for edge in edges['outgoing']:
-                target_id = edge['target']
-                storage_node = next(
+            for connected_node_id in edges['connected_nodes']:
+                node = next(
                     (node for node in self.json_data.get('nodeData', [])
-                     if node.get('id') == target_id and node.get('data', {}).get('type') == 'STORAGE_VAR'),
+                    if node.get('id') == connected_node_id and 
+                        node.get('data', {}).get('type') == 'STORAGE_VAR'),
                     None
                 )
-                if storage_node:
+                if node:
+                    storage_node = node
                     break
             
             if not storage_node:
                 print(f"Warning: No storage node found for function {function_node.get('id')}")
                 continue
-            
             # Get parameters from incoming nodes
             params = {
                 "function_name": function_node.get('data', {}).get('name', 'unnamed_function')
             }
             
-            # Process incoming edges to get parameters
-            for edge in edges['incoming']:
-                source_id = edge['source']
+            # Look for parameter nodes among connected nodes
+            for connected_node_id in edges['connected_nodes']:
                 param_node = next(
                     (node for node in self.json_data.get('nodeData', [])
-                     if node.get('id') == source_id),
+                    if node.get('id') == connected_node_id and 
+                        node.get('data', {}).get('type') == 'PRIM_TYPE'),
                     None
                 )
                 
-                if param_node and param_node['data']['type'] == 'PRIM_TYPE':
+                if param_node:
                     param_name = param_node['data'].get('name', 'param')
                     param_type = self.get_primitive_type(param_node)
                     params[param_name] = param_type
@@ -326,7 +327,7 @@ class ContractBuilder:
             # Generate the appropriate function based on identifier
             if identifier == 'SET':
                 self.generate_function(language_json, 'set', storage_node, params)
-            elif identifier == 'RETURN':
+            elif identifier == 'GET':
                 self.generate_function_with_return(language_json, 'get', storage_node, params)
     
     def generate_storage_vars(self):
@@ -342,7 +343,7 @@ class ContractBuilder:
 
 
 # Create a global contract builder instance
-contract_builder = ContractBuilder('sample2.json')
+contract_builder = ContractBuilder('sample3.json')
     
 def main():
     language_map = contract_builder._load_json('language.json')
@@ -357,6 +358,15 @@ def main():
 
     final_contract = contract_builder.build()
 
+    # Define the output file path
+    output_file_path = '/home/appuser/blocks-1/server/src/lib.cairo'
+
+    # Write the final contract to the specified file
+    with open(output_file_path, 'w') as file:
+        file.write(final_contract)
+    
+    print(f"Contract written to {output_file_path}")
+    
     print(final_contract)
 
 if __name__ == "__main__":
