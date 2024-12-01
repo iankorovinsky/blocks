@@ -15,15 +15,15 @@ mod SimpleWallet {
 	#[abi(embed_v0)]
 	impl SimpleWallet of super::ISimpleWalletContractState> {
 		fn get(self: @ContractState) -> u64 {
-			self.storagename1.read()
+			self.value.read()
 		}
 
-        fn increment_value(ref self: ContractState, value: u64) {
-            self.value.write(self.value.read() + value);
+        fn increment_value(ref self: ContractState, amount: u64) {
+            self.value.write(self.value.read() + amount);
         }
 
-        fn decrement_value(ref self: ContractState, value: u64) {
-            self.value.write(self.value.read() - value);
+        fn decrement_value(ref self: ContractState, amount: u64) {
+            self.value.write(self.value.read() - amount);
         }
 	}
 }
