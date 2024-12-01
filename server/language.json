@@ -23,7 +23,7 @@
                 ],
                 "return_type": "void",
                 "template": [
-                    "fn set_{functionName}(ref self: ContractState, value: {storageVarType}) {",
+                    "fn {functionName}(ref self: ContractState, value: {storageVarType}) {",
                     "\tself.{storageVarName}.write(value);",
                     "}"
                 ]
@@ -41,7 +41,7 @@
                   }
                 ],
                 "template": [
-                  "fn get_{functionName}(self: @ContractState) -> {storageVarType} {",
+                  "fn {functionName}(self: @ContractState) -> {storageVarType} {",
                   "\tself.{storageVarName}.read()",
                   "}"
                 ]
@@ -59,8 +59,26 @@
                     }
                 ],
                 "template": [
-                    "fn increment_{functionName}(ref self: ContractState, amount: {storageVarType}) {",
+                    "fn {functionName}(ref self: ContractState, amount: {storageVarType}) {",
                     "\tself.{storageVarName}.write(self.{storageVarName}.read() + {amount});",
+                    "}"
+                ]
+            },
+            "DECREMENT": {
+                "description": "Decrement a numeric value in the contract storage.",
+                "visibility": "public",
+                "modifier": "ref",
+                "annotations": ["#[external(v0)]"],
+                "parameters": [
+                    {
+                        "name": "self",
+                        "type": "ContractState",
+                        "mode": "ref"
+                    }
+                ],
+                "template": [
+                    "fn {functionName}(ref self: ContractState, amount: {storageVarType}) {",
+                    "\tself.{storageVarName}.write(self.{storageVarName}.read() - {amount});",
                     "}"
                 ]
             }

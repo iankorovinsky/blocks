@@ -1,29 +1,29 @@
 #[starknet::interface]
-trait ISimpleWallet<TContractState> {
+trait IMyContract<TContractState> {
 	fn get(self: @TContractState) -> u64;
+	fn increment_value(ref self: TContractState, amount: u64);
+	fn decrement_value(ref self: TContractState, amount: u64);
 }
 
 #[starknet::contract]
-mod SimpleWallet {
+mod MyContract {
 	use core::starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
 
 	#[storage]
-	struct Wallet {
+	struct Storage {
 		value: u64,
 	}
 
 	#[abi(embed_v0)]
-	impl SimpleWallet of super::ISimpleWalletContractState> {
+	impl MyContract of super::IMyContract<ContractState> {
 		fn get(self: @ContractState) -> u64 {
-			self.storagename1.read()
+			self.value.read()
 		}
-
-        fn increment_value(ref self: ContractState, value: u64) {
-            self.value.write(self.value.read() + value);
-        }
-
-        fn decrement_value(ref self: ContractState, value: u64) {
-            self.value.write(self.value.read() - value);
-        }
+		fn increment_value(ref self: ContractState, amount: u64) {
+			self.value.write(self.value.read() + 1);
+		}
+		fn decrement_value(ref self: ContractState, amount: u64) {
+			self.value.write(self.value.read() - 1);
+		}
 	}
 }
