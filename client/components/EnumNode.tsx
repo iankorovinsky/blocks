@@ -1,23 +1,44 @@
-import { Handle, Position } from "@xyflow/react";
-import { FolderTree } from "lucide-react";
-import { useState } from "react";
+import { Handle, Position, useReactFlow } from "@xyflow/react";
+import { List } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
-interface StructNodeProps {
-  data: {
-    name: string;
-    label: string;
-    onChange?: (updates: { name: string }) => void;
-  };
-  isConnectable: boolean;
-}
+type Props = {
+  data: { label: string; storage_variable: string };
+  id: string;
+};
 
-export function StructNode({ data }: StructNodeProps) {
-  const [inputValue, setInputValue] = useState(data.name);
-  const [storageVariable] = useState<string | undefined>("");
+const EnumNode = ({ data, id }: Props) => {
+  const [inputValue, setInputValue] = useState("");
+  const [storageVariable, setStorageVariable] = useState<string | undefined>(
+    "",
+  );
+  const { getNodes, getEdges } = useReactFlow();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    data.onChange?.({ name: e.target.value });
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nodes = getNodes();
+      const edges = getEdges();
+
+      const connectedNodeIds = edges
+        .filter((edge) => edge.source === id || edge.target === id)
+        .map((edge) => (edge.source === id ? edge.target : edge.source));
+
+      const connectedNode = nodes.find((node) =>
+        connectedNodeIds.includes(node.id),
+      );
+
+      if (
+        connectedNode 
+      ) {
+        setStorageVariable(connectedNode.data?.target as string);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [getNodes, getEdges, id, storageVariable]);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
   };
 
   return (
@@ -25,17 +46,17 @@ export function StructNode({ data }: StructNodeProps) {
       <div
         className="absolute -top-px -right-px w-0 h-0 
         border-t-[30px] border-l-[30px] 
-        border-t-yellow-500 border-l-transparent
+        border-t-purple-500 border-l-transparent
         overflow-visible rounded"
       >
         <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">
-          S
+          E
         </span>
       </div>
 
       <div className="p-3 border-b border-gray-800">
         <div className="flex items-center gap-2">
-          <FolderTree className="w-4 h-4 text-blue-400" />
+          <List className="w-4 h-4 text-blue-400" />
           <span className="font-medium">{data.label}</span>
         </div>
       </div>
@@ -58,7 +79,7 @@ export function StructNode({ data }: StructNodeProps) {
         <div className="space-y-2 relative">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-orange-400" />
-            <label className="text-sm text-gray-400">Typed Variables</label>
+            <label className="text-sm text-gray-400">Variables</label>
           </div>
           {storageVariable ? (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
@@ -66,7 +87,7 @@ export function StructNode({ data }: StructNodeProps) {
             </div>
           ) : (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect to add typed variables
+              Connect to add variables
             </div>
           )}
 
@@ -86,4 +107,4 @@ export function StructNode({ data }: StructNodeProps) {
   );
 };
 
-export default StructNode; 
+export default EnumNode; 

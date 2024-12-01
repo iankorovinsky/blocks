@@ -15,6 +15,11 @@ import AdditionNode from "@/components/AdditionNode";
 import SubtractionNode from "@/components/SubtractionNode";
 import EmitNode from "@/components/EmitNode";
 import LegacyNode from "@/components/LegacyNode";
+import EnumNode from "@/components/EnumNode";
+import TypedVariableNode from "@/components/TypedVariableNode";
+import WriteWithParamsNode from "@/components/WriteWithParamsNode";
+import ReadWithParamsNode from "@/components/ReadWithParamsNode";
+
 
 export const nodeTypes = {
   setFunction: SetFunctionNode,
@@ -34,5 +39,8 @@ export const nodeTypes = {
   subtractionNode: SubtractionNode,
   emitNode: EmitNode,
   legacyMap: LegacyNode,
-
+  enum: EnumNode,
+  typedVariable: TypedVariableNode,
+  writeWithParams: WriteWithParamsNode,
+  readWithParams: ReadWithParamsNode,
 };
