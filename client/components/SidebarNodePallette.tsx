@@ -80,6 +80,14 @@ const nodeTemplates: NodeTemplate[] = [
     description: "Compound type node",
   },
   {
+    type: "basicFunction",
+    label: "Basic Function",
+    data: { label: "Basic Function", type: "FUNCTION", identifier: "BASIC" },
+    icon: ArrowDownCircle,
+    color: "bg-orange-500",
+    description: "Basic function node",
+  },
+  {
     type: "readFunction",
     label: "Read",
     data: { label: "Read", type: "READ", identifier: "" },
