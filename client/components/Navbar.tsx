@@ -52,7 +52,10 @@ export function Navbar({ onDeploy }: Props) {
             </Select>
           </div>
           <div>
-            <Button onClick={onDeploy}>Deploy</Button>
+            <Button onClick={() => {
+              console.log("Deploying contract...");
+              onDeploy();
+            }}>Deploy</Button>
           </div>
         </div>
       </div>

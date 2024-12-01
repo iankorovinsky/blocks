@@ -1,4 +1,7 @@
 // Define Liveblocks types for your application
+
+import { LiveList, LiveObject } from "@liveblocks/client";
+
 // https://liveblocks.io/docs/api-reference/liveblocks-react#Typing-your-data
 declare global {
   interface Liveblocks {
@@ -12,6 +15,24 @@ declare global {
     Storage: {
       // Example, a conflict-free list
       // animals: LiveList<string>;
+      nodeData: LiveList<{
+        id: string;
+        type: string;
+        data: {
+          label: string;
+          type: string;
+          identifier: string;
+          storage_variable: string;
+          primitiveType: string;
+        };
+      }>
+      edgeData: LiveList<{
+        id: string;
+        source: string;
+        target: string;
+      }>;
+      network: string;
+      contractName: string;
     };
 
     // Custom user info set when authenticating with a secret key

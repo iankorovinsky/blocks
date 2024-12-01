@@ -1,12 +1,10 @@
-import TextNode from "../../components/TextNode";
-import SetFunctionNode from "../../components/SetFunctionNode";
-import StorageNode from "@/components/StorageNode";
-import PrimitiveNode from "@/components/PrimitiveNode";
 import CompoundNode from "@/components/CompoundNode";
 import GetFunctionNode from "@/components/GetFunctionNode";
+import PrimitiveNode from "@/components/PrimitiveNode";
+import StorageNode from "@/components/StorageNode";
+import SetFunctionNode from "../../components/SetFunctionNode";
 
 export const nodeTypes = {
-  textUpdater: TextNode,
   setFunction: SetFunctionNode,
   storage: StorageNode,
   primitive: PrimitiveNode,

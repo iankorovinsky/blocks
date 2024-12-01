@@ -4,75 +4,62 @@ import {
   addEdge,
   Background,
   BackgroundVariant,
-  Panel,
+  Connection,
+  Edge,
+  Node,
   ReactFlow,
   useEdgesState,
-  useNodesState,
+  useNodesState
 } from "@xyflow/react";
 
-import { useMyPresence, useOthers } from "@liveblocks/react/suspense";
+import AISearch from "@/components/AIAgentSearchbar";
+import { Navbar } from "@/components/Navbar";
+import { NodeTemplate } from "@/components/SidebarNodePallette";
+import { useNavbar } from "@/contexts/NavbarContext";
+import { useMutation, useMyPresence, useOthers, useStorage } from "@liveblocks/react/suspense";
 import "@xyflow/react/dist/style.css";
 import React, { useCallback, useEffect } from "react";
 import { Cursor } from "../components/Cursor";
 import { nodeTypes } from "./types/node";
-import { Navbar } from "@/components/Navbar";
-import { useNavbar } from "@/contexts/NavbarContext";
-import { NodeTemplate } from "@/components/SidebarNodePallette";
-import AISearch from "@/components/AIAgentSearchbar";
 
-const initialNodes = [
-  {
-    id: "3",
-    position: { x: 0, y: 200 },
-    data: { label: "Set", type: "FUNCTION", identifier: "SET", name: "" }, // todo: set name
-    type: "setFunction",
-  },
-  {
-    id: "4",
-    position: { x: 400, y: 200 },
-    data: {
-      label: "Storage",
-      type: "STORAGE_VAR",
-      identifier: "",
-      storage_variable: "",
-    },
-    type: "storage",
-  },
-  {
-    id: "5",
-    position: { x: 800, y: 200 },
-    data: { label: "Primitive", type: "PRIM_TYPE", identifier: "" },
-    type: "primitive",
-  },
-  {
-    id: "6",
-    position: { x: 0, y: 600 },
-    data: { label: "Compound", type: "COMPOUND_TYPE", identifier: "" },
-    type: "compound",
-  },
-  {
-    id: "7",
-    position: { x: 400, y: 600 },
-    data: { label: "Get", type: "FUNCTION", identifier: "" },
-    type: "getFunction",
-  },
-];
+import axios from "axios";
 
-const initialEdges = [
-  { id: "e1-2", source: "3", target: "2" },
-  { id: "e2-3", source: "2", target: "3" },
-];
+const initialNodes: Node[] = [];
+const initialEdges: Edge[] = [];
 
 
 export default function Home() {
   const { contractName, network } = useNavbar();
 
-  const [myPresence, updateMyPresence] = useMyPresence();
+  const [, updateMyPresence] = useMyPresence();
   const others = useOthers();
-  const userCount = others.length;
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  const nodeStorage = useStorage(() => initialNodes);
+  const edgeStorage = useStorage(() => initialEdges);
+
+  const storage = useStorage(() => {
+    return {
+      nodeData: nodeStorage,
+      edgeData: edgeStorage,
+    };
+  })
+
+  console.log("FROM STORAGE", storage);
+
+
+  const updateNodeStorage = useMutation(({ storage }, newNodeData) => {
+    const nodeData = storage.get("nodeData");
+    storage.set("nodeData", newNodeData);
+  }, []);
+
+  // update node storage
+  useEffect(() => {
+    updateNodeStorage({ nodeData: nodes });
+  }, [nodes]);
+
 
   const handleDeploy = useCallback(() => {
     const deploymentData = {
@@ -85,16 +72,26 @@ export default function Home() {
     window.alert("Deploying contract with data: " +  JSON.stringify(deploymentData, null, 2));
     console.log("Deploying contract with data: ", deploymentData);
 
-    // Add your deployment logic here (e.g., API call or contract deployment)
+    axios.post("https://apt-polished-raptor.ngrok-free.app/deploy", deploymentData)
+      .then(response => {
+        const hash = response.data.hash;
+        console.log("Deployment hash: ", hash);
+        window.open(`https://sepolia.starkscan.co/contract/${hash}`, "_blank");
+      })
+      .catch(error => {
+        console.error("Error deploying contract: ", error);
+      });
+
+
   }, [contractName, network, nodes, edges]);
 
   // print json data of nodes, edges
-  console.log(
-    JSON.stringify({
-      nodeData: nodes,
-      edgeData: edges,
-    }),
-  );
+  // console.log(
+  //   JSON.stringify({
+  //     nodeData: nodes,
+  //     edgeData: edges,
+  //   }),
+  // );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -112,7 +109,7 @@ export default function Home() {
       if (
         typeof nodeInformation.type === "undefined" ||
         !nodeInformation.type
-      ) {
+      ) { 
         return;
       }
 
@@ -126,16 +123,23 @@ export default function Home() {
         id: `${nodeInformation.type}_${Date.now()}`,
         type: nodeInformation.type,
         position,
-        data: nodeInformation.data,
+        data: {
+          label: nodeInformation.data.label || "",
+          type: nodeInformation.data.type || "",
+          identifier: nodeInformation.data.identifier || "",
+          name: nodeInformation.data.name as undefined,
+          storage_variable: nodeInformation.data.storage_variable as string,
+          primitiveType: nodeInformation.data.primitiveType as string,
+        },
       };
-
+      
       setNodes((nds) => nds.concat(newNode));
     },
     [setNodes],
   );
 
   const onConnect = useCallback(
-    (params: any) => setEdges((eds) => addEdge(params, eds)),
+    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
   );
 

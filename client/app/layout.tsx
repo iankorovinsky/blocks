@@ -1,9 +1,9 @@
+import { NodePalette } from "@/components/SidebarNodePallette";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { NavbarProvider } from "@/contexts/NavbarContext";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Room } from "./Room";
-import { NavbarProvider } from "@/contexts/NavbarContext";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { NodePalette } from "@/components/SidebarNodePallette";
 
 export const metadata: Metadata = {
   title: "Create Next App",
