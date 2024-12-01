@@ -70,7 +70,7 @@ export default function Home() {
     };
 
     window.alert("Deploying contract with data: " +  JSON.stringify(deploymentData, null, 2));
-    console.log("Deploying contract with data: ", deploymentData);
+    console.log("Deploying contract with data: ", JSON.stringify(deploymentData, null, 2));
 
     axios.post("https://apt-polished-raptor.ngrok-free.app/deploy", deploymentData)
       .then(response => {

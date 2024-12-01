@@ -3,13 +3,18 @@ import { Settings2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 type Props = {
-  data: { label: string; storage_variable: string };
+  data: { 
+    label: string; 
+    storage_variable: string;
+    name: string;
+    amount: string;
+  };
   id: string;
 };
 
 const DecrementFunctionNode = ({ data, id }: Props) => {
-  const [inputValue, setInputValue] = useState("");
-  const [amountValue, setAmountValue] = useState("");
+  const [inputValue, setInputValue] = useState(data.name || "");
+  const [amountValue, setAmountValue] = useState(data.amount || "");
   const [storageVariable, setStorageVariable] = useState<string | undefined>(
     "",
   );
@@ -41,10 +46,12 @@ const DecrementFunctionNode = ({ data, id }: Props) => {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
+    data.name = event.target.value;
   };
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmountValue(event.target.value);
+    data.amount = event.target.value;
   };
 
   return (
