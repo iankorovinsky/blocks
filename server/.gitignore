@@ -3,3 +3,7 @@
 *.pyc
 
 __pycache__/
+
+.env
+account_testnet_ian_account.json
+account_testnet_ian_keystore.json
