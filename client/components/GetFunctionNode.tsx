@@ -28,7 +28,7 @@ const GetFunctionNode = ({ data, id }: Props) => {
       );
 
       if (
-        connectedNode &&
+        connectedNode && 
         connectedNode.data?.storage_variable !== storageVariable
       ) {
         setStorageVariable(connectedNode.data?.storage_variable as string);
