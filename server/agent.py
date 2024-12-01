@@ -6,36 +6,24 @@ import json
 import smtplib
 from dotenv import load_dotenv
 from langgraph.graph import END, START, StateGraph, MessagesState
+from langchain_community.vectorstores import Chroma
 from langchain_groq import ChatGroq
 from langchain_core.tools import tool
 from langchain_community.document_loaders import PyMuPDFLoader
-from langgraph.prebuilt import ToolNode, create_react_agent
+from langgraph.prebuilt import ToolNode
 from langgraph.checkpoint.memory import MemorySaver
-from langchain_core.messages import HumanMessage
 from langgraph.checkpoint.memory import MemorySaver
-from langchain_community.document_transformers import LongContextReorder
-from langchain.chains import create_history_aware_retriever
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.tools.yahoo_finance_news import YahooFinanceNewsTool
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import InjectedToolArg
 from typing_extensions import Annotated
 from langsmith import traceable
-from langchain.callbacks.tracers.langchain import wait_for_all_tracers
-from IPython.display import Image, display
 
-
-
-# langsmith tracing
-# LANGCHAIN_TRACING_V2=True
-# LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
-# LANGCHAIN_API_KEY="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"
-# LANGCHAIN_PROJECT="pr-healthy-sip-57"
 load_dotenv()
 
 def add(a: int, b: int) -> int:
@@ -89,7 +77,7 @@ def send_email(query: str):
         print(f"Failed to send email: {e}")
     return
 
-# get data from starknet id
+# get data from starknet id tool
 # sample question: what is the data of starknet id 1
 def get_data_from_starknet_id (starknet_id: str):
     """Retrieve the data of a Starknet ID.
@@ -106,7 +94,7 @@ def get_data_from_starknet_id (starknet_id: str):
     except requests.exceptions.RequestException as e:
         return {"error": str(e)}
     
-# get address and expiry date of a domain
+# get address and expiry date of a domain tool
 # sample question: what address is fricoben.stark
 def get_address_from_starknet_domain (domain: str):
     """Retrieve the associated address and its expiry date for a given domain.
@@ -122,7 +110,7 @@ def get_address_from_starknet_domain (domain: str):
     except requests.exceptions.RequestException as e:
         return {"error": str(e)}
     
-# get the NFT uri from a starknet id
+# get the NFT uri from a starknet id tool
 # sample question: whwat is the nft uri of starknet id 12
 def uri_of_starknet_id (starknet_id: str):
     """Retrieve the NFT uri of a Starknet ID.
@@ -138,7 +126,7 @@ def uri_of_starknet_id (starknet_id: str):
     except requests.exceptions.RequestException as e:
         return {"error": str(e)}
 
-# get all nfts by account
+# get all nfts by account tool
 # sample question: what are the nfts in this address: 0x06a8e001355e8a8436ccef288bdb42fce04b2853ed7b7dacde4e3693ceb95b2b"
 def get_nft_by_account (account_address: str, show_attribute: bool | None = None, sort_field: str | None = None, sort_direction: str | None = None):
     """returns all NFTs owned by an account address.
@@ -165,7 +153,7 @@ def get_nft_by_account (account_address: str, show_attribute: bool | None = None
     except requests.exceptions.RequestException as e:
         return {"error": str(e)}
 
-# search collections
+# search collections tool
 # sample question: give me all the info about the collections at this contact address: 0x060c7bac593716c5ab7b9dcb98c2cb97dcee9eef49bd2e8329383b35f7232452
 def search_collections (
         contract_address_list: List[str],
@@ -229,8 +217,8 @@ def search_collections (
 
 def cairo_rag():
 
-    file_path="documents/cairo_programming_language.pdf"
-
+    file_path="blocks/server/documents/cairo_programming_language.pdf"
+    
     def document_ingestion(file_path):
         documents = []
         pdf_reader = PyMuPDFLoader(file_path=file_path).load()
@@ -248,40 +236,29 @@ def cairo_rag():
         return chunks
 
     def store_into_vectorstore(chunks : None):
-        embedding_function = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2',
-                                                model_kwargs={'device': 'cpu'})
-        db_path = 'vectorstore/db_faiss'
+        embedding_function = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        db_path = 'blocks/server/vectorstore/db_chroma'
 
         # create a new DB from the documents or take the existing DB from local
         if os.path.exists(db_path):
-            vectordb = FAISS.load_local(db_path, embedding_function, allow_dangerous_deserialization=True)
+            vectordb = Chroma(persist_directory=db_path, embedding_function=embedding_function)
             print("vectorstore loaded from local")
         else:
-            vectordb = FAISS.from_documents(chunks, embedding_function)
-            vectordb.save_local(db_path)
+            vectordb = Chroma.from_documents(documents=chunks, embedding=embedding_function, persist_directory=db_path)
             print("vectorstore saved to local")
 
         return vectordb
     
     def conversation_chain(vectordb):
-        basic_retriever = vectordb.as_retriever(search_kwargs={'k': 12})
+        basic_retriever = vectordb.as_retriever(search_kwargs={'k': 3})
 
-        # long_context_reorder = LongContextReorder()
-        # pipeline_compressor = DocumentCompressorPipeline(
-        #     transformers=[long_context_reorder]
-        # )
-        # compression_retriever = ContextualCompressionRetriever(
-        #     base_compressor=pipeline_compressor, base_retriever=basic_retriever
-        # )
-
-        qa_system_prompt = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>As an AI assisting a Starknet developer, be helpful. 
-        If the documents are relevant to the question, answer the following question based on the retrieved documents.
+        qa_system_prompt = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>As an AI tool assisting an AI agent helping a Starknet developer.
+        If the documents are relevant to the question, give the information from the documents to the AI agent.
         You are connected to a RAG system that gave you the provided documents, and it is a complete database of all the information you need to know.
         Your response should adhere to the following guidelines:
         - Answer the question by only using the provided documents.
         - Do not fabricate any information or data.
-        - Be straightforward.
-        - Do not easily state what you do not know, but only say it if you absolutely have no relevant sources.<|eot_id|>
+        - Be straightforward.<|eot_id|>
         <|start_header_id|>user<|end_header_id|> 
         Question: {input} 
         Context: {context}
@@ -299,8 +276,9 @@ def cairo_rag():
             raise Exception("Groq api key not found.")
 
         model = ChatGroq(
-            model="llama-3.1-70b-versatile",
+            model="llama3-groq-8b-8192-tool-use-preview",
             temperature=0.0,
+            max_tokens=8000,
             api_key=groq_api_key
             )
 
@@ -309,23 +287,25 @@ def cairo_rag():
         return rag_chain
     
     if os.path.exists(file_path):
-        vectorstore = store_into_vectorstore(None)
+        vectorstore = store_into_vectorstore(chunks=None)
         chain = conversation_chain(vectorstore)
         return chain
     else:
         documents = document_ingestion(file_path)
         chunks = text_splitting(documents)
-        vectorstore = store_into_vectorstore(chunks)
+        vectorstore = store_into_vectorstore(chunks=chunks)
         chain = conversation_chain(vectorstore)
-        return chain
+    return chain
 
 
 def cairo_rag_tool(query: str):
     """This tool is used to get information related to Cairo programming.
-    Arg: query (A string containing the developer's question or topic of interest)."""
-    response = cairo_rag.invoke({"input": query})
-    return response["answer"];
-
+    Arg: query"""
+    rag_chain = cairo_rag()
+    response = rag_chain.invoke({"input": query})
+    context = response['context']
+    document_data = str([document.page_content for document in context])
+    return document_data;
 
 TOOLS = {
     "add": add,
@@ -354,8 +334,9 @@ def invoke(requested_tools, prompt):
         raise Exception("Groq api key not found.")
 
     model = ChatGroq(
-        model="llama-3.1-70b-versatile",
+        model="llama3-groq-8b-8192-tool-use-preview",
         temperature=0.0,
+        max_tokens=8000,
         api_key=groq_api_key
         )
 
@@ -397,12 +378,8 @@ def invoke(requested_tools, prompt):
 
     # memory
     checkpointer = MemorySaver()
-    app = workflow.compile(checkpointer=checkpointer)
+    app = workflow.compile()
 
-    # final_state = app.invoke(
-    #     {"messages": [HumanMessage(content="what 500 + 267?")]},
-    #     config={"configurable": {"thread_id": 42}}
-    # )
     response = ""
     for chunk in app.stream(
         {"messages": [("human", prompt)]},
@@ -419,10 +396,8 @@ def handle_agent_request():
     return "Agent endpoint reached" 
 
 if __name__ == "__main__":
-    # try:
-    response = invoke(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"], "what is the best way to write smart contracts in Cairo?")
-    print(response)
-    # finally:
-    #     wait_for_all_tracers()
+    response = invoke_agent(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"])
+    print(response.content)
+
     
     

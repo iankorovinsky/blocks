@@ -5,3 +5,9 @@ langchain-groq
 groq
 langchain_community
 pymupdf
+sentence_transformers
+langchain_huggingface
+faiss-cpu
+langchain-chroma>=0.1.2
+gpt4all
+langchain_pinecone
