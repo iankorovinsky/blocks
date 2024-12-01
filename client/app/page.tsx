@@ -14,6 +14,9 @@ import {
   NodeChange,
   useReactFlow,
   ReactFlowInstance,
+  BaseEdge,
+  EdgeProps,
+  getSmoothStepPath,
 } from "@xyflow/react";
 
 import AISearch from "@/components/AIAgentSearchbar";
@@ -35,9 +38,16 @@ import { LiveList, LiveObject } from "@liveblocks/client";
 import type { Presence, SerializedNode, SerializedEdge } from '../liveblocks.config';
 
 import { FlowWrapper } from "@/components/FlowWrapper";
+import { CustomEdge } from '@/components/CustomEdge';
+import { MarkerType } from '@xyflow/react';
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
+
+// Add this near your other constants
+const edgeTypes = {
+  custom: CustomEdge,
+};
 
 // Create a new component for the flow content
 function FlowContent({ 
@@ -245,6 +255,16 @@ function FlowContent({
           updatePresence({
             cursor: null,
           });
+        }}
+        edgeTypes={edgeTypes}
+        defaultEdgeOptions={{
+          type: 'custom',
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            width: 15,
+            height: 15,
+            color: '#94a3b8',
+          },
         }}
       >
         <Background color="#FFFFFF" variant={BackgroundVariant.Dots} />
