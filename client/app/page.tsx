@@ -21,13 +21,11 @@ import CustomEdge from "@/components/CustomEdge";
 import { FlowWrapper } from "@/components/FlowWrapper";
 import { Navbar } from "@/components/Navbar";
 import { NodeTemplate } from "@/components/SidebarNodePallette";
-import { FlowProvider, useFlow } from "@/contexts/FlowContext";
-import { useNavbar } from "@/contexts/NavbarContext";
+import { FlowProvider } from "@/contexts/FlowContext";
 import { LiveList } from "@liveblocks/client";
 import { useMutation, useMyPresence, useOthers, useStorage } from "@liveblocks/react/suspense";
 import { MarkerType } from '@xyflow/react';
 import "@xyflow/react/dist/style.css";
-import axios from "axios";
 import React, { useCallback, useEffect, useRef } from "react";
 import type { Presence, SerializedEdge, SerializedNode } from '../liveblocks.config';
 import { nodeTypes } from "./types/node";
@@ -226,35 +224,11 @@ function FlowContent({
 
 // Main component now just handles the provider setup
 export default function Home() {
-  const { contractName, network } = useNavbar();
   const [myPresence, updateMyPresence] = useMyPresence();
-  const { localNodes, localEdges } = useFlow();
-
-  const handleDeploy = useCallback(() => {
-    const deploymentData = {
-      nodeData: localNodes,
-      edgeData: localEdges,
-      contractName,
-      network,
-    };
-
-    window.alert("Deploying contract with data: " + JSON.stringify(deploymentData, null, 2));
-    console.log("Deploying contract with data: ", JSON.stringify(deploymentData, null, 2));
-
-    axios.post("https://apt-polished-raptor.ngrok-free.app/deploy", deploymentData)
-      .then(response => {
-        const hash = response.data.hash;
-        console.log("Deployment hash: ", hash);
-        window.open(`https://sepolia.starkscan.co/contract/${hash}`, "_blank");
-      })
-      .catch(error => {
-        console.error("Error deploying contract: ", error);
-      });
-  }, [contractName, network, localNodes, localEdges]);
 
   return (
     <>
-      <Navbar onDeploy={handleDeploy} />
+      <Navbar />
       <div className="relative" style={{ width: "100%", height: "93vh" }}>
         <FlowWrapper>
           <FlowContent

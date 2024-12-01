@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,14 +9,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CuboidIcon as Cube } from "lucide-react";
 import { useNavbar } from "@/contexts/NavbarContext";
-import { Edge, Node as FlowNode } from "@xyflow/react";
 import { useAuth0 } from '@auth0/auth0-react';
-import { useStorage } from "@liveblocks/react/suspense";
 import { LiveList } from "@liveblocks/client";
-import type { SerializedNode, SerializedEdge } from '../liveblocks.config';
+import { useStorage } from "@liveblocks/react/suspense";
 import axios from 'axios';
+import { CuboidIcon as Cube } from "lucide-react";
+import type { SerializedEdge, SerializedNode } from '../liveblocks.config';
 
 
 export function Navbar() {
