@@ -2,375 +2,301 @@ import json
 from typing import List, Dict, Any
 
 class ContractBuilder:
-    def __init__(self, json_data: Dict[str, Any]):
-        self.contract_name = ""
+    def __init__(self, jsonData: Dict[str, Any]):
+        self.contractName = ""
         self.functions = []
-        self.storage_vars = []
+        self.storageVars = []
         self.interfaces = []
-        self.json_data = json_data
+        self.jsonData = jsonData
 
-    def _load_json(self, json_file_path: str) -> Dict:
-        """Load JSON file and store its content"""
+    def loadJson(self, jsonFilePath: str) -> Dict:
         try:
-            with open(json_file_path, 'r') as file:
+            with open(jsonFilePath, 'r') as file:
                 return json.load(file)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Could not find JSON file at: {json_file_path}")
+            raise FileNotFoundError(f"Could not find JSON file at: {jsonFilePath}")
         except json.JSONDecodeError:
-            raise ValueError(f"Invalid JSON format in file: {json_file_path}")
+            raise ValueError(f"Invalid JSON format in file: {jsonFilePath}")
     
-    # We need this added to the frontend its not in the json
-    def set_name(self, name: str):
-        self.contract_name = name
+    def setName(self, name: str):
+        self.contractName = name
 
-    def add_function(self, function_data: dict):
-        self.functions.append(function_data)
+    def addFunction(self, functionData: dict):
+        self.functions.append(functionData)
     
-    def build_interface_block(self) -> str:
-        """Builds the interface section of the contract."""
-        if not self.contract_name:
+    def buildInterfaceBlock(self) -> str:
+        if not self.contractName:
             raise ValueError("Contract name must be set before building interface block")
         
-        interface_name = f"I{self.contract_name}"
+        interfaceName = f"I{self.contractName}"
         
-        # Start the interface block
-        interface_block = [
+        interfaceBlock = [
             "#[starknet::interface]",
-            f"trait {interface_name}<TContractState> {{",
+            f"trait {interfaceName}<TContractState> {{",
         ]
         
-        # Add function declarations from templates
         for func in self.functions:
             template = func['template']
             if template:
-                # Get just the function signature from the first line
                 signature = template[0].strip()
-                # Replace ContractState with TContractState
                 signature = signature.replace("ContractState", "TContractState")
-                # Remove the opening brace if it exists
                 signature = signature.rstrip(" {")
-                # Add semicolon
                 signature = f"\t{signature};"
-                interface_block.append(signature)
+                interfaceBlock.append(signature)
         
-        # Close the interface block
-        interface_block.append("}")
+        interfaceBlock.append("}")
         
-        return "\n".join(interface_block)
+        return "\n".join(interfaceBlock)
 
-    def build_contract_block(self) -> str:
-        """Builds the main contract block including storage and implementation."""
-        if not self.contract_name:
+    def buildContractBlock(self) -> str:
+        if not self.contractName:
             raise ValueError("Contract name must be set before building contract block")
         
-        # Start the contract block
-        contract_parts = [
+        contractParts = [
             "#[starknet::contract]",
-            f"mod {self.contract_name} {{",
+            f"mod {self.contractName} {{",
         ]
 
-        # Check for GET and SET functions
-        has_get = any(func.get('template', [None])[0].strip().startswith('fn get') for func in self.functions)
-        has_set = any(func.get('template', [None])[0].strip().startswith('fn set') for func in self.functions)
+        hasGet = any(func.get('template', [None])[0].strip().startswith('fn get') for func in self.functions)
+        hasSet = any(func.get('template', [None])[0].strip().startswith('fn set') for func in self.functions)
 
-        # Add storage traits only if needed
-        if has_get or has_set:
-            storage_traits = []
-            if has_get:
-                storage_traits.append("StoragePointerReadAccess")
-            if has_set:
-                storage_traits.append("StoragePointerWriteAccess")
-            contract_parts.append(f"\tuse core::starknet::storage::{{{', '.join(storage_traits)}}};")
+        if hasGet or hasSet:
+            storageTraits = []
+            if hasGet:
+                storageTraits.append("StoragePointerReadAccess")
+            if hasSet:
+                storageTraits.append("StoragePointerWriteAccess")
+            contractParts.append(f"\tuse core::starknet::storage::{{{', '.join(storageTraits)}}};")
 
-        contract_parts.append("")
-        # Add storage block inside the contract
-        storage_block = self.build_storage_block()
-        # Indent the storage block lines
-        indented_storage = "\t" + storage_block.replace("\n", "\n\t")
-        contract_parts.append(indented_storage)
-        contract_parts.append("")  # Add empty line for spacing
+        contractParts.append("")
+        storageBlock = self.buildStorageBlock()
+        indentedStorage = "\t" + storageBlock.replace("\n", "\n\t")
+        contractParts.append(indentedStorage)
+        contractParts.append("")
         
-        # Add implementation block
-        impl_block = self.build_implementation_block()
-        contract_parts.append(impl_block)
+        implBlock = self.buildImplementationBlock()
+        contractParts.append(implBlock)
         
-        # Close the contract block
-        contract_parts.append("}")
+        contractParts.append("}")
         
-        return "\n".join(contract_parts)
+        return "\n".join(contractParts)
     
-    def build_storage_block(self):
-        """Build the storage block structure"""
-        storage_block = [
+    def buildStorageBlock(self):
+        storageBlock = [
             "#[storage]",
             "struct Storage {",
         ]
         
-        if self.storage_vars:
-            storage_block.extend(f"\t{var}" for var in self.storage_vars)
+        if self.storageVars:
+            storageBlock.extend(f"\t{var}" for var in self.storageVars)
             
-        storage_block.append("}")
+        storageBlock.append("}")
         
-        return "\n".join(storage_block)
+        return "\n".join(storageBlock)
 
-    def build_implementation_block(self) -> str:
-        if not self.contract_name:
+    def buildImplementationBlock(self) -> str:
+        if not self.contractName:
             raise ValueError("Contract name must be set before building implementation block")
             
-        impl_parts = [
+        implParts = [
             "\t#[abi(embed_v0)]",
-            f"\timpl {self.contract_name} of super::I{self.contract_name}<ContractState> {{",
+            f"\timpl {self.contractName} of super::I{self.contractName}<ContractState> {{",
         ]
-        # Add all functions - extract the template strings from the function dictionaries
         if self.functions:
             for func in self.functions:
-                # Add two levels of indentation for function content
-                impl_parts.extend(["\t\t" + line for line in func['template']])
+                implParts.extend(["\t\t" + line for line in func['template']])
         
-        # Add closing brace with one level of indentation
-        impl_parts.append("\t}")
+        implParts.append("\t}")
         
-        return "\n".join(impl_parts)
+        return "\n".join(implParts)
 
-    def build(self):
-        # Combine all components into a complete contract
-        contract_parts = []
-        
-        # Add the interface block
-        contract_parts.append(self.build_interface_block())
-        # Add the contract block (includes storage block and implementation block)
-        contract_parts.append(self.build_contract_block())
-        return "\n\n".join(contract_parts)
-    
-    # ------------------------------------------------------------------------------------------------
-    # Helper functions
-    def parse_nodes(self) -> List[Dict]:
-        """Get all nodes from the loaded JSON"""
-        if 'nodeData' not in self.json_data:
+    def parseNodes(self) -> List[Dict]:
+        if 'nodeData' not in self.jsonData:
             raise KeyError("JSON data does not contain 'nodeData' key")
-        return self.json_data['nodeData']
-    
+        return self.jsonData['nodeData']
 
-    def get_nodes_by_type(self, node_type: str) -> List[Dict]:
-        """Get all nodes of a specific type"""
-        nodes = self.parse_nodes()
-        return [node for node in nodes if node['data']['type'] == node_type]
+    def getNodesByType(self, nodeType: str) -> List[Dict]:
+        nodes = self.parseNodes()
+        return [node for node in nodes if node['data']['type'] == nodeType]
 
-    def get_node_edges(self, node_id: str) -> Dict[str, List[Dict]]:
-        """Get all edges connected to a specific node, treating the graph as undirected"""
-        if 'edgeData' not in self.json_data:
+    def getNodeEdges(self, nodeId: str) -> Dict[str, List[Dict]]:
+        if 'edgeData' not in self.jsonData:
             raise KeyError("JSON data does not contain 'edgeData' key")
             
-        edges = self.json_data['edgeData']
-        connected_edges = [edge for edge in edges if edge['source'] == node_id or edge['target'] == node_id]
+        edges = self.jsonData['edgeData']
+        connectedEdges = [edge for edge in edges if edge['source'] == nodeId or edge['target'] == nodeId]
         
         return {
-            'connections': connected_edges,
-            'connected_nodes': [
-                edge['target'] if edge['source'] == node_id else edge['source']
-                for edge in connected_edges
+            'connections': connectedEdges,
+            'connectedNodes': [
+                edge['target'] if edge['source'] == nodeId else edge['source']
+                for edge in connectedEdges
             ]
         }
     
-    def get_primitive_type(self, primitive_node: Dict) -> str:
-        """Extract the primitive type from a primitive node"""
-        if primitive_node['data']['type'] != 'PRIM_TYPE':
-            raise ValueError(f"Node {primitive_node['id']} is not a primitive type node")
+    def getPrimitiveType(self, primitiveNode: Dict) -> str:
+        if primitiveNode['data']['type'] != 'PRIM_TYPE':
+            raise ValueError(f"Node {primitiveNode['id']} is not a primitive type node")
         
-        return primitive_node['data']['identifier']
+        return primitiveNode['data']['identifier']
 
-    def get_function_name(self, function_node: Dict) -> str:
-        """Get the name of a function node""" 
-        if function_node['data']['type'] != "FUNCTION":
-            raise ValueError(f"Node {function_node['id']} is not a function node")
-        return function_node['data']['name']
+    def getFunctionName(self, functionNode: Dict) -> str:
+        if functionNode['data']['type'] != "FUNCTION":
+            raise ValueError(f"Node {functionNode['id']} is not a function node")
+        return functionNode['data']['name']
     
-    def get_storage_var_name(self, storage_var_node) -> str:
-        """Extract the storage variable name from a storage node"""
-        # Get the storage variable name from the node data
-        storage_var = storage_var_node.get('data', {}).get('storage_variable', '')
+    def getStorageVarName(self, storageVarNode) -> str:
+        storageVar = storageVarNode.get('data', {}).get('storage_variable', '')
         
-        # If no name is provided or it's empty, raise an error
-        if not storage_var:
+        if not storageVar:
             raise ValueError("Storage variable name is required")
         
-        # Remove any special characters and spaces, keeping alphanumeric and underscores
-        # This ensures the name is valid in Cairo
-        clean_name = ''.join(c for c in storage_var if c.isalnum() or c == '_')
+        cleanName = ''.join(c for c in storageVar if c.isalnum() or c == '_')
         
-        # Ensure the name starts with a letter
-        if clean_name[0].isdigit():
-            clean_name = 'var_' + clean_name
+        if cleanName[0].isdigit():
+            cleanName = 'var_' + cleanName
             
-        return clean_name
+        return cleanName
     
-    def get_storage_var_type(self, storage_var_node) -> str:
-        edges = self.get_node_edges(storage_var_node['id'])
+    def getStorageVarType(self, storageVarNode) -> str:
+        edges = self.getNodeEdges(storageVarNode['id'])
 
-         # Look through all connected nodes for type definitions
-        for connected_node_id in edges['connected_nodes']:
-            # Find the connected node in nodeData
-            connected_node = next(
-                (node for node in self.json_data['nodeData'] if node['id'] == connected_node_id), 
+        for connectedNodeId in edges['connectedNodes']:
+            connectedNode = next(
+                (node for node in self.jsonData['nodeData'] if node['id'] == connectedNodeId), 
                 None
             )
             
-            if not connected_node:
+            if not connectedNode:
                 continue
 
-            # Check if this is a type node
-            if connected_node['data']['type'] == 'PRIM_TYPE':
-                return self.get_primitive_type(connected_node)
-            elif connected_node['data']['type'] == 'COMPOUND_TYPE':
-                return connected_node['data']['primitiveType']
+            if connectedNode['data']['type'] == 'PRIM_TYPE':
+                return self.getPrimitiveType(connectedNode)
+            elif connectedNode['data']['type'] == 'COMPOUND_TYPE':
+                return connectedNode['data']['primitiveType']
    
-        raise ValueError(f"No type definition found for storage variable {storage_var_node['id']}")
+        raise ValueError(f"No type definition found for storage variable {storageVarNode['id']}")
 
-
-        
-    # ------------------------------------------------------------------------------------------------  
-    # Generate smart contract
-    def generate_function_with_return(self, language_json, function_name, storage_node, params):
-        template = language_json["type"]["FUNCTION"].get('GET', {})
+    def generateFunctionWithReturn(self, languageJson, functionName, storageNode, params):
+        template = languageJson["type"]["FUNCTION"].get('GET', {})
         if not template:
-            raise ValueError(f"No template found for function: {function_name}")
+            raise ValueError(f"No template found for function: {functionName}")
         
-        # Get storage variable details from the node
-        storage_var_name = self.get_storage_var_name(storage_node)
-        storage_var_type = self.get_storage_var_type(storage_node)
+        storageVarName = self.getStorageVarName(storageNode)
+        storageVarType = self.getStorageVarType(storageNode)
         
-        # Create a copy of the template
-        function_data = template.copy()
+        functionData = template.copy()
         
-        # Process the template strings
-        processed_template = []
+        processedTemplate = []
         for line in template['template']:
-            line = line.replace("{function_name}", function_name)
-            line = line.replace("{storage_var_name}", storage_var_name)
-            line = line.replace("{storage_var_type}", storage_var_type)
+            line = line.replace("{function_name}", functionName)
+            line = line.replace("{storage_var_name}", storageVarName)
+            line = line.replace("{storage_var_type}", storageVarType)
             
             if params:
                 for key, value in params.items():
                     line = line.replace(f"{{{key}}}", value)
             
-            processed_template.append(line)
+            processedTemplate.append(line)
         
-        function_data['template'] = processed_template
-        self.add_function(function_data)
-        return "\n".join(processed_template)
+        functionData['template'] = processedTemplate
+        self.addFunction(functionData)
+        return "\n".join(processedTemplate)
 
-    def generate_function(self, language_json, function_name, storage_node, params):
-        template = language_json["type"]["FUNCTION"].get('SET', {})
+    def generateFunction(self, languageJson, functionName, storageNode, params):
+        template = languageJson["type"]["FUNCTION"].get('SET', {})
         if not template:
-            raise ValueError(f"No template found for function: {function_name}")
+            raise ValueError(f"No template found for function: {functionName}")
         
-        # Get storage variable details from the node
-        storage_var_name = self.get_storage_var_name(storage_node)
-        storage_var_type = self.get_storage_var_type(storage_node)
+        storageVarName = self.getStorageVarName(storageNode)
+        storageVarType = self.getStorageVarType(storageNode)
         
-        # Create a copy of the template
-        function_data = template.copy()
+        functionData = template.copy()
         
-        # Process the template strings
-        processed_template = []
+        processedTemplate = []
         for line in template['template']:
-            line = line.replace("{function_name}", function_name)
-            line = line.replace("{storage_var_name}", storage_var_name)
-            line = line.replace("{storage_var_type}", storage_var_type)
+            line = line.replace("{function_name}", functionName)
+            line = line.replace("{storage_var_name}", storageVarName)
+            line = line.replace("{storage_var_type}", storageVarType)
             
             if params:
                 for key, value in params.items():
                     line = line.replace(f"{{{key}}}", value)
             
-            processed_template.append(line)
+            processedTemplate.append(line)
         
-        function_data['template'] = processed_template
-        self.add_function(function_data)
-        return "\n".join(processed_template)
+        functionData['template'] = processedTemplate
+        self.addFunction(functionData)
+        return "\n".join(processedTemplate)
     
-    def generate_functions(self, language_json):
-        """Generate all functions based on function nodes in the JSON data
-        Args:
-            language_json: The language template data
-        """
-        function_nodes = self.get_nodes_by_type('FUNCTION')
+    def generateFunctions(self, languageJson):
+        functionNodes = self.getNodesByType('FUNCTION')
         
-        for function_node in function_nodes:
-            # Get the function identifier (SET or RETURN)
-            identifier = function_node.get('data', {}).get('identifier')
+        for functionNode in functionNodes:
+            identifier = functionNode.get('data', {}).get('identifier')
             
-            # Get edges for this function node
-            edges = self.get_node_edges(function_node['id'])
+            edges = self.getNodeEdges(functionNode['id'])
             
-            # Find the storage node among connected nodes
-            storage_node = None
-            for connected_node_id in edges['connected_nodes']:
+            storageNode = None
+            for connectedNodeId in edges['connectedNodes']:
                 node = next(
-                    (node for node in self.json_data.get('nodeData', [])
-                    if node.get('id') == connected_node_id and 
+                    (node for node in self.jsonData.get('nodeData', [])
+                    if node.get('id') == connectedNodeId and 
                         node.get('data', {}).get('type') == 'STORAGE_VAR'),
                     None
                 )
                 if node:
-                    storage_node = node
+                    storageNode = node
                     break
             
-            if not storage_node:
-                print(f"Warning: No storage node found for function {function_node.get('id')}")
+            if not storageNode:
+                print(f"Warning: No storage node found for function {functionNode.get('id')}")
                 continue
-            # Get parameters from incoming nodes
             params = {
-                "function_name": function_node.get('data', {}).get('name', 'unnamed_function')
+                "function_name": functionNode.get('data', {}).get('name', 'unnamed_function')
             }
             
-            # Look for parameter nodes among connected nodes
-            for connected_node_id in edges['connected_nodes']:
-                param_node = next(
-                    (node for node in self.json_data.get('nodeData', [])
-                    if node.get('id') == connected_node_id and 
+            for connectedNodeId in edges['connectedNodes']:
+                paramNode = next(
+                    (node for node in self.jsonData.get('nodeData', [])
+                    if node.get('id') == connectedNodeId and 
                         node.get('data', {}).get('type') == 'PRIM_TYPE'),
                     None
                 )
                 
-                if param_node:
-                    param_name = param_node['data'].get('name', 'param')
-                    param_type = self.get_primitive_type(param_node)
-                    params[param_name] = param_type
+                if paramNode:
+                    paramName = paramNode['data'].get('name', 'param')
+                    paramType = self.getPrimitiveType(paramNode)
+                    params[paramName] = paramType
             
-            # Generate the appropriate function based on identifier
             if identifier == 'SET':
-                self.generate_function(language_json, 'set', storage_node, params)
+                self.generateFunction(languageJson, 'set', storageNode, params)
             elif identifier == 'GET':
-                self.generate_function_with_return(language_json, 'get', storage_node, params)
+                self.generateFunctionWithReturn(languageJson, 'get', storageNode, params)
     
-    def generate_storage_vars(self):
-        """Generate storage variables from the JSON data"""
-        storage_nodes = self.get_nodes_by_type('STORAGE_VAR')
-        for node in storage_nodes:
-            storage_var_name = self.get_storage_var_name(node)
-            storage_var_type = self.get_storage_var_type(node)
-            self.storage_vars.append(f"{storage_var_name}: {storage_var_type},")
+    def generateStorageVars(self):
+        storageNodes = self.getNodesByType('STORAGE_VAR')
+        for node in storageNodes:
+            storageVarName = self.getStorageVarName(node)
+            storageVarType = self.getStorageVarType(node)
+            self.storageVars.append(f"{storageVarName}: {storageVarType},")
 
-    def invoke(self, contract_name: str):
-        language_map = self._load_json('language.json')
+    def invoke(self, contractName: str):
+        languageMap = self.loadJson('language.json')
     
-        # Add this line to set the contract name while we don't have a frontend for it
-        self.set_name(contract_name)
+        self.setName(contractName)
         
-        self.generate_storage_vars()
+        self.generateStorageVars()
 
-        # Generate all functions - this populates self.functions
-        self.generate_functions(language_map)
+        self.generateFunctions(languageMap)
 
-        final_contract = self.build()
+        finalContract = self.build()
 
-        # Define the output file path
-        output_file_path = '/home/appuser/blocks/server/src/lib.cairo'
+        outputFilePath = '/home/appuser/blocks/server/src/lib.cairo'
 
-        # Write the final contract to the specified file
-        with open(output_file_path, 'w') as file:
-            file.write(final_contract)
+        with open(outputFilePath, 'w') as file:
+            file.write(finalContract)
             
-        print(f"Contract written to {output_file_path}")
+        print(f"Contract written to {outputFilePath}")
         
-        print(final_contract)
+        print(finalContract)

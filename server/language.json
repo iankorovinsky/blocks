@@ -23,8 +23,8 @@
                 ],
                 "return_type": "void",
                 "template": [
-                    "fn {function_name}(ref self: ContractState, {storage_var_type}) {",
-                    "\tself.{storage_var_name}.write({param});",
+                    "fn set_{functionName}(ref self: ContractState, value: {storageVarType}) {",
+                    "\tself.{storageVarName}.write(value);",
                     "}"
                 ]
             },
@@ -41,8 +41,8 @@
                   }
                 ],
                 "template": [
-                  "fn {function_name}(self: @ContractState) -> {storage_var_type} {",
-                  "\tself.{storage_var_name}.read()",
+                  "fn get_{functionName}(self: @ContractState) -> {storageVarType} {",
+                  "\tself.{storageVarName}.read()",
                   "}"
                 ]
             }
