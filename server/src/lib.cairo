@@ -3,8 +3,9 @@ trait IMyContract<TContractState> {
 	fn get(self: @TContractState) -> u64;
 }
 #[starknet::contract]
-mod SimpleStorage {
+mod MyContract {
 	use core::starknet::storage::{StoragePointerReadAccess};
+
 	#[storage]
 	struct Storage {
 		storagename1: u64,
