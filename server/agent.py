@@ -305,7 +305,7 @@ def cairo_rag_tool(query: str):
     response = rag_chain.invoke({"input": query})
     context = response['context']
     document_data = str([document.page_content for document in context])
-    return document_data;
+    return document_data
 
 TOOLS = {
     "add": add,
@@ -321,7 +321,7 @@ TOOLS = {
 }   
 
 @traceable
-def invoke_agent(requested_tools):
+def invoke(requested_tools, prompt):
     agent_tools = []
     for tool in requested_tools:
         if tool in TOOLS.keys():
@@ -382,19 +382,22 @@ def invoke_agent(requested_tools):
 
     response = ""
     for chunk in app.stream(
-        {"messages": [("human", "what is cairo programming?")]},
+        {"messages": [("human", prompt)]},
         {"configurable": {"thread_id": "thread-1"}},
         stream_mode="values"):
         response = chunk["messages"][-1]
 
     # agent = create_react_agent(model, agent_tools)
     # response = agent.invoke({"messages": [("human", "what's 2 + 2")]})
-    return response
+    return response.content
 
 def handle_agent_request():
 
     return "Agent endpoint reached" 
 
 if __name__ == "__main__":
-    response = invoke_agent(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"])
-    print(response.content)
+    response = invoke(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"], "what is the best way to write smart contracts in Cairo?")
+    print(response)
+
+    
+    
