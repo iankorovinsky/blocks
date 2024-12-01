@@ -1,0 +1,1 @@
+{"version":1,"contracts":[{"id":"reinites4ku5q","package_name":"server","contract_name":"MyContract","module_path":"server::MyContract","artifacts":{"sierra":"sample_contract_MyContract.contract_class.json","casm":"sample_contract_MyContract.compiled_contract_class.json"}}]}
