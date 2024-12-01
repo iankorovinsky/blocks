@@ -11,3 +11,4 @@ faiss-cpu
 langchain-chroma>=0.1.2
 gpt4all
 langchain_pinecone
+langchain_openai

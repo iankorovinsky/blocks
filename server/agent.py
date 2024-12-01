@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from langgraph.graph import END, START, StateGraph, MessagesState
 from langchain_community.vectorstores import Chroma
 from langchain_groq import ChatGroq
+from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain_community.document_loaders import PyMuPDFLoader
 from langgraph.prebuilt import ToolNode
@@ -240,12 +241,12 @@ def cairo_rag():
         db_path = 'blocks/server/vectorstore/db_chroma'
 
         # create a new DB from the documents or take the existing DB from local
-        # if os.path.exists(db_path):
-        #     vectordb = Chroma(persist_directory=db_path, embedding_function=embedding_function)
-        #     print("vectorstore loaded from local")
-        # else:
-        vectordb = Chroma.from_documents(documents=chunks, embedding=embedding_function, persist_directory=db_path)
-        print("vectorstore saved to local")
+        if os.path.exists(db_path):
+            vectordb = Chroma(persist_directory=db_path, embedding_function=embedding_function)
+            print("vectorstore loaded from local")
+        else:
+            vectordb = Chroma.from_documents(documents=chunks, embedding=embedding_function, persist_directory=db_path)
+            print("vectorstore saved to local")
 
         return vectordb
     
@@ -271,35 +272,45 @@ def cairo_rag():
             ]
         )
 
-        groq_api_key = os.getenv('GROQ_API_KEY', None)
-        if groq_api_key is None:
-            raise Exception("Groq api key not found.")
+        # groq_api_key = os.getenv('GROQ_API_KEY', None)
+        # if groq_api_key is None:
+        #     raise Exception("Groq api key not found.")
 
-        model = ChatGroq(
-            model="llama3-groq-8b-8192-tool-use-preview",
-            temperature=0.0,
-            max_tokens=8000,
-            api_key=groq_api_key
-            )
+        # model = ChatGroq(
+        #     model="llama-3.1-70b-versatile",
+        #     temperature=0.0,
+        #     max_tokens=8000,
+        #     api_key=groq_api_key
+        #     )
+
+        open_api_key = os.getenv('OPENAI_API_KEY', None)
+        if open_api_key is None:
+            raise Exception("OpenAI api key not found.")
+        
+        model = ChatOpenAI(
+            model="gpt-4o",
+            temperature=0,
+            timeout=None,
+            max_retries=2)
 
         question_answer_chain = create_stuff_documents_chain(model, qa_prompt)
         rag_chain = create_retrieval_chain(basic_retriever, question_answer_chain)
         return rag_chain
     
-    # if os.path.exists(file_path):
-    #     vectorstore = store_into_vectorstore(chunks=None)
-    #     chain = conversation_chain(vectorstore)
-    #     return chain
-    # else:
-    documents = document_ingestion(file_path)
-    chunks = text_splitting(documents)
-    vectorstore = store_into_vectorstore(chunks=chunks)
-    chain = conversation_chain(vectorstore)
-    return chain
+    if os.path.exists(file_path):
+        vectorstore = store_into_vectorstore(chunks=None)
+        chain = conversation_chain(vectorstore)
+        return chain
+    else:
+        documents = document_ingestion(file_path)
+        chunks = text_splitting(documents)
+        vectorstore = store_into_vectorstore(chunks=chunks)
+        chain = conversation_chain(vectorstore)
+        return chain
 
 
 def cairo_rag_tool(query: str):
-    """This tool is used to get information related to Cairo programming.
+    """Use this tool to get any information related to Cairo programming.
     Arg: query"""
     rag_chain = cairo_rag()
     response = rag_chain.invoke({"input": query})
@@ -329,16 +340,27 @@ def invoke(requested_tools, prompt):
 
     tool_node = ToolNode(agent_tools)
 
-    groq_api_key = os.getenv('GROQ_API_KEY', None)
-    if groq_api_key is None:
-        raise Exception("Groq api key not found.")
+    # groq_api_key = os.getenv('GROQ_API_KEY', None)
+    # if groq_api_key is None:
+    #     raise Exception("Groq api key not found.")
 
-    model = ChatGroq(
-        model="llama3-groq-8b-8192-tool-use-preview",
-        temperature=0.0,
-        max_tokens=8000,
-        api_key=groq_api_key
-        )
+    # model = ChatGroq(
+    #     model="llama-3.1-70b-versatile",
+    #     temperature=0.0,
+    #     max_tokens=8000,
+    #     api_key=groq_api_key
+    #     )
+    
+    open_api_key = os.getenv('OPENAI_API_KEY', None)
+    if open_api_key is None:
+        raise Exception("OpenAI api key not found.")
+    
+    model = ChatOpenAI(
+        model="gpt-4o",
+        temperature=0,
+        timeout=None,
+        max_retries=2)
+
 
     model_with_tools = model.bind_tools(agent_tools)
 
@@ -378,7 +400,7 @@ def invoke(requested_tools, prompt):
 
     # memory
     checkpointer = MemorySaver()
-    app = workflow.compile()
+    app = workflow.compile(checkpointer=checkpointer)
 
     response = ""
     for chunk in app.stream(
@@ -396,7 +418,7 @@ def handle_agent_request():
     return "Agent endpoint reached" 
 
 if __name__ == "__main__":
-    response = invoke(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"], "what is the best way to write smart contracts in Cairo?")
+    response = invoke(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"], "what are the best ways to make smart contracts in Cairo?")
     print(response)
 
     
