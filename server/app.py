@@ -31,7 +31,7 @@ def deploy():
     data = request.get_json(force=True)
     network = data.get('network')
     contract_name = data.get('contract_name')
-    contract_builder = ContractBuilder(data.get('contract_data'))
+    contract_builder = ContractBuilder(data)
     contract_builder.invoke(contract_name)
     result = handle_deploy_request(network, contract_name)
     return {"hash": result}
