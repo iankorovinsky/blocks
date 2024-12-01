@@ -1,4 +1,5 @@
 import { NodePalette } from "@/components/SidebarNodePallette";
+import { FlowProviderWrapper } from "@/components/FlowProviderWrapper";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { NavbarProvider } from "@/contexts/NavbarContext";
 import type { Metadata } from "next";
@@ -12,19 +13,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body>
         <Room>
           <NavbarProvider>
             <SidebarProvider>
-              <div className="flex h-screen w-screen">
-                <NodePalette />
-                <div className="grow overflow-hidden">{children}</div>
-              </div>
+              <FlowProviderWrapper>
+                <div className="flex h-screen w-screen">
+                  <NodePalette />
+                  <div className="grow overflow-hidden">{children}</div>
+                </div>
+              </FlowProviderWrapper>
             </SidebarProvider>
           </NavbarProvider>
         </Room>

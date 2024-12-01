@@ -1,8 +1,16 @@
-import { Handle, Position } from "reactflow";
+import { Handle, Position } from "@xyflow/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-export function StructNode({ data, isConnectable }: any) {
+interface StructNodeProps {
+  data: {
+    name: string;
+    onChange?: (updates: { name: string }) => void;
+  };
+  isConnectable: boolean;
+}
+
+export function StructNode({ data, isConnectable }: StructNodeProps) {
   return (
     <Card className="w-[250px]">
       <CardHeader className="p-4">

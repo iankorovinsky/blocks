@@ -1,8 +1,18 @@
-import { Handle, Position } from "reactflow";
+import { Handle, Position } from "@xyflow/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-export function TypedVarNode({ data, isConnectable }: any) {
+interface TypedVarData {
+  data: {
+    label: string;
+    value: string | number;
+    name: string;
+    onChange?: (update: { name: string }) => void;
+  };
+  isConnectable: boolean;
+}
+
+export function TypedVarNode({ data, isConnectable }: TypedVarData) {
   return (
     <Card className="w-[200px]">
       <CardHeader className="p-4">

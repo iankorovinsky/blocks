@@ -1,18 +1,12 @@
 import React from "react";
 import { BaseEdge, EdgeProps, getStraightPath } from "@xyflow/react";
-import { X } from "lucide-react";
 
 const CustomEdge = ({
-  // id,
   sourceX,
   sourceY,
   targetX,
   targetY,
-  sourcePosition,
-  targetPosition,
-  style = {},
   markerEnd,
-  // data,
 }: EdgeProps) => {
   const [edgePath] = getStraightPath({
     sourceX,
@@ -25,16 +19,12 @@ const CustomEdge = ({
     <BaseEdge
       path={edgePath}
       markerEnd={markerEnd}
+      className="edge-path"
       style={{
-        ...style,
         strokeWidth: 2,
-        stroke: '#94a3b8', // Tailwind slate-400
+        stroke: '#94a3b8',
         strokeDasharray: '5,5',
         transition: 'stroke 0.2s, strokeWidth 0.2s',
-        '&:hover': {
-          strokeWidth: 3,
-          stroke: '#475569', // Tailwind slate-600
-        },
       }}
     />
   );

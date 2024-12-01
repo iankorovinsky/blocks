@@ -1,7 +1,12 @@
-import { Handle, Position } from "reactflow";
+import { Handle, Position } from "@xyflow/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export function WriteNode({ data, isConnectable }: any) {
+interface WriteNodeProps {
+  data: Record<string, unknown>;
+  isConnectable: boolean;
+}
+
+export function WriteNode({ isConnectable }: WriteNodeProps) {
   return (
     <Card className="w-[200px]">
       <CardHeader className="p-4">

@@ -12,12 +12,13 @@ import {
 } from "@/components/ui/select";
 import { CuboidIcon as Cube } from "lucide-react";
 import { useNavbar } from "@/contexts/NavbarContext";
+import { Edge } from "@xyflow/react";
 
-type Props = {
-  onDeploy: () => void;
-};
+interface NavbarProps {
+  onDeploy: (nodes: Node[], edges: Edge[]) => void;
+}
 
-export function Navbar({ onDeploy }: Props) {
+export function Navbar({ onDeploy }: NavbarProps) {
   const { contractName, setContractName, network, setNetwork } = useNavbar();
 
   return (
@@ -52,10 +53,7 @@ export function Navbar({ onDeploy }: Props) {
             </Select>
           </div>
           <div>
-            <Button onClick={() => {
-              console.log("Deploying contract...");
-              onDeploy();
-            }}>Deploy</Button>
+            <Button onClick={() => onDeploy([], [])}>Deploy</Button>
           </div>
         </div>
       </div>

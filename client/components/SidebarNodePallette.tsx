@@ -26,6 +26,12 @@ export interface NodeTemplate {
     name?: string;
     storage_variable?: string;
     primitiveType?: string;
+    varType?: string;
+    variables?: string[];
+    storageVar?: string;
+    param1?: string;
+    param2?: string;
+    paramType?: string;
   };
   label: string;
   icon: React.ElementType;
@@ -139,6 +145,8 @@ const nodeTemplates: NodeTemplate[] = [
     icon: Boxes,
     color: "bg-indigo-500",
     description: "Parameterized read node",
+  },
+  {
     type: "incrementFunction",
     label: "Increment",
     data: { label: "Increment", type: "FUNCTION", identifier: "INCREMENT" },

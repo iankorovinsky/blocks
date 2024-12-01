@@ -14,9 +14,9 @@ export function FlowWrapper({ children }: { children: React.ReactNode }) {
         return (
           <Cursor
             key={connectionId}
-            x={presence.cursor.x}
-            y={presence.cursor.y}
-            lastActive={presence.lastActive}
+            x={(presence.cursor as { x: number }).x}
+            y={(presence.cursor as { y: number }).y}
+            lastActive={presence.lastActive as number}
           />
         );
       })}

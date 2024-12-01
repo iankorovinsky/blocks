@@ -1,7 +1,7 @@
-import { Handle, Position } from "reactflow";
+import { Handle, Position } from "@xyflow/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export function ReadWithParamNode({ data, isConnectable }: any) {
+export function ReadWithParamNode({ isConnectable }: { isConnectable: boolean }) {
   return (
     <Card className="w-[200px]">
       <CardHeader className="p-4">
