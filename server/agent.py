@@ -341,7 +341,7 @@ TOOLS = {
 }   
 
 @traceable
-def invoke(requested_tools):
+def invoke(requested_tools, prompt):
     agent_tools = []
     for tool in requested_tools:
         if tool in TOOLS.keys():
@@ -405,7 +405,7 @@ def invoke(requested_tools):
     # )
     response = ""
     for chunk in app.stream(
-        {"messages": [("human", "what is cairo programming?")]},
+        {"messages": [("human", prompt)]},
         {"configurable": {"thread_id": "thread-1"}},
         stream_mode="values"):
         response = chunk["messages"][-1]
@@ -420,7 +420,7 @@ def handle_agent_request():
 
 if __name__ == "__main__":
     # try:
-    response = invoke(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"])
+    response = invoke(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"], "what is the best way to write smart contracts in Cairo?")
     print(response)
     # finally:
     #     wait_for_all_tracers()
