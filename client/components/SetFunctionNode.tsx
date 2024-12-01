@@ -1,5 +1,5 @@
 import { Handle, Position, useReactFlow } from "@xyflow/react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Settings2 } from "lucide-react";
 
 type Props = {

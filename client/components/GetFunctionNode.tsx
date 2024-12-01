@@ -1,6 +1,6 @@
 import { Handle, Position, useReactFlow } from "@xyflow/react";
-import React, { useEffect, useMemo, useState } from "react";
 import { Settings2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
 type Props = {
   data: { label: string; storage_variable: string };
