@@ -13,7 +13,7 @@ import AISearch from "@/components/AIAgentSearchbar";
 import { Navbar } from "@/components/Navbar";
 import { NodeTemplate } from "@/components/SidebarNodePallette";
 import { useNavbar } from "@/contexts/NavbarContext";
-import { useMyPresence, useOthers } from "@liveblocks/react/suspense";
+import { useMutation, useMyPresence, useOthers, useStorage } from "@liveblocks/react/suspense";
 import "@xyflow/react/dist/style.css";
 import React, { useCallback } from "react";
 import { Cursor } from "../components/Cursor";
@@ -68,10 +68,19 @@ export default function Home() {
 
   const [myPresence, updateMyPresence] = useMyPresence();
   const others = useOthers();
-  const userCount = others.length;
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  const nodeStorage = useStorage(() => initialNodes);
+  const edgeStorage = useStorage(() => initialEdges);
+
+
+  const updateNodeStorage = useMutation(({ storage }, newNodeData) => {
+    const nodeData = storage.get("nodeData");
+    storage.set("nodeData", newNodeData);
+  }, []);  
+
 
   const handleDeploy = useCallback(() => {
     const deploymentData = {
