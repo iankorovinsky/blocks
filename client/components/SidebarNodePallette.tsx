@@ -83,9 +83,25 @@ const nodeTemplates: NodeTemplate[] = [
     type: "readFunction",
     label: "Read",
     data: { label: "Read", type: "READ", identifier: "" },
-    icon: Boxes,
-    color: "bg-purple-500",
+    icon: Settings2,
+    color: "bg-orange-500",
     description: "Read function node",
+  },
+  {
+    type: "incrementFunction",
+    label: "Increment",
+    data: { label: "Increment", type: "FUNCTION", identifier: "" },
+    icon: Settings2,
+    color: "bg-orange-500",
+    description: "Increment function node",
+  },
+  {
+    type: "decrementFunction",
+    label: "Decrement",
+    data: { label: "Decrement", type: "FUNCTION", identifier: "" },
+    icon: Settings2,
+    color: "bg-orange-500",
+    description: "Decrement function node",
   },
 ];
 
