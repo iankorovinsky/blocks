@@ -13,7 +13,8 @@ import {
   applyNodeChanges,
   NodeChange,
   useReactFlow,
-  ReactFlowInstance
+  ReactFlowInstance,
+  ReactFlowProvider
 } from "@xyflow/react";
 
 import AISearch from "@/components/AIAgentSearchbar";
@@ -29,30 +30,35 @@ import { nodeTypes } from "./types/node";
 import axios from "axios";
 import { ChatBot } from "@/components/Chatbot";
 import { LiveList, LiveObject } from "@liveblocks/client";
-import { SerializedNode } from "@/liveblocks.config";
-import { FlowCursors } from '@/components/FlowCursors';
+// import FlowCursors from '../components/FlowCursors';
+
+// Import types from liveblocks config
+import type { Presence, SerializedNode, SerializedEdge } from '../liveblocks.config';
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
 
+// Create a new component for the flow content
+function FlowContent({ onDeploy }: { onDeploy: () => void }) {
+  const flowRef = useRef<HTMLDivElement>(null);
+  const { getViewport } = useReactFlow();
 
-export default function Home() {
   const { contractName, network } = useNavbar();
   const others = useOthers();
   
-  const [myPresence, updateMyPresence] = useMyPresence<Presence>();
+  const [myPresence, updateMyPresence] = useMyPresence();
   
   const nodes = useStorage((root) => root.nodes);
   const edges = useStorage((root) => root.edges);
 
-  const [localNodes, setNodes] = useNodesState(nodes ? Array.from(nodes) as Node[] : []);
-  const [localEdges, setEdges, onEdgesChange] = useEdgesState(edges ? Array.from(edges) as Edge[] : []);
+  const [localNodes, setNodes] = useNodesState(nodes ? Array.from(nodes).map(node => node as unknown as Node) : []);
+  const [localEdges, setEdges, onEdgesChange] = useEdgesState(edges ? Array.from(edges).map(edge => edge as unknown as Edge) : []);
 
-  const updateNodes = useMutation(({ storage }) => {
+  const updateNodes = useMutation(({ storage }, nodes: LiveList<SerializedNode>) => {
     storage.set("nodes", nodes);
   }, []);
 
-  const updateEdges = useMutation(({ storage }) => {
+  const updateEdges = useMutation(({ storage }, edges: LiveList<SerializedEdge>) => {
     storage.set("edges", edges);
   }, []);
 
@@ -65,10 +71,10 @@ export default function Home() {
             draggedNode: { id: change.id, position: change.position }
           });
         } else {
-          updateNodes((root) => {
-            const nodeIndex = root.nodes.findIndex(n => n.id === change.id);
+          updateNodes((root, nodes) => {
+            const nodeIndex = nodes.findIndex(n => n.id === change.id);
             if (nodeIndex !== -1) {
-              const node = root.nodes.get(nodeIndex);
+              const node = nodes.get(nodeIndex);
               if (node) {
                 root.nodes.set(nodeIndex, {
                   ...node,
@@ -169,7 +175,7 @@ export default function Home() {
       };
 
       // Update Liveblocks storage
-      updateNodes((root) => {
+      updateNodes((root, nodes) => {
         root.nodes.push(newNode);
       });
       
@@ -181,7 +187,7 @@ export default function Home() {
 
   const onConnect = useCallback((params: Connection) => {
     const newEdge = { id: `e${params.source}-${params.target}`, ...params };
-    updateEdges((root) => {
+    updateEdges((root, edges) => {
       root.edges.push(newEdge);
     });
     setEdges((eds) => addEdge(params, eds));
@@ -191,54 +197,63 @@ export default function Home() {
   //   console.log(localNodes);
   // }, [localNodes]);
 
-  const flowRef = useRef<HTMLDivElement>(null);
-  const { project, getViewport } = useReactFlow();
+  return (
+    <div
+      ref={flowRef}
+      className="relative"
+      style={{ width: "100%", height: "93vh" }}
+    >
+      <ReactFlow
+        nodes={localNodes}
+        edges={localEdges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+        nodeTypes={nodeTypes}
+        onMouseMove={(e) => {
+          if (flowRef.current) {
+            const bounds = flowRef.current.getBoundingClientRect();
+            const { zoom, x: vpX, y: vpY } = getViewport();
+            const x = (e.clientX - bounds.left - vpX) / zoom;
+            const y = (e.clientY - bounds.top - vpY) / zoom;
+            updateMyPresence({
+              ...myPresence,
+              cursor: { x, y },
+              lastActive: Date.now()
+            });
+          }
+        }}
+        onMouseLeave={() => updateMyPresence({
+          ...myPresence,
+          cursor: null
+        })}
+      >
+        <Background color="#FFFFFF" variant={BackgroundVariant.Dots} />
+        {/* <FlowCursors others={others} /> */}
+      </ReactFlow>
+
+      <AISearch />
+      <ChatBot />
+    </div>
+  );
+}
+
+// Main component now just handles the provider setup
+export default function Home() {
+  const { contractName, network } = useNavbar();
+
+  const handleDeploy = useCallback(() => {
+    // ... your deploy logic ...
+  }, [contractName, network]);
 
   return (
-    <>
+    <div className="h-screen w-screen">
       <Navbar onDeploy={handleDeploy} />
-      <div
-        ref={flowRef}
-        className="relative"
-        style={{ width: "100%", height: "93vh" }}
-      >
-        <ReactFlow
-          nodes={localNodes}
-          edges={localEdges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onDragOver={onDragOver}
-          onDrop={onDrop}
-          nodeTypes={nodeTypes}
-          onMouseMove={(e) => {
-            if (flowRef.current) {
-              const bounds = flowRef.current.getBoundingClientRect();
-              const { zoom, x: vpX, y: vpY } = getViewport();
-              
-              // Get position relative to the viewport
-              const x = (e.clientX - bounds.left - vpX) / zoom;
-              const y = (e.clientY - bounds.top - vpY) / zoom;
-              
-              updateMyPresence({
-                ...myPresence,
-                cursor: { x, y },
-                lastActive: Date.now()
-              });
-            }
-          }}
-          onMouseLeave={() => updateMyPresence({
-            ...myPresence,
-            cursor: null
-          })}
-        >
-          <Background color="#FFFFFF" variant={BackgroundVariant.Dots} />
-          <FlowCursors others={others} />
-        </ReactFlow>
-
-        <AISearch />
-        <ChatBot />
-      </div>
-    </>
+      <ReactFlowProvider>
+        <FlowContent onDeploy={handleDeploy} />
+      </ReactFlowProvider>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
-import { TypedVarNode } from "./nodes/TypedVarNode";
-import { StructNode } from "./nodes/StructNode";
-import { WriteNode } from "./nodes/WriteNode";
-import { ReadWithParamNode } from "./nodes/ReadWithParamNode";
+import { TypedVarNode } from "./TypedVarNode";
+import { StructNode } from "./StructNode";
+import { WriteNode } from "./WriteNode";
+import { ReadWithParamNode } from "./ReadWithParamNode";
 // ... existing imports ...
 
 export const nodeTypes = {
