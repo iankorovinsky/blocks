@@ -11,30 +11,23 @@ import {
 } from "@/components/ui/select";
 import { useNavbar } from "@/contexts/NavbarContext";
 import { useAuth0 } from '@auth0/auth0-react';
-import { LiveList } from "@liveblocks/client";
-import { useStorage } from "@liveblocks/react/suspense";
 import axios from 'axios';
 import { CuboidIcon as Cube } from "lucide-react";
-import type { SerializedEdge, SerializedNode } from '../liveblocks.config';
 import { useState } from "react";
 import { CollaborativeEditor } from "./CollaborativeEditor";
-
+import { useFlow } from "@/contexts/FlowContext";
 
 export function Navbar() {
   const { contractName, setContractName, network, setNetwork } = useNavbar();
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
-  const nodes = useStorage((root) => root.nodes);
-  const edges = useStorage((root) => root.edges);
+  const { localNodes: nodes, localEdges: edges } = useFlow();
   const [showEditor, setShowEditor] = useState(false);
   const [compiledCode, setCompiledCode] = useState("");
 
   const handleDeploy = () => {
-    const actualNodes = nodes ? Array.from(nodes as unknown as LiveList<SerializedNode>) : [];
-    const actualEdges = edges ? Array.from(edges as unknown as LiveList<SerializedEdge>) : [];
-
     const deploymentData = {
-      nodeData: actualNodes,
-      edgeData: actualEdges,
+      nodeData: nodes,
+      edgeData: edges,
       contractName,
       network,
     };
@@ -58,12 +51,9 @@ export function Navbar() {
   };
 
   const handleCompile = () => {
-    const actualNodes = nodes ? Array.from(nodes as unknown as LiveList<SerializedNode>) : [];
-    const actualEdges = edges ? Array.from(edges as unknown as LiveList<SerializedEdge>) : [];
-
     const compilationData = {
-      nodeData: actualNodes,
-      edgeData: actualEdges,
+      nodeData: nodes,
+      edgeData: edges,
       contractName,
     };
 

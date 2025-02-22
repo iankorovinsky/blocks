@@ -1,9 +1,8 @@
 "use client";
 
 import { Editor } from "@monaco-editor/react";
-import { useRoom, useOthers } from "@liveblocks/react";
 import { editor } from "monaco-editor";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 interface CollaborativeEditorProps {
   initialValue?: string;
@@ -12,7 +11,6 @@ interface CollaborativeEditorProps {
 // Collaborative text editor with simple rich text, live cursors, and live avatars
 export function CollaborativeEditor({ initialValue = "" }: CollaborativeEditorProps) {
   const [editorRef, setEditorRef] = useState<editor.IStandaloneCodeEditor>();
-  const others = useOthers();
 
   const handleOnMount = useCallback((e: editor.IStandaloneCodeEditor) => {
     setEditorRef(e);

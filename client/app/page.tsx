@@ -22,108 +22,25 @@ import { FlowWrapper } from "@/components/FlowWrapper";
 import { Navbar } from "@/components/Navbar";
 import { NodeTemplate } from "@/components/SidebarNodePallette";
 import { FlowProvider } from "@/contexts/FlowContext";
-import { LiveList } from "@liveblocks/client";
-import { useMutation, useMyPresence, useOthers, useStorage } from "@liveblocks/react/suspense";
 import { MarkerType } from '@xyflow/react';
 import "@xyflow/react/dist/style.css";
-import React, { useCallback, useEffect, useRef } from "react";
-import type { Presence, SerializedEdge, SerializedNode } from '../liveblocks.config';
+import React, { useCallback, useRef } from "react";
 import { nodeTypes } from "./types/node";
 
 const edgeTypes = {
   custom: CustomEdge,
 };
 
-function FlowContent({
-  updatePresence,
-}: {
-  updatePresence: (presence: Partial<Presence>) => void;
-  presence: Presence;
-}) {
+function FlowContent() {
   const flowRef = useRef<HTMLDivElement>(null);
   const { getViewport } = useReactFlow();
-  const others = useOthers();
 
-  const [myPresence, updateMyPresence] = useMyPresence();
-
-  const nodes = useStorage((root) => root.nodes);
-  const edges = useStorage((root) => root.edges);
-
-  const [localNodes, setNodes] = useNodesState(
-    nodes ? Array.from(nodes as unknown as LiveList<SerializedNode>).map(node => node as unknown as Node) : []
-  );
-  const [localEdges, setEdges, onEdgesChange] = useEdgesState(
-    edges ? Array.from(edges as unknown as LiveList<SerializedEdge>).map(edge => edge as unknown as Edge) : []
-  );
-
-  const updateNodes = useMutation(({ storage }, nodes: SerializedNode) => {
-    const list = storage.get("nodes") as LiveList<SerializedNode>;
-    if (!list) {
-      // Initialize the list if it doesn't exist
-      storage.set("nodes", new LiveList([nodes]));
-    } else {
-      // Add to existing list
-      list.push(nodes);
-    }
-  }, []);
-
-  const updateEdges = useMutation(({ storage }, edge: SerializedEdge) => {
-    const list = storage.get("edges") as LiveList<SerializedEdge>;
-    list.push(edge);
-  }, []);
-
-  const updateNodePosition = useMutation(({ storage }, update: { id: string, position: { x: number, y: number } }) => {
-    const list = storage.get("nodes") as LiveList<SerializedNode>;
-    const nodes = Array.from(list);
-    const nodeIndex = nodes.findIndex(n => n.id === update.id);
-    
-    if (nodeIndex !== -1) {
-      const node = nodes[nodeIndex];
-      if (node) {
-        list.set(nodeIndex, { ...node, position: update.position });
-      }
-    }
-  }, []);
+  const [nodes, setNodes] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
-    changes.forEach((change) => {
-      if (change.type === 'position' && 'position' in change && change.position) {
-        if (!change.dragging) {
-          updateNodePosition({
-            id: change.id,
-            position: { x: change.position.x, y: change.position.y }
-          });
-          updateMyPresence({
-            ...myPresence,
-            draggedNode: null
-          });
-        } else {
-          updateMyPresence({
-            ...myPresence,
-            draggedNode: { id: change.id, position: change.position }
-          });
-        }
-      }
-    });
-
     setNodes((nds) => applyNodeChanges(changes, nds));
-  }, [setNodes, updateNodes, updateMyPresence, myPresence, updateNodePosition]);
-
-  useEffect(() => {
-    others.forEach((other) => {
-      const draggedNode = other.presence?.draggedNode as { id: string; position: { x: number; y: number } };
-      if (draggedNode) {
-        setNodes((nds) =>
-          nds.map((n: unknown) => {
-            const node = n as Node;
-            return node.id === draggedNode.id
-              ? { ...node, position: draggedNode.position }
-              : node;
-          })
-        );
-      }
-    });
-  }, [others, setNodes]);
+  }, [setNodes]);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -145,7 +62,7 @@ function FlowContent({
         y: event.clientY - event.currentTarget.getBoundingClientRect().top,
       };
 
-      const newNode: SerializedNode = {
+      const newNode: Node = {
         id: `${nodeInformation.type}_${Date.now()}`,
         type: nodeInformation.type,
         position,
@@ -158,55 +75,27 @@ function FlowContent({
         },
       };
 
-      updateNodes(newNode);
-
-      setNodes((nds) => nds.concat(newNode));
+      setNodes((nds) => [...nds, newNode]);
     },
-    [setNodes, updateNodes],
+    [setNodes],
   );
 
   const onConnect = useCallback((params: Connection) => {
-    const newEdge = { id: `e${params.source}-${params.target}`, ...params };
-    updateEdges(newEdge);
     setEdges((eds) => addEdge(params, eds));
-  }, [updateEdges, setEdges]);
+  }, [setEdges]);
 
   return (
-    <FlowProvider value={{ localNodes, localEdges }}>
+    <FlowProvider value={{ localNodes: nodes, localEdges: edges }}>
       <div ref={flowRef} className="relative" style={{ width: "100%", height: "93vh" }}>
         <ReactFlow
-          nodes={localNodes}
-          edges={localEdges}
+          nodes={nodes}
+          edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onDragOver={onDragOver}
           onDrop={onDrop}
           nodeTypes={nodeTypes}
-          onMouseMove={(e) => {
-            if (flowRef.current) {
-              const bounds = flowRef.current.getBoundingClientRect();
-              const { zoom, x: vpX, y: vpY } = getViewport();
-
-              const flowX = (e.clientX - bounds.left - vpX) / zoom;
-              const flowY = (e.clientY - bounds.top - vpY) / zoom;
-
-              updatePresence({
-                cursor: {
-                  x: flowX,
-                  y: flowY,
-                  flowX,
-                  flowY
-                },
-                lastActive: Date.now(),
-              });
-            }
-          }}
-          onMouseLeave={() => {
-            updatePresence({
-              cursor: null,
-            });
-          }}
           edgeTypes={edgeTypes}
           defaultEdgeOptions={{
             type: 'custom',
@@ -228,19 +117,13 @@ function FlowContent({
   );
 }
 
-// Main component now just handles the provider setup
 export default function Home() {
-  const [myPresence, updateMyPresence] = useMyPresence();
-
   return (
     <>
       <Navbar />
       <div className="relative" style={{ width: "100%", height: "93vh" }}>
         <FlowWrapper>
-          <FlowContent
-            updatePresence={updateMyPresence}
-            presence={myPresence as Presence}
-          />
+          <FlowContent />
         </FlowWrapper>
       </div>
     </>
