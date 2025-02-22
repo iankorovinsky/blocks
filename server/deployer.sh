@@ -1,38 +1,53 @@
 #!/bin/bash
 
 # Check if both arguments are provided
-if [ -z "$1" ] || [ -z "$2" ]; then
-    echo "Error: Both contract name and password arguments are required"
-    echo "Usage: ./deployer.sh <contract_name> <password>"
+if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
+    echo "Error: Contract name, password, network, and rpc endpoint arguments are required"
+    echo "Usage: ./deployer.sh <contract_name> <password> <network> <rpc_endpoint>"
     exit 1
 fi
 
 CONTRACT_NAME="$1"
 PASSWORD="$2"
-DEPLOYED_NETWORK="${DEPLOYED_NETWORK:-testnet}"  # Default to testnet if not set
-RPC_ENDPOINT="${RPC_ENDPOINT:-https://free-rpc.nethermind.io/sepolia-juno}"  # Default RPC if not set
+DEPLOYED_NETWORK="$3"
+RPC_ENDPOINT="$4"
 
-# 1. Delete everything in src/target/dev
-rm -rf src/target/dev/*
+echo "Deleting everything in target/dev"
+
+# 1. Delete everything in target/dev
+rm -rf target/dev/*
+
+echo "Asserting deletion succeeded"
 
 # 2. Assert directory is empty
-if [ "$(ls -A src/target/dev 2>/dev/null)" ]; then
-    echo "Error: src/target/dev is not empty"
+if [ "$(ls -A target/dev 2>/dev/null)" ]; then
+    echo "Error: target/dev is not empty"
     exit 1
 fi
 
+echo "Moving into directory"
+
+echo "Current directory: $(pwd)\nBuilding contract"
+
 # 3. Run scarb build and wait for files
 scarb build
+
+echo "Waiting for files to appear in target/dev"
 
 # Wait for files to appear in target/dev
 while [ $(ls target/dev | wc -l) -lt 3 ]; do
     sleep 1
 done
 
-# Create expect script for declare
+echo "Files appeared in target/dev\nDeclaring contract"
+
+# Run declare command directly with password
+echo "Running declare"
+
+# Create declare expect script
 cat << EOF > declare.exp
 #!/usr/bin/expect -f
-spawn starkli declare target/dev/sample_contract_${CONTRACT_NAME}.contract_class.json --rpc ${RPC_ENDPOINT} --account account_${DEPLOYED_NETWORK}_ian_account.json --keystore account_${DEPLOYED_NETWORK}_ian_keystore.json
+spawn starkli declare target/dev/sample_contract_${CONTRACT_NAME}.contract_class.json --rpc ${RPC_ENDPOINT} --account account_${DEPLOYED_NETWORK}_ian_account.json --keystore account_${DEPLOYED_NETWORK}_ian_keystore.json --fee-token STRK
 expect "Enter keystore password:"
 send "${PASSWORD}\r"
 expect eof
@@ -40,7 +55,7 @@ EOF
 
 chmod +x declare.exp
 
-# Run declare and capture output with better parsing
+# Run declare with output parsing
 declare_output=$(./declare.exp)
 class_hash=$(echo "$declare_output" | grep -o '0x[0-9a-fA-F]\+' | tail -n 1)
 
@@ -54,7 +69,7 @@ echo "Successfully declared class hash: $class_hash"
 # Create deploy expect script with proper quoting
 cat << EOF > deploy.exp
 #!/usr/bin/expect -f
-spawn starkli deploy "$class_hash" --rpc ${RPC_ENDPOINT} --account account_${DEPLOYED_NETWORK}_ian_account.json --keystore account_${DEPLOYED_NETWORK}_ian_keystore.json
+spawn starkli deploy "$class_hash" --rpc ${RPC_ENDPOINT} --account account_${DEPLOYED_NETWORK}_ian_account.json --keystore account_${DEPLOYED_NETWORK}_ian_keystore.json --fee-token STRK
 expect "Enter keystore password:"
 send "${PASSWORD}\r"
 expect eof

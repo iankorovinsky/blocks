@@ -35,8 +35,9 @@ def deploy():
     contract_builder = ContractBuilder(data)
     try:
         # contract_builder.jsonData = data
-        contract_builder.invoke(contract_name)
-        result = handle_deploy_request(network, contract_name)
+        contract_path = contract_builder.invoke(contract_name)
+        print("Done invoking contract builder")
+        result = handle_deploy_request(network, contract_name, contract_path)
         return {"hash": result}
     except Exception as e:
         contract_name = "SimpleContract"
@@ -44,8 +45,9 @@ def deploy():
         contract_builder = ContractBuilder({})
         contract_builder.jsonData = contract_builder.loadJson(data)
         print(f"HIIIIIII: {contract_name}")
-        contract_builder.invoke(contract_name)
-        result = handle_deploy_request(network, contract_name)
+        contract_path = contract_builder.invoke(contract_name)
+        print("Done invoking contract builder")
+        result = handle_deploy_request(network, contract_name, contract_path)
         print("TRIGGERED EXCEPTION")
         return {"hash": result}
         
