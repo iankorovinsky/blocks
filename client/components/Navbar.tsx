@@ -16,6 +16,7 @@ import { CuboidIcon as Cube } from "lucide-react";
 import { useState } from "react";
 import { CollaborativeEditor } from "./CollaborativeEditor";
 import { useFlow } from "@/contexts/FlowContext";
+import Image from "next/image";
 
 export function Navbar() {
   const { contractName, setContractName, network, setNetwork } = useNavbar();
@@ -78,8 +79,8 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="flex items-center justify-between h-full">
             <div className="flex-shrink-0 flex items-center">
-              <Cube className="h-6 w-6 text-primary mr-2" />
-              <span className="text-2xl font-bold text-primary">blocks</span>
+              <Image src="/blocks-logo.png" alt="Blocks Logo" width={24} height={24} className="mr-2" />
+              <span className="text-2xl font-bold text-primary">Blocks</span>
             </div>
             <div className="flex items-center space-x-4 flex-grow justify-center">
               <Input

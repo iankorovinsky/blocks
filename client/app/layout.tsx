@@ -8,8 +8,12 @@ import { Room } from "./Room";
 import { AuthProvider } from "@/components/AuthProvider";
 
 export const metadata: Metadata = {
-  title: "Blocks",
-  description: "Blocks - A visual editor for the Starknet Blockchain",
+  title: 'Blocks',
+  description: 'Visual Smart Contract Builder',
+  icons: [
+    { rel: 'icon', url: '/favicon.ico' },
+    { rel: 'apple-touch-icon', url: '/favicon.ico' },
+  ],
 };
 
 export default function RootLayout({
