@@ -16,7 +16,7 @@ export function Room({ children }: { children: ReactNode }) {
       }
       throttle={16}
     >
-      <RoomProvider initialStorage={{ nodeData: new LiveList([]), edgeData: new LiveList([]), network: "", contractName: "" }} initialPresence={{ cursor: null }} id="my-room">
+      <RoomProvider initialStorage={{ nodes: new LiveList([]), edges: new LiveList([]), network: "", contractName: "" }} initialPresence={{ cursor: null }} id="my-room">
         <ClientSideSuspense fallback={<div>Loading…</div>}>
           {children}
         </ClientSideSuspense>

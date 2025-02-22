@@ -46,7 +46,11 @@ export function Navbar() {
       .then(response => {
         const hash = response.data.hash;
         console.log("Deployment hash: ", hash);
-        window.open(`https://sepolia.starkscan.co/contract/${hash}`, "_blank");
+        if (network === "testnet") {
+          window.open(`https://sepolia.starkscan.co/contract/${hash}`, "_blank");
+        } else {
+          window.open(`https://starkscan.co/contract/${hash}`, "_blank");
+        }
       })
       .catch(error => {
         console.error("Error deploying contract: ", error);

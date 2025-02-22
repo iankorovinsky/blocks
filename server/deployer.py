@@ -5,8 +5,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def handle_deploy_request(network: str, contract_name: str):
+def handle_deploy_request(network: str, contract_name: str, contract_path: str):
     try:
+        print(f"Deploying contract from {contract_path}")
         env = os.environ.copy()
         if network == 'testnet':
             env['DEPLOYED_NETWORK'] = 'testnet'  # or whatever network you want
@@ -14,7 +15,8 @@ def handle_deploy_request(network: str, contract_name: str):
         else:
             env['DEPLOYED_NETWORK'] = 'mainnet'
             env['RPC_ENDPOINT'] = 'https://free-rpc.nethermind.io/mainnet-juno'
-        result = subprocess.run(['bash', './deployer.sh', contract_name, env['KEYSTORE_PASSWORD']], 
+        print(f"Running deployer.sh with contract name {contract_name}")
+        result = subprocess.run(['bash', './deployer.sh', contract_name, env['KEYSTORE_PASSWORD'], env['DEPLOYED_NETWORK'], env['RPC_ENDPOINT']], 
                               capture_output=True, 
                               text=True,
                               check=True,
