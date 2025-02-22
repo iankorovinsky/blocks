@@ -1,5 +1,7 @@
 import json
 from typing import List, Dict, Any
+import time
+import os
 
 class ContractBuilder:
     def __init__(self, jsonData: Dict[str, Any]):
@@ -364,12 +366,17 @@ class ContractBuilder:
 
         finalContract = self.build()
 
-        outputFilePath = '/home/appuser/blocks/server/src/lib.cairo'
+        outputFilePath = f'src/lib.cairo'
+        
+        if os.path.exists(outputFilePath):
+            os.remove(outputFilePath)
 
         with open(outputFilePath, 'w') as file:
             file.write(finalContract)
             
         print(f"Contract written to {outputFilePath}")
+
+        return outputFilePath
         
         # print(finalContract)
 
