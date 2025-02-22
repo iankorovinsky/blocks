@@ -12,7 +12,7 @@ export function Room({ children }: { children: ReactNode }) {
   return (
     <LiveblocksProvider
       publicApiKey={
-        "pk_prod_hxsifK11dNff7o_wuiZQx9FH2z5jvTZmS09I6wFNacLK924Rwh0gvA1WL3s6mldT"
+        process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY as string
       }
       throttle={16}
     >

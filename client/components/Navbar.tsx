@@ -38,7 +38,7 @@ export function Navbar() {
     window.alert("Deploying contract with data: " + JSON.stringify(deploymentData, null, 2));
     console.log("Deploying contract with data: ", deploymentData);
 
-    axios.post("https://apt-polished-raptor.ngrok-free.app/deploy", deploymentData)
+    axios.post("http://127.0.0.1:5000/deploy", deploymentData)
       .then(response => {
         const hash = response.data.hash;
         console.log("Deployment hash: ", hash);
