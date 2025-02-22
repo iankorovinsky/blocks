@@ -354,8 +354,6 @@ class ContractBuilder:
     def invoke(self, contractName: str):
         languageMap = self.loadJson('language.json')
 
-        #self.jsonData = data
-    
         self.setName(contractName)
         
         self.generateStorageVars()
@@ -364,7 +362,7 @@ class ContractBuilder:
 
         finalContract = self.build()
 
-        outputFilePath = '/home/appuser/blocks/server/src/lib.cairo'
+        outputFilePath = 'src/lib.cairo'
 
         with open(outputFilePath, 'w') as file:
             file.write(finalContract)

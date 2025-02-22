@@ -58,7 +58,13 @@ function FlowContent({
 
   const updateNodes = useMutation(({ storage }, nodes: SerializedNode) => {
     const list = storage.get("nodes") as LiveList<SerializedNode>;
-    list.push(nodes);
+    if (!list) {
+      // Initialize the list if it doesn't exist
+      storage.set("nodes", new LiveList([nodes]));
+    } else {
+      // Add to existing list
+      list.push(nodes);
+    }
   }, []);
 
   const updateEdges = useMutation(({ storage }, edge: SerializedEdge) => {
