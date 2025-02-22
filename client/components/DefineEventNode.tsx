@@ -7,11 +7,7 @@ type Props = {
   id: string;
 };
 
-<<<<<<<< HEAD:client/components/EventNode.tsx
-const EventNode = ({ data, id }: Props) => {
-========
-const EmitEventNode = ({ data, id }: Props) => {
->>>>>>>> cef92fc60c555f00fd5606f4319159136834ee7f:client/components/EmitEventNode.tsx
+const DefineEventNode = ({ data, id }: Props) => {
   const [storageVariable, setStorageVariable] = useState<string | undefined>(
     "",
   );
@@ -62,21 +58,7 @@ const EmitEventNode = ({ data, id }: Props) => {
       </div>
 
       <div className="p-4 space-y-4">
-        <div className="space-y-2 relative">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-blue-400" />
-            <label className="text-sm text-gray-400">Name</label>
-          </div>
-          {storageVariable ? (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
-              {storageVariable}
-            </div>
-          ) : (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect to view name
-            </div>
-          )}
-        </div>
+        
 
         <div className="space-y-2 relative">
           <div className="flex items-center gap-2">
@@ -110,8 +92,4 @@ const EmitEventNode = ({ data, id }: Props) => {
   );
 };
 
-<<<<<<<< HEAD:client/components/EventNode.tsx
-export default EventNode;
-========
-export default EmitEventNode;
->>>>>>>> cef92fc60c555f00fd5606f4319159136834ee7f:client/components/EmitEventNode.tsx
+export default DefineEventNode;

@@ -223,6 +223,14 @@ const nodeTemplates: NodeTemplate[] = [
     description: "Emits an event"
   },
   {
+    type: "defineEventNode",
+    label: "Define Event",
+    data: { label: "DefineEvent", type: "EVENT", identifier: "" },
+    icon: SendHorizonal,
+    color: "bg-orange-500",
+    description: "Defines an event"
+  },
+  {
     type: "legacyMap",
     label: "LegacyMap",
     data: { label: "LegacyMap", type: "TYPE", identifier: "" },
