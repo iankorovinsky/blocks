@@ -20,6 +20,16 @@
         "selected": false
       },
       {
+        "id": "struct_1234567890",
+        "type": "struct",
+        "position": { "x": 400, "y": 300 },
+        "data": {
+            "label": "Struct",
+            "type": "STRUCT",
+            "name": "MyStruct"
+        }
+    },
+      {
         "id": "primitive_1733049106182",
         "type": "primitive",
         "position": {

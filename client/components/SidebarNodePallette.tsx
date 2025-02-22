@@ -212,12 +212,20 @@ const nodeTemplates: NodeTemplate[] = [
     description: "Subtracts two values togethe",
   },
   {
-    type: "emitNode",
+    type: "emitEventNode",
     label: "Emit Event",
-    data: { label: "Emit", type: "EVENT", identifier: "" },
+    data: { label: "EmitEvent", type: "EVENT", identifier: "" },
     icon: SendHorizonal,
     color: "bg-orange-500",
     description: "Emits an event"
+  },
+  {
+    type: "defineEventNode",
+    label: "Define Event",
+    data: { label: "DefineEvent", type: "EVENT", identifier: "" },
+    icon: SendHorizonal,
+    color: "bg-orange-500",
+    description: "Defines an event"
   },
   {
     type: "legacyMap",

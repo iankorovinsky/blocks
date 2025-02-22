@@ -7,7 +7,7 @@ type Props = {
   id: string;
 };
 
-const EmitNode = ({ data, id }: Props) => {
+const DefineEventNode = ({ data, id }: Props) => {
   const [storageVariable, setStorageVariable] = useState<string | undefined>(
     "",
   );
@@ -92,4 +92,4 @@ const EmitNode = ({ data, id }: Props) => {
   );
 };
 
-export default EmitNode;
+export default DefineEventNode;

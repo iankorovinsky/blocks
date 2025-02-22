@@ -1,12 +1,12 @@
 #[starknet::interface]
-trait ISimpleContract<TContractState> {
+trait IMyContract<TContractState> {
 	fn get(self: @TContractState) -> u64;
 	fn increment_value(ref self: TContractState, amount: u64);
 	fn decrement_value(ref self: TContractState, amount: u64);
 }
 
 #[starknet::contract]
-mod SimpleContract {
+mod TEST {
 	use core::starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
 
 	#[storage]
@@ -15,7 +15,7 @@ mod SimpleContract {
 	}
 
 	#[abi(embed_v0)]
-	impl SimpleContract of super::ISimpleContract<ContractState> {
+	impl MyContract of super::IMyContract<ContractState> {
 		fn get(self: @ContractState) -> u64 {
 			self.value.read()
 		}
