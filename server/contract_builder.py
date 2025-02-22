@@ -9,6 +9,7 @@ class ContractBuilder:
         self.functions = []
         self.storageVars = []
         self.interfaces = []
+        self.structs = []
         self.jsonData = jsonData
 
     def loadJson(self, jsonFilePath: str) -> Dict:
@@ -112,12 +113,61 @@ class ContractBuilder:
         
         return "\n".join(implParts)
 
+    def getStructFields(self, structNode: Dict) -> List[Dict]:
+        edges = self.getNodeEdges(structNode['id'])
+        fields = []
+        
+        for connectedNodeId in edges['connectedNodes']:
+            connectedNode = next(
+                (node for node in self.jsonData['nodeData'] if node['id'] == connectedNodeId), 
+                None
+            )
+            
+            if not connectedNode:
+                continue
+
+            # NEED TO CHANGE THIS TO TYPED VARIABLE    
+            if connectedNode['data']['type'] == 'PRIM_TYPE':
+                fields.append({
+                    'name': connectedNode['data'].get('name', f'field_{len(fields)}'),
+                    'type': self.getPrimitiveType(connectedNode)
+                })
+                
+        return fields
+    
+    def buildEventEnum(self) -> str:
+        eventNodes = self.getNodesByType('EVENT')
+        if not eventNodes:
+            return ""
+            
+        enumBlock = [
+            "#[derive(Drop, starknet::Event)]",
+            "enum Event {",
+        ]
+        
+        for node in eventNodes:
+            eventName = node['data'].get('name', 'UnnamedEvent')
+            structName = self.getConnectedStructName(node['id'])
+            if structName:
+                enumBlock.append(f"\t{eventName}: {structName},")
+        
+        enumBlock.append("}")
+        return "\n".join(enumBlock)
+
+
     def build(self):
         # Combine all components into a complete contract
         contract_parts = []
 
+        # Add struct definitions if any exist
+        structs = self.buildStructs()
+        if structs:
+            contract_parts.append(structs)
+            contract_parts.append("")  # Add blank line for separation
+
         # Add the interface block
         contract_parts.append(self.buildInterfaceBlock())
+        
         # Add the contract block (includes storage block and implementation block)
         contract_parts.append(self.buildContractBlock())
         return "\n\n".join(contract_parts)
@@ -186,9 +236,13 @@ class ContractBuilder:
                 return self.getPrimitiveType(connectedNode)
             elif connectedNode['data']['type'] == 'COMPOUND_TYPE':
                 return connectedNode['data']['primitiveType']
+            elif connectedNode['data']['type'] == 'STRUCT':
+                return connectedNode['data'].get('name', 'UnnamedStruct')
    
         raise ValueError(f"No type definition found for storage variable {storageVarNode['id']}")
 
+    
+    
     def generateFunctionWithReturn(self, languageJson, functionName, storageNode, params):
         template = languageJson["type"]["FUNCTION"].get('GET', {})
         if not template:

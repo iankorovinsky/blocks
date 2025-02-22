@@ -7,7 +7,7 @@ import SubtractionNode from "./SubtractionNode";
 import AssertNode from "./AssertNode"; 
 import CompoundNode from "./CompoundNode";
 import DecrementFunctionNode from "./DecrementFunctionNode";
-import EmitNode from "./EmitNode";
+import EmitNode from "./EmitEventNode";
 import FunctionCallNode from "./FunctionCallNode";
 import GetFunctionNode from "./GetFunctionNode";
 import GetCallerAddressNode from "./GetCallerAddressNode";
