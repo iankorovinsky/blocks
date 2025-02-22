@@ -7,6 +7,8 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
+  SidebarSearch,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   AlertTriangle,
@@ -30,6 +32,7 @@ import {
   Variable
 } from "lucide-react";
 import React from "react";
+import { cn } from "@/lib/utils";
 
 export interface NodeTemplate {
   type: string;
@@ -291,6 +294,8 @@ const nodeTemplates: NodeTemplate[] = [
 ];
 
 export function NodePalette() {
+  const { searchQuery, isSearchFocused } = useSidebar();
+
   const onDragStart = (
     event: React.DragEvent,
     nodeInformation: NodeTemplate,
@@ -302,22 +307,42 @@ export function NodePalette() {
     event.dataTransfer.effectAllowed = "move";
   };
 
+  const filteredNodes = React.useMemo(() => {
+    if (!searchQuery.trim()) return nodeTemplates;
+
+    const query = searchQuery.toLowerCase();
+    return nodeTemplates.filter(
+      (node) =>
+        node.label.toLowerCase().includes(query) ||
+        node.description.toLowerCase().includes(query) ||
+        node.type.toLowerCase().includes(query)
+    );
+  }, [searchQuery]);
+
   return (
     <Sidebar className="w-64 border-r border-border">
-      <SidebarHeader className="h-[7vh] border-b flex items-center px-4">
+      <SidebarHeader className="h-[7vh] border-b flex items-center justify-center px-4">
         <h2 className="text-lg font-semibold">Nodes</h2>
       </SidebarHeader>
       <SidebarContent>
+        <SidebarSearch />
         <SidebarGroup>
           <SidebarGroupLabel>Available Blocks</SidebarGroupLabel>
           <SidebarGroupContent>
             <div className="grid gap-2 p-2">
-              {nodeTemplates.map((template) => {
+              {filteredNodes.map((template) => {
                 const Icon = template.icon;
                 return (
                   <div
                     key={template.type}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border cursor-move hover:bg-accent transition-colors"
+                    className={cn(
+                      "flex items-center gap-3 p-3 rounded-lg bg-card border border-border cursor-move transition-colors",
+                      isSearchFocused &&
+                      searchQuery &&
+                      template.label.toLowerCase().includes(searchQuery.toLowerCase())
+                        ? "bg-blue-500/20 scale-102"
+                        : "hover:bg-accent"
+                    )}
                     draggable
                     onDragStart={(e) => onDragStart(e, template)}
                   >
