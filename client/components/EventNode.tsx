@@ -7,11 +7,7 @@ type Props = {
   id: string;
 };
 
-<<<<<<<< HEAD:client/components/EventNode.tsx
 const EventNode = ({ data, id }: Props) => {
-========
-const EmitEventNode = ({ data, id }: Props) => {
->>>>>>>> cef92fc60c555f00fd5606f4319159136834ee7f:client/components/EmitEventNode.tsx
   const [storageVariable, setStorageVariable] = useState<string | undefined>(
     "",
   );
