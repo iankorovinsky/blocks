@@ -59,5 +59,30 @@ def populate():
     result = handle_populate_request(prompt)
     return {"result": result}
 
+@app.route('/compile', methods=['POST'])
+def compile():
+    data = request.get_json(force=True)
+    print(data)
+    contract_name = data.get('contract_name')
+    contract_builder = ContractBuilder(data)
+    
+    # Ensure the src directory exists
+    os.makedirs('src', exist_ok=True)
+    
+    try:
+        contract_builder.invoke(contract_name)
+        print("Invoke works")
+    except Exception as e:
+        print(f"Error during compilation: {str(e)}")
+
+    # Always try to read the file, regardless of whether compilation succeeded
+    try:
+        with open('src/lib.cairo', 'r') as file:
+            contract_code = file.read()
+        return {"code": contract_code}
+    except Exception as file_error:
+        print(f"Error reading file: {str(file_error)}")
+        return {"code": "// Error: Could not read contract file"}
+
 if __name__ == '__main__':
     app.run(debug=True) 

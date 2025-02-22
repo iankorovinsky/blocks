@@ -356,8 +356,6 @@ class ContractBuilder:
     def invoke(self, contractName: str):
         languageMap = self.loadJson('language.json')
 
-        #self.jsonData = data
-    
         self.setName(contractName)
         
         self.generateStorageVars()
