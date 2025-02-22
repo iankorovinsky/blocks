@@ -7,7 +7,7 @@ import SubtractionNode from "./SubtractionNode";
 import AssertNode from "./AssertNode"; 
 import CompoundNode from "./CompoundNode";
 import DecrementFunctionNode from "./DecrementFunctionNode";
-import EmitNode from "./EmitNode";
+import EventNode from "./EventNode";
 import FunctionCallNode from "./FunctionCallNode";
 import GetFunctionNode from "./GetFunctionNode";
 import GetCallerAddressNode from "./GetCallerAddressNode";
@@ -36,7 +36,7 @@ export const nodeTypes = {
   assert: AssertNode,
   compound: CompoundNode,
   decrement: DecrementFunctionNode,
-  emit: EmitNode,
+  event: EventNode,
   functionCall: FunctionCallNode,
   getFunction: GetFunctionNode,
   getCallerAddress: GetCallerAddressNode,

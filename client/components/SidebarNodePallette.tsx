@@ -204,7 +204,7 @@ const nodeTemplates: NodeTemplate[] = [
     data: { label: "Addition", type: "FUNCTION", identifier: "" },
     icon: Plus,
     color: "bg-green-500",
-    description: "Adds two values togethe",
+    description: "Adds two values together",
   },
   {
     type: "subtractionNode",
@@ -212,12 +212,12 @@ const nodeTemplates: NodeTemplate[] = [
     data: { label: "Subtraction", type: "FUNCTION", identifier: "" },
     icon: Minus,
     color: "bg-indigo-500",
-    description: "Subtracts two values togethe",
+    description: "Subtracts two values together",
   },
   {
-    type: "emitNode",
-    label: "Emit Event",
-    data: { label: "Emit", type: "EVENT", identifier: "" },
+    type: "eventNode",
+    label: "Event",
+    data: { label: "Event", type: "EVENT", identifier: "" },
     icon: SendHorizonal,
     color: "bg-orange-500",
     description: "Emits an event"

@@ -13,7 +13,7 @@ import FunctionCallNode from "@/components/FunctionCallNode";
 import GetCallerAddressNode from "@/components/GetCallerAddressNode";
 import AdditionNode from "@/components/AdditionNode";
 import SubtractionNode from "@/components/SubtractionNode";
-import EmitNode from "@/components/EmitNode";
+import EmitNode from "@/components/EventNode";
 import LegacyNode from "@/components/LegacyNode";
 import EnumNode from "@/components/EnumNode";
 import TypedVariableNode from "@/components/TypedVariableNode";
