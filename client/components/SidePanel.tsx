@@ -2,6 +2,7 @@
 
 import { ChatBot } from "./Chatbot"
 import { CollaborativeEditor } from "./CollaborativeEditor"
+// @ts-ignore
 import { useEditorStore } from "./Navbar"
 import { Button } from "./ui/button"
 import { Card, CardContent, CardHeader } from "./ui/card"

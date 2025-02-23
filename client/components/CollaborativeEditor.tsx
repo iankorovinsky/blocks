@@ -48,3 +48,5 @@ export const CollaborativeEditor = forwardRef<EditorRef, CollaborativeEditorProp
     );
   }
 );
+
+CollaborativeEditor.displayName = 'CollaborativeEditor';
