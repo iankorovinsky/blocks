@@ -1,4 +1,3 @@
-import { TypedVarNode } from "./TypedVarNode";
 import { StructNode } from "./StructNode";
 import { WriteNode } from "./WriteNode";
 import { ReadWithParamNode } from "./ReadWithParamNode";
@@ -27,7 +26,7 @@ import ReadWithParamsNode from "./ReadWithParamsNode";
 
 export const nodeTypes = {
   // ... existing node types ...
-  typedVar: TypedVarNode,
+  typedVariable: TypedVariableNode,
   struct: StructNode,
   write: WriteNode,
   readWithParam: ReadWithParamNode,
@@ -48,7 +47,6 @@ export const nodeTypes = {
   setFunction: SetFunctionNode,
   storage: StorageNode,
   enum: EnumNode,
-  typedVariable: TypedVariableNode,
   writeWithParams: WriteWithParamsNode,
   readWithParams: ReadWithParamsNode,
 }; 

@@ -13,12 +13,7 @@ import FunctionCallNode from "@/components/FunctionCallNode";
 import GetCallerAddressNode from "@/components/GetCallerAddressNode";
 import AdditionNode from "@/components/AdditionNode";
 import SubtractionNode from "@/components/SubtractionNode";
-<<<<<<< HEAD
-import EmitNode from "@/components/EventNode";
-=======
-import EmitEventNode from "@/components/EmitEventNode";
-import DefineEventNode from "@/components/DefineEventNode";
->>>>>>> cef92fc60c555f00fd5606f4319159136834ee7f
+import EventNode from "@/components/EventNode";
 import LegacyNode from "@/components/LegacyNode";
 import EnumNode from "@/components/EnumNode";
 import TypedVariableNode from "@/components/TypedVariableNode";
@@ -44,8 +39,7 @@ export const nodeTypes = {
   getCallerAddress: GetCallerAddressNode,
   additionNode: AdditionNode,
   subtractionNode: SubtractionNode,
-  emitEventNode: EmitEventNode,
-  defineEventNode: DefineEventNode,
+  eventNode: EventNode,
   legacyMap: LegacyNode,
   enum: EnumNode,
   typedVariable: TypedVariableNode,

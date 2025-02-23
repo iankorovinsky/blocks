@@ -3,14 +3,13 @@ import { Settings2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 type Props = {
-  data: { label: string; storage_variable: string };
+  data: { label: string };
   id: string;
 };
 
 const EventNode = ({ data, id }: Props) => {
-  const [storageVariable, setStorageVariable] = useState<string | undefined>(
-    "",
-  );
+  const [structName, setStructName] = useState<string>("");
+  const [structValue, setStructValue] = useState<string>("");
   const { getNodes, getEdges } = useReactFlow();
 
   useEffect(() => {
@@ -18,23 +17,37 @@ const EventNode = ({ data, id }: Props) => {
       const nodes = getNodes();
       const edges = getEdges();
 
-      const connectedNodeIds = edges
-        .filter((edge) => edge.source === id || edge.target === id)
-        .map((edge) => (edge.source === id ? edge.target : edge.source));
-
-      const connectedNode = nodes.find((node) =>
-        connectedNodeIds.includes(node.id),
+      const connectedEdges = edges.filter(
+        (edge) => edge.source === id || edge.target === id
       );
 
-      if (
-        connectedNode 
-      ) {
-        setStorageVariable(connectedNode.data?.target as string);
-      }
-    }, 1000); // Check every 500ms
+      const structEdge = connectedEdges.find((edge) => {
+        const connectedNode = nodes.find(
+          (node) => node.id === (edge.source === id ? edge.target : edge.source)
+        );
+        return connectedNode?.data?.type === "STRUCT";
+      });
 
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, [getNodes, getEdges, id, storageVariable]);
+      if (structEdge) {
+        const structNode = nodes.find(
+          (node) =>
+            node.id === (structEdge.source === id ? structEdge.target : structEdge.source)
+        );
+        
+        if (structNode?.data) {
+          const name = typeof structNode.data.name === 'string' ? structNode.data.name : '';
+          const fields = Array.isArray(structNode.data.fields) ? structNode.data.fields : [];
+          setStructName(name);
+          setStructValue(JSON.stringify(fields));
+        }
+      } else {
+        setStructName("");
+        setStructValue("");
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [getNodes, getEdges, id]);
 
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
@@ -63,13 +76,13 @@ const EventNode = ({ data, id }: Props) => {
             <div className="w-2 h-2 rounded-full bg-blue-400" />
             <label className="text-sm text-gray-400">Name</label>
           </div>
-          {storageVariable ? (
+          {structName ? (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
-              {storageVariable}
+              {structName}
             </div>
           ) : (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect to view name
+              Connect a struct!
             </div>
           )}
         </div>
@@ -79,13 +92,13 @@ const EventNode = ({ data, id }: Props) => {
             <div className="w-2 h-2 rounded-full bg-pink-400" />
             <label className="text-sm text-gray-400">Structure</label>
           </div>
-          {storageVariable ? (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
-              {storageVariable}
+          {structValue ? (
+            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
+              Struct connected!
             </div>
           ) : (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect event emit structure
+              Connect a struct!
             </div>
           )}
 
@@ -100,14 +113,9 @@ const EventNode = ({ data, id }: Props) => {
             className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
           />
         </div>
-
       </div>
     </div>
   );
 };
 
-<<<<<<<< HEAD:client/components/EventNode.tsx
 export default EventNode;
-========
-export default EmitEventNode;
->>>>>>>> cef92fc60c555f00fd5606f4319159136834ee7f:client/components/EmitEventNode.tsx

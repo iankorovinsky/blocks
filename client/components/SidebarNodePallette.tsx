@@ -111,7 +111,7 @@ const nodeTemplates: NodeTemplate[] = [
     description: "Read function node",
   },
   {
-    type: "typedVar",
+    type: "typedVariable",
     label: "Typed Variable",
     data: { 
       label: "Typed Variable", 

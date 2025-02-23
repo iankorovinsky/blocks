@@ -1,27 +1,60 @@
 import { Handle, Position } from "@xyflow/react";
 import { FolderTree } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useReactFlow } from "@xyflow/react";
 
 interface StructNodeProps {
   data: {
     name: string;
     label: string;
+    type: string;
     onChange?: (updates: { name: string }) => void;
   };
   isConnectable: boolean;
+  id: string;
 }
 
-export function StructNode({ data }: StructNodeProps) {
-  const [inputValue, setInputValue] = useState(data.name);
-  const [storageVariable] = useState<string | undefined>("");
+export function StructNode({ data, id }: StructNodeProps) {
+  const [inputValue, setInputValue] = useState(data.name || "");
+  const [storageVariable] = useState<string>("");
+  const { setNodes } = useReactFlow();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    data.onChange?.({ name: e.target.value });
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    
+    // Update the node data
+    setNodes((nodes) =>
+      nodes.map((node) => {
+        if (node.id === id) {
+          node.data = { 
+            ...node.data, 
+            name: newValue,
+            type: "STRUCT" 
+          };
+        }
+        return node;
+      })
+    );
+    
+    data.onChange?.({ name: newValue });
   };
+
+  // Update input value when data.name changes
+  useEffect(() => {
+    if (data.name !== undefined) {
+      setInputValue(data.name);
+    }
+  }, [data.name]);
 
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
+      <Handle
+        type="source"
+        position={Position.Left}
+        isConnectable={true}
+        className="!top-[50%] -translate-y-1/2 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
+      />
       <div
         className="absolute -top-px -right-px w-0 h-0 
         border-t-[30px] border-l-[30px] 
@@ -71,13 +104,9 @@ export function StructNode({ data }: StructNodeProps) {
           )}
 
           <Handle
-            type="source"
-            position={Position.Right}
-            className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
-          />
-          <Handle
             type="target"
             position={Position.Right}
+            isConnectable={true}
             className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
           />
         </div>

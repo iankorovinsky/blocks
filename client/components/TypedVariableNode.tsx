@@ -61,7 +61,13 @@ const TypedVariableNode = ({ data, id }: Props) => {
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-4">
+        <Handle
+          type="source"
+          position={Position.Left}
+          isConnectable={true}
+          className="!top-[50%] -translate-y-1/2 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
+        />
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-400" />
@@ -76,7 +82,7 @@ const TypedVariableNode = ({ data, id }: Props) => {
           />
         </div>
 
-        <div className="space-y-2 relative">
+        <div className="mt-4 space-y-2 relative">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Type</label>
@@ -91,11 +97,6 @@ const TypedVariableNode = ({ data, id }: Props) => {
             </div>
           )}
 
-          <Handle
-            type="source"
-            position={Position.Right}
-            className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
-          />
           <Handle
             type="target"
             position={Position.Right}
