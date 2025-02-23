@@ -5,9 +5,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def handle_deploy_request(network: str, contract_name: str, contract_path: str):
+def save_code_to_file(code: str):
+    if os.path.exists('src/lib.cairo'):
+        os.remove('src/lib.cairo')
+    with open('src/lib.cairo', 'w') as file:
+        file.write(code)
+
+def handle_deploy_request(network: str, contract_name: str):
     try:
-        print(f"Deploying contract from {contract_path}")
         env = os.environ.copy()
         if network == 'testnet':
             env['DEPLOYED_NETWORK'] = 'testnet'  # or whatever network you want

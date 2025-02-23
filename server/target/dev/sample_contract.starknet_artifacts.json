@@ -1,1 +1,1 @@
-{"version":1,"contracts":[{"id":"n2hm1iencskb2","package_name":"server","contract_name":"SimpleContract","module_path":"server::SimpleContract","artifacts":{"sierra":"sample_contract_SimpleContract.contract_class.json","casm":"sample_contract_SimpleContract.compiled_contract_class.json"}}]}
+{"version":1,"contracts":[{"id":"sn47i7k8k5u16","package_name":"server","contract_name":"SimpleStorage","module_path":"server::SimpleStorage","artifacts":{"sierra":"sample_contract_SimpleStorage.contract_class.json","casm":"sample_contract_SimpleStorage.compiled_contract_class.json"}}]}

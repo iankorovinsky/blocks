@@ -2,6 +2,7 @@ import { NodePalette } from "@/components/SidebarNodePallette";
 import { FlowProviderWrapper } from "@/components/FlowProviderWrapper";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { NavbarProvider } from "@/contexts/NavbarContext";
+import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Room } from "./Room";
@@ -33,6 +34,7 @@ export default function RootLayout({
                     <NodePalette />
                     <div className="grow overflow-hidden">{children}</div>
                   </div>
+                  <Toaster />
                 </FlowProviderWrapper>
               </SidebarProvider>
             </NavbarProvider>

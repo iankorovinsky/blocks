@@ -69,7 +69,7 @@ echo "Successfully declared class hash: $class_hash"
 # Create deploy expect script with proper quoting
 cat << EOF > deploy.exp
 #!/usr/bin/expect -f
-spawn starkli deploy "$class_hash" --rpc ${RPC_ENDPOINT} --account account_${DEPLOYED_NETWORK}_ian_account.json --keystore account_${DEPLOYED_NETWORK}_ian_keystore.json --fee-token STRK
+spawn starkli deploy "$class_hash" --rpc ${RPC_ENDPOINT} --account account_${DEPLOYED_NETWORK}_ian_account.json --keystore account_${DEPLOYED_NETWORK}_ian_keystore.json
 expect "Enter keystore password:"
 send "${PASSWORD}\r"
 expect eof
