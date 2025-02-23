@@ -9,9 +9,7 @@ type Props = {
 
 const TypedVariableNode = ({ data, id }: Props) => {
   const [inputValue, setInputValue] = useState("");
-  const [storageVariable, setStorageVariable] = useState<string | undefined>(
-    "",
-  );
+  const [storageVariable, setStorageVariable] = useState<string>("");
   const { getNodes, getEdges } = useReactFlow();
 
   useEffect(() => {
@@ -24,18 +22,18 @@ const TypedVariableNode = ({ data, id }: Props) => {
         .map((edge) => (edge.source === id ? edge.target : edge.source));
 
       const connectedNode = nodes.find((node) =>
-        connectedNodeIds.includes(node.id),
+        connectedNodeIds.includes(node.id) && node.type === "primitive"
       );
 
-      if (
-        connectedNode 
-      ) {
-        setStorageVariable(connectedNode.data?.target as string);
+      if (connectedNode && connectedNode.data?.identifier) {
+        setStorageVariable(connectedNode.data.identifier as string);
+      } else {
+        setStorageVariable("");
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [getNodes, getEdges, id, storageVariable]);
+  }, [getNodes, getEdges, id]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);

@@ -17,7 +17,8 @@ interface StructNodeProps {
 export function StructNode({ data, id }: StructNodeProps) {
   const [inputValue, setInputValue] = useState(data.name || "");
   const [storageVariable] = useState<string>("");
-  const { setNodes } = useReactFlow();
+  const [connectedVars, setConnectedVars] = useState(0);
+  const { setNodes, getNodes, getEdges } = useReactFlow();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -46,6 +47,25 @@ export function StructNode({ data, id }: StructNodeProps) {
       setInputValue(data.name);
     }
   }, [data.name]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const edges = getEdges();
+      const nodes = getNodes();
+      
+      const connectedNodeIds = edges
+        .filter((edge) => edge.target === id)
+        .map((edge) => edge.source);
+
+      const typedVarCount = nodes.filter(
+        (node) => connectedNodeIds.includes(node.id) && node.type === "typedVariable"
+      ).length;
+
+      setConnectedVars(typedVarCount);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [getNodes, getEdges, id]);
 
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
@@ -99,7 +119,10 @@ export function StructNode({ data, id }: StructNodeProps) {
             </div>
           ) : (
             <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect to add typed variables
+              {connectedVars > 0 
+                ? `${connectedVars} typed variable${connectedVars > 1 ? 's' : ''} connected`
+                : 'Connect to add typed variables'
+              }
             </div>
           )}
 
