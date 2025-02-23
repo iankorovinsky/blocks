@@ -12,7 +12,6 @@ import {
 import { useNavbar } from "@/contexts/NavbarContext";
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
-import { CuboidIcon as Cube } from "lucide-react";
 import { useState } from "react";
 import { CollaborativeEditor } from "./CollaborativeEditor";
 import { useFlow } from "@/contexts/FlowContext";
@@ -32,9 +31,7 @@ export function Navbar() {
       contractName,
       network,
     };
-
-    window.alert("Deploying contract with data: " + JSON.stringify(deploymentData, null, 2));
-    console.log("Deploying contract with data: ", deploymentData);
+    console.log("Deploying contract with data: " + JSON.stringify(deploymentData, null, 2));
 
     axios.post("http://127.0.0.1:5000/deploy", deploymentData)
       .then(response => {
@@ -58,8 +55,7 @@ export function Navbar() {
       contractName,
     };
 
-    console.log("Compiling contract with data: ", compilationData);
-
+    console.log("Deploying contract with data: " + JSON.stringify(compilationData, null, 2));
     axios.post("http://127.0.0.1:5000/compile", compilationData)
       .then(response => {
         const code = response.data.code;

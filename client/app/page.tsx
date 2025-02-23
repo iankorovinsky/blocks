@@ -21,10 +21,10 @@ import CustomEdge from "@/components/CustomEdge";
 import { FlowWrapper } from "@/components/FlowWrapper";
 import { Navbar } from "@/components/Navbar";
 import { NodeTemplate } from "@/components/SidebarNodePallette";
-import { FlowProvider } from "@/contexts/FlowContext";
+import { useFlow } from "@/contexts/FlowContext";
 import { MarkerType } from '@xyflow/react';
 import "@xyflow/react/dist/style.css";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useEffect } from "react";
 import { nodeTypes } from "./types/node";
 
 const edgeTypes = {
@@ -34,9 +34,19 @@ const edgeTypes = {
 function FlowContent() {
   const flowRef = useRef<HTMLDivElement>(null);
   const { getViewport } = useReactFlow();
+  const { setLocalNodes, setLocalEdges } = useFlow();
 
-  const [nodes, setNodes] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes] = useNodesState<any>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<any>([]);
+
+  // Update context whenever nodes/edges change
+  useEffect(() => {
+    setLocalNodes(nodes);
+  }, [nodes, setLocalNodes]);
+
+  useEffect(() => {
+    setLocalEdges(edges);
+  }, [edges, setLocalEdges]);
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -85,35 +95,33 @@ function FlowContent() {
   }, [setEdges]);
 
   return (
-    <FlowProvider value={{ localNodes: nodes, localEdges: edges }}>
-      <div ref={flowRef} className="relative" style={{ width: "100%", height: "93vh" }}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onDragOver={onDragOver}
-          onDrop={onDrop}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          defaultEdgeOptions={{
-            type: 'custom',
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-              width: 15,
-              height: 15,
-              color: '#94a3b8',
-            },
-          }}
-        >
-          <Background color="#FFFFFF" variant={BackgroundVariant.Dots} />
-        </ReactFlow>
+    <div ref={flowRef} className="relative" style={{ width: "100%", height: "93vh" }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        defaultEdgeOptions={{
+          type: 'custom',
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            width: 15,
+            height: 15,
+            color: '#94a3b8',
+          },
+        }}
+      >
+        <Background color="#FFFFFF" variant={BackgroundVariant.Dots} />
+      </ReactFlow>
 
-        <AISearch />
-        <ChatBot />
-      </div>
-    </FlowProvider>
+      <AISearch />
+      <ChatBot />
+    </div>
   );
 }
 

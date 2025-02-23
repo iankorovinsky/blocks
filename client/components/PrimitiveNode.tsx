@@ -90,12 +90,12 @@ const SetFunctionNode = ({ data, id }: Props) => {
 
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Left}
         className="top-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
       />
       <Handle
         type="target"
-        position={Position.Bottom}
+        position={Position.Left}
         className="bottom-12 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
       />
     </div>
