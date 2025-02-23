@@ -1,4 +1,4 @@
-import { Handle, Position, useReactFlow } from "@xyflow/react";
+import { Handle, Position, useReactFlow, Node } from "@xyflow/react";
 import { Settings2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -10,6 +10,7 @@ type Props = {
 const BasicFunctionNode = ({ data, id }: Props) => {
   const [inputValue, setInputValue] = useState("");
   const [connectedVars, setConnectedVars] = useState(0);
+  const [returnType, setReturnType] = useState("");
   const { getNodes, getEdges } = useReactFlow();
 
   useEffect(() => {
@@ -17,16 +18,26 @@ const BasicFunctionNode = ({ data, id }: Props) => {
       const edges = getEdges();
       const nodes = getNodes();
       
-      const connectedNodeIds = edges
-        .filter((edge) => edge.target === id)
-        .map((edge) => edge.source);
-
+      // Check input parameters
+      const inputEdges = edges.filter((edge) => edge.target === id);
+      const connectedNodeIds = inputEdges.map((edge) => edge.source);
       const connectedNodes = nodes.filter(
         (node) => connectedNodeIds.includes(node.id) && node.type === "typedVariable"
       );
+      setConnectedVars(connectedNodes.length);
 
-      const typedVarCount = connectedNodes.length;
-      setConnectedVars(typedVarCount);
+      // Check return type
+      const returnEdge = edges.find((edge) => edge.target === id);
+      if (returnEdge) {
+        const returnNode = nodes.find((node) => node.id === returnEdge.source) as Node<{ identifier: string }>;
+        if (returnNode?.type === "primitive" && returnNode.data?.identifier) {
+          setReturnType(returnNode.data.identifier);
+        } else {
+          setReturnType("");
+        }
+      } else {
+        setReturnType("");
+      }
     }, 1000);
 
     return () => clearInterval(interval);
@@ -42,6 +53,11 @@ const BasicFunctionNode = ({ data, id }: Props) => {
         type="target"
         position={Position.Right}
         className="!absolute right-[-12px] top-1/2 -translate-y-1/2 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
+      />
+      <Handle
+        type="source"
+        position={Position.Left}
+        className="!absolute left-[-12px] top-1/2 -translate-y-1/2 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
       />
 
       {/* Triangle with F label */}
@@ -83,7 +99,7 @@ const BasicFunctionNode = ({ data, id }: Props) => {
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Parameters</label>
           </div>
-          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${connectedVars > 0 ? 'border-blue-700 text-blue-500' : 'border-gray-800 text-gray-500'}`}>
+          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${connectedVars > 0 ? 'border-blue-700 text-white-500' : 'border-gray-800 text-gray-500'}`}>
             {connectedVars > 0 
               ? `${connectedVars} parameter${connectedVars > 1 ? 's' : ''} connected`
               : 'Connect to add parameters'
@@ -97,7 +113,9 @@ const BasicFunctionNode = ({ data, id }: Props) => {
             <label className="text-sm text-gray-400">Return Type</label>
           </div>
           <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-            Connect to add return type
+            <span className={returnType ? "text-white" : ""}>
+              {returnType ? `Returns ${returnType}` : 'Connect to add return type'}
+            </span>
           </div>
         </div>
 

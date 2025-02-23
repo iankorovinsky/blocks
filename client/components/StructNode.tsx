@@ -114,7 +114,7 @@ export function StructNode({ data, id }: StructNodeProps) {
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Typed Variables</label>
           </div>
-          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${connectedVars > 0 ? 'border-blue-700 text-blue-400' : 'border-gray-800 text-gray-500'}`}>
+          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${connectedVars > 0 ? 'border-blue-700 text-white-400' : 'border-gray-800 text-gray-500'}`}>
             {connectedVars > 0 
               ? `${connectedVars} typed variable${connectedVars > 1 ? 's' : ''} connected`
               : 'Connect to add typed variables'
