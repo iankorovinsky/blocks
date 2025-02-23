@@ -85,12 +85,25 @@ export function Navbar() {
     axios.post("http://127.0.0.1:5000/compile", compilationData)
       .then(response => {
         const code = response.data.code;
-        setCompiledCode(code);
-        setShowEditor(true);
-        toast({
-          title: "Compilation Successful",
-          description: "Your contract has been compiled successfully.",
-        });
+        const success = response.data.success;
+        console.log("Compilation success: ", success);
+        console.log("Compilation code: ", code);
+        if (success === true) {
+          setCompiledCode(code);
+          setShowEditor(true);
+          toast({
+            title: "Compilation Successful",
+            description: "Your contract has been compiled successfully.",
+          });
+        } else {
+          setCompiledCode(code);
+          setShowEditor(true);
+          toast({
+            variant: "warning",
+            title: "Compilation Warning",
+            description: "We tried, this is our best estimate of what you were trying to compile.",
+          });
+        }
       })
       .catch(error => {
         console.error("Error compiling contract: ", error);
