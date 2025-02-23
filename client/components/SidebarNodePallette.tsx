@@ -94,22 +94,22 @@ const nodeTemplates: NodeTemplate[] = [
     color: "bg-orange-500",
     description: "Primitive type node",
   },
-  {
-    type: "compound",
-    label: "Compound",
-    data: { label: "Compound", type: "COMPOUND_TYPE", identifier: "" },
-    icon: Boxes,
-    color: "bg-red-500",
-    description: "Compound type node",
-  },
-  {
-    type: "readFunction",
-    label: "Read",
-    data: { label: "Read", type: "READ", identifier: "" },
-    icon: BookOpen,
-    color: "bg-yellow-500",
-    description: "Read function node",
-  },
+  // {
+  //   type: "compound",
+  //   label: "Compound",
+  //   data: { label: "Compound", type: "COMPOUND_TYPE", identifier: "" },
+  //   icon: Boxes,
+  //   color: "bg-red-500",
+  //   description: "Compound type node",
+  // },
+  // {
+  //   type: "readFunction",
+  //   label: "Read",
+  //   data: { label: "Read", type: "READ", identifier: "" },
+  //   icon: BookOpen,
+  //   color: "bg-yellow-500",
+  //   description: "Read function node",
+  // },
   {
     type: "typedVariable",
     label: "Typed Variable",
@@ -123,33 +123,33 @@ const nodeTemplates: NodeTemplate[] = [
     color: "bg-blue-500",
     description: "Typed variable node",
   },
-  {
-    type: "write",
-    label: "Write",
-    data: { 
-      label: "Write", 
-      type: "WRITE",
-      storageVar: "",
-      param1: "",
-      param2: "" 
-    },
-    icon: FileEdit,
-    color: "bg-purple-500",
-    description: "Write function node",
-  },
-  {
-    type: "readWithParam",
-    label: "Read With Param",
-    data: { 
-      label: "Read With Param", 
-      type: "READ_PARAM",
-      storageVar: "",
-      paramType: "" 
-    },
-    icon: BookOpen,
-    color: "bg-green-500",
-    description: "Parameterized read node",
-  },
+  // {
+  //   type: "write",
+  //   label: "Write",
+  //   data: { 
+  //     label: "Write", 
+  //     type: "WRITE",
+  //     storageVar: "",
+  //     param1: "",
+  //     param2: "" 
+  //   },
+  //   icon: FileEdit,
+  //   color: "bg-purple-500",
+  //   description: "Write function node",
+  // },
+  // {
+  //   type: "readWithParam",
+  //   label: "Read With Param",
+  //   data: { 
+  //     label: "Read With Param", 
+  //     type: "READ_PARAM",
+  //     storageVar: "",
+  //     paramType: "" 
+  //   },
+  //   icon: BookOpen,
+  //   color: "bg-green-500",
+  //   description: "Parameterized read node",
+  // },
   {
     type: "incrementFunction",
     label: "Increment",
@@ -166,54 +166,54 @@ const nodeTemplates: NodeTemplate[] = [
     color: "bg-orange-500",
     description: "Decrement function node",
   },
-  {
-    type: "assert",
-    label: "Assert",
-    data: { label: "Assert", type: "CONDITION", identifier: "" },
-    icon: AlertTriangle,
-    color: "bg-red-500",
-    description: "Assert condition",
-  },
-  {
-    type: "isNotZeroCondition",
-    label: "Is Not Zero?",
-    data: { label: "is_not_zero", type: "CONDITION", identifier: "" },
-    icon: Ban,
-    color: "bg-yellow-500",
-    description: "Is Not Zero Condition",
-  },
-  {
-    type: "functionCall",
-    label: "Function Call",
-    data: { label: "function_call", type: "FUNCTION", identifier: "" },
-    icon: Play,
-    color: "bg-blue-500",
-    description: "Calls a function and is a parameter",
-  },
-  {
-    type: "getCallerAddress",
-    label: "Get Caller Address",
-    data: { label: "get_caller_address", type: "FUNCTION", identifier: "" },
-    icon: UserCircle,
-    color: "bg-purple-500",
-    description: "Gets the address of the caller",
-  },
-  {
-    type: "additionNode",
-    label: "Addition",
-    data: { label: "Addition", type: "FUNCTION", identifier: "" },
-    icon: Plus,
-    color: "bg-green-500",
-    description: "Adds two values together",
-  },
-  {
-    type: "subtractionNode",
-    label: "Subtraction",
-    data: { label: "Subtraction", type: "FUNCTION", identifier: "" },
-    icon: Minus,
-    color: "bg-indigo-500",
-    description: "Subtracts two values together",
-  },
+  // {
+  //   type: "assert",
+  //   label: "Assert",
+  //   data: { label: "Assert", type: "CONDITION", identifier: "" },
+  //   icon: AlertTriangle,
+  //   color: "bg-red-500",
+  //   description: "Assert condition",
+  // },
+  // {
+  //   type: "isNotZeroCondition",
+  //   label: "Is Not Zero?",
+  //   data: { label: "is_not_zero", type: "CONDITION", identifier: "" },
+  //   icon: Ban,
+  //   color: "bg-yellow-500",
+  //   description: "Is Not Zero Condition",
+  // },
+  // {
+  //   type: "functionCall",
+  //   label: "Function Call",
+  //   data: { label: "function_call", type: "FUNCTION", identifier: "" },
+  //   icon: Play,
+  //   color: "bg-blue-500",
+  //   description: "Calls a function and is a parameter",
+  // },
+  // {
+  //   type: "getCallerAddress",
+  //   label: "Get Caller Address",
+  //   data: { label: "get_caller_address", type: "FUNCTION", identifier: "" },
+  //   icon: UserCircle,
+  //   color: "bg-purple-500",
+  //   description: "Gets the address of the caller",
+  // },
+  // {
+  //   type: "additionNode",
+  //   label: "Addition",
+  //   data: { label: "Addition", type: "FUNCTION", identifier: "" },
+  //   icon: Plus,
+  //   color: "bg-green-500",
+  //   description: "Adds two values together",
+  // },
+  // {
+  //   type: "subtractionNode",
+  //   label: "Subtraction",
+  //   data: { label: "Subtraction", type: "FUNCTION", identifier: "" },
+  //   icon: Minus,
+  //   color: "bg-indigo-500",
+  //   description: "Subtracts two values together",
+  // },
   {
     type: "eventNode",
     label: "Event",
@@ -222,22 +222,22 @@ const nodeTemplates: NodeTemplate[] = [
     color: "bg-orange-500",
     description: "Emits an event"
   },
-  {
-    type: "defineEventNode",
-    label: "Define Event",
-    data: { label: "DefineEvent", type: "EVENT", identifier: "" },
-    icon: SendHorizonal,
-    color: "bg-orange-500",
-    description: "Defines an event"
-  },
-  {
-    type: "legacyMap",
-    label: "LegacyMap",
-    data: { label: "LegacyMap", type: "TYPE", identifier: "" },
-    icon: Map,
-    color: "bg-red-500",
-    description: "Dictionary type"
-  },
+  // {
+  //   type: "defineEventNode",
+  //   label: "Define Event",
+  //   data: { label: "DefineEvent", type: "EVENT", identifier: "" },
+  //   icon: SendHorizonal,
+  //   color: "bg-orange-500",
+  //   description: "Defines an event"
+  // },
+  // {
+  //   type: "legacyMap",
+  //   label: "LegacyMap",
+  //   data: { label: "LegacyMap", type: "TYPE", identifier: "" },
+  //   icon: Map,
+  //   color: "bg-red-500",
+  //   description: "Dictionary type"
+  // },
   {
     type: "basicFunction",
     label: "Function",
@@ -246,19 +246,19 @@ const nodeTemplates: NodeTemplate[] = [
     color: "bg-yellow-500",
     description: "Defines the start of a function"
   },
-  {
-    type: "enum",
-    label: "Enum",
-    data: {
-      label: "Enum",
-      type: "TYPE",
-      name: "",
-      variables: []
-    },
-    icon: List,
-    color: "bg-blue-500",
-    description: "Enum definition node"
-  },
+  // {
+  //   type: "enum",
+  //   label: "Enum",
+  //   data: {
+  //     label: "Enum",
+  //     type: "TYPE",
+  //     name: "",
+  //     variables: []
+  //   },
+  //   icon: List,
+  //   color: "bg-blue-500",
+  //   description: "Enum definition node"
+  // },
   {
     type: "struct",
     label: "Struct",
@@ -273,32 +273,40 @@ const nodeTemplates: NodeTemplate[] = [
     description: "Struct definition node"
   },
   {
-    type: "writeWithParams",
-    label: "Write With Parameters",
-    data: {
-      label: "Write With Parameters",
-      type: "FUNCTION",
-      storageVar: "",
-      param1: "",
-      param2: ""
-    },
-    icon: FileEdit,
-    color: "bg-green-500",
-    description: "Write with parameters node"
+    type: "constructor",
+    label: "Constructor",
+    data: { label: "Constructor", type: "FUNCTION", identifier: "CONSTRUCTOR" },
+    icon: Code,
+    color: "bg-pink-500",
+    description: "Constructor function node"
   },
-  {
-    type: "readWithParams",
-    label: "Read With Parameters",
-    data: {
-      label: "Read With Parameters",
-      type: "FUNCTION",
-      storageVar: "",
-      paramType: ""
-    },
-    icon: BookOpen,
-    color: "bg-indigo-500",
-    description: "Read with parameters node"
-  }
+  // {
+  //   type: "writeWithParams",
+  //   label: "Write With Parameters",
+  //   data: {
+  //     label: "Write With Parameters",
+  //     type: "FUNCTION",
+  //     storageVar: "",
+  //     param1: "",
+  //     param2: ""
+  //   },
+  //   icon: FileEdit,
+  //   color: "bg-green-500",
+  //   description: "Write with parameters node"
+  // },
+  // {
+  //   type: "readWithParams",
+  //   label: "Read With Parameters",
+  //   data: {
+  //     label: "Read With Parameters",
+  //     type: "FUNCTION",
+  //     storageVar: "",
+  //     paramType: ""
+  //   },
+  //   icon: BookOpen,
+  //   color: "bg-indigo-500",
+  //   description: "Read with parameters node"
+  // }
 ];
 
 export function NodePalette() {
