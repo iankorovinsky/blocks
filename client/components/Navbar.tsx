@@ -51,7 +51,7 @@ export function Navbar() {
           return;
         }
 
-        if (hash === "error" || typeof hash !== 'string') {
+        if (hash === "error" || typeof hash !== 'string' || hash === 'Deployment failed: ') {
           toast({
             variant: "destructive",
             title: "Deployment Failed",
