@@ -16,6 +16,7 @@ import {
   BookOpen,
   Boxes,
   Code,
+  Code2,
   Database,
   FileEdit,
   FileSearch,
@@ -49,6 +50,7 @@ export interface NodeTemplate {
     param1?: string;
     param2?: string;
     paramType?: string;
+    code?: string;
   };
   label: string;
   icon: React.ElementType;
@@ -127,6 +129,14 @@ const nodeTemplates: NodeTemplate[] = [
     icon: SendHorizonal,
     color: "bg-pink-500",
     description: "Emits an event"
+  },
+  {
+    type: "code",
+    label: "Code",
+    data: { label: "Code", type: "CODE", code: "" },
+    icon: Code,
+    color: "bg-pink-500",
+    description: "Code editor node"
   },
   {
     type: "getFunction",
