@@ -54,8 +54,9 @@ export function Navbar() {
         console.log("Deploying a happy toast");
 
         toast({
-          title: "Contract Deployed",
-          description: "Your contract has been successfully deployed!",
+          variant: "success",
+          title: "🚀 Contract Deployed",
+          description: "Your contract has been successfully deployed to the blockchain! ✨",
         });
         if (network === "testnet") {
         window.open(`https://sepolia.starkscan.co/contract/${hash}`, "_blank");
@@ -92,8 +93,9 @@ export function Navbar() {
           setCompiledCode(code);
           setShowEditor(true);
           toast({
-            title: "Compilation Successful",
-            description: "Your contract has been compiled successfully.",
+            variant: "success",
+            title: "🎯 Compilation Successful",
+            description: "Your contract has been compiled successfully! ✨",
           });
         } else {
           setCompiledCode(code);
