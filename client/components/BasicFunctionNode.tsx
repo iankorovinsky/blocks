@@ -3,55 +3,122 @@ import { Settings2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 type Props = {
-  data: { label: string; storage_variable: string };
+  data: { 
+    label: string; 
+    storage_variable: string;
+    returnType?: string;
+    parameters?: Array<{name: string, type: string}>;
+    name?: string;
+    type: string;
+    identifier: string;
+  };
   id: string;
 };
 
 const BasicFunctionNode = ({ data, id }: Props) => {
-  const [inputValue, setInputValue] = useState("");
-  const [connectedVars, setConnectedVars] = useState(0);
-  const [returnType, setReturnType] = useState("");
+  const [inputValue, setInputValue] = useState(data.name || "");
+  const [parameters, setParameters] = useState<Array<{name: string, type: string}>>(data.parameters || []);
+  const [returnType, setReturnType] = useState(data.returnType || "");
   const [hasCodeNode, setHasCodeNode] = useState(false);
-  const { getNodes, getEdges } = useReactFlow();
+  const { getNodes, getEdges, setNodes } = useReactFlow();
+
+  useEffect(() => {
+    // Ensure the node has the correct type identifier
+    setNodes(nodes => nodes.map(node => {
+      if (node.id === id) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            type: 'BASIC_FUNCTION',
+            identifier: 'BASIC_FUNCTION'
+          }
+        };
+      }
+      return node;
+    }));
+  }, [id, setNodes]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       const edges = getEdges();
       const nodes = getNodes();
       
-      // Check input parameters
-      const inputEdges = edges.filter((edge) => edge.target === id);
-      const connectedNodeIds = inputEdges.map((edge) => edge.source);
-      const connectedNodes = nodes.filter(
+      // Get all connected nodes
+      const connectedEdges = edges.filter((edge) => edge.target === id || edge.source === id);
+      const connectedNodeIds = connectedEdges.map((edge) => 
+        edge.target === id ? edge.source : edge.target
+      );
+
+      // Process parameters (TypedVariable nodes)
+      const paramNodes = nodes.filter(
         (node) => connectedNodeIds.includes(node.id) && node.type === "typedVariable"
       );
-      setConnectedVars(connectedNodes.length);
+      
+      const newParams = paramNodes.map(node => {
+        // Find the primitive type connected to this typed variable
+        const typeEdge = edges.find(edge => edge.target === node.id);
+        const typeNode = typeEdge ? nodes.find(n => n.id === typeEdge.source) : null;
+        return {
+          name: (node.data?.label as string) || "",
+          type: (typeNode?.data?.identifier as string) || "unknown"
+        };
+      });
 
-      // Check for connected code nodes
+      // Process return type (direct Primitive node connection)
+      const returnTypeNode = nodes.find(
+        (node) => connectedNodeIds.includes(node.id) && node.type === "primitive"
+      );
+      const newReturnType = (returnTypeNode?.data?.identifier as string) || "";
+
+      // Check for code node
       const codeNodes = nodes.filter(
         (node) => connectedNodeIds.includes(node.id) && node.type === "code"
       );
       setHasCodeNode(codeNodes.length > 0);
 
-      // Check return type
-      const returnEdge = edges.find((edge) => edge.target === id);
-      if (returnEdge) {
-        const returnNode = nodes.find((node) => node.id === returnEdge.source) as Node<{ identifier: string }>;
-        if (returnNode?.type === "primitive" && returnNode.data?.identifier) {
-          setReturnType(returnNode.data.identifier);
-        } else {
-          setReturnType("");
-        }
-      } else {
-        setReturnType("");
+      // Update state and node data if changes detected
+      if (JSON.stringify(parameters) !== JSON.stringify(newParams) || returnType !== newReturnType) {
+        setParameters(newParams);
+        setReturnType(newReturnType);
+        
+        // Update node data
+        setNodes(nodes.map(node => {
+          if (node.id === id) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                parameters: newParams,
+                returnType: newReturnType,
+                name: inputValue
+              }
+            };
+          }
+          return node;
+        }));
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [getNodes, getEdges, id]);
+  }, [getNodes, getEdges, id, setNodes, parameters, returnType, inputValue]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
+    const newValue = event.target.value;
+    setInputValue(newValue);
+    // Update node data
+    setNodes(nodes => nodes.map(node => {
+      if (node.id === id) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            name: newValue
+          }
+        };
+      }
+      return node;
+    }));
   };
 
   return (
@@ -106,9 +173,14 @@ const BasicFunctionNode = ({ data, id }: Props) => {
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Parameters</label>
           </div>
-          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${connectedVars > 0 ? 'border-blue-700 text-white-500' : 'border-gray-800 text-gray-500'}`}>
-            {connectedVars > 0 
-              ? `${connectedVars} parameter${connectedVars > 1 ? 's' : ''} connected`
+          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${parameters.length > 0 ? 'border-blue-700 text-white-500' : 'border-gray-800 text-gray-500'}`}>
+            {parameters.length > 0 
+              ? parameters.map((param, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-400" />
+                    <span>{param.name} ({param.type})</span>
+                  </div>
+                ))
               : 'Connect to add parameters'
             }
           </div>

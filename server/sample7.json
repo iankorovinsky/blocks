@@ -1,0 +1,135 @@
+{
+    "nodeData": [
+      {
+        "id": "code_1740337810085",
+        "type": "code",
+        "position": {
+          "x": 178.7554100619452,
+          "y": 704.3130342897205
+        },
+        "data": {
+          "label": "Code",
+          "type": "CODE",
+          "identifier": "",
+          "code": ""
+        },
+        "measured": {
+          "width": 400,
+          "height": 283
+        },
+        "selected": true,
+        "dragging": false
+      },
+      {
+        "id": "primitive_1740337836009",
+        "type": "primitive",
+        "position": {
+          "x": 776,
+          "y": 120.7109375
+        },
+        "data": {
+          "label": "Primitive",
+          "type": "PRIM_TYPE",
+          "identifier": "bool"
+        },
+        "measured": {
+          "width": 280,
+          "height": 147
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "typedVariable_1740337843154",
+        "type": "typedVariable",
+        "position": {
+          "x": 397,
+          "y": 75.7109375
+        },
+        "data": {
+          "label": "sheep",
+          "type": "TYPED_VAR",
+          "identifier": ""
+        },
+        "measured": {
+          "width": 280,
+          "height": 223
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "basicFunction_1740337890325",
+        "type": "basicFunction",
+        "position": {
+          "x": 6,
+          "y": 105.7109375
+        },
+        "data": {
+          "label": "Function",
+          "type": "BASIC_FUNCTION",
+          "identifier": "BASIC_FUNCTION",
+          "parameters": [
+            {
+              "name": "sheep",
+              "type": "bool"
+            }
+          ],
+          "returnType": "bool",
+          "name": "test"
+        },
+        "measured": {
+          "width": 280,
+          "height": 379
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "primitive_1740337912384",
+        "type": "primitive",
+        "position": {
+          "x": 757,
+          "y": 390.7109375
+        },
+        "data": {
+          "label": "Primitive",
+          "type": "PRIM_TYPE",
+          "identifier": "felt252"
+        },
+        "measured": {
+          "width": 280,
+          "height": 147
+        },
+        "selected": false,
+        "dragging": false
+      }
+    ],
+    "edgeData": [
+      {
+        "type": "custom",
+        "source": "primitive_1740337836009",
+        "target": "typedVariable_1740337843154",
+        "id": "xy-edge__primitive_1740337836009-typedVariable_1740337843154"
+      },
+      {
+        "type": "custom",
+        "source": "typedVariable_1740337843154",
+        "target": "basicFunction_1740337890325",
+        "id": "xy-edge__typedVariable_1740337843154-basicFunction_1740337890325"
+      },
+      {
+        "type": "custom",
+        "source": "code_1740337810085",
+        "target": "basicFunction_1740337890325",
+        "id": "xy-edge__code_1740337810085-basicFunction_1740337890325"
+      },
+      {
+        "type": "custom",
+        "source": "primitive_1740337912384",
+        "target": "basicFunction_1740337890325",
+        "id": "xy-edge__primitive_1740337912384-basicFunction_1740337890325"
+      }
+    ],
+    "contractName": "test-functions"
+  }

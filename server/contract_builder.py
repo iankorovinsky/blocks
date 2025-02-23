@@ -444,10 +444,57 @@ class ContractBuilder:
             self.addFunction(functionData)
             return "\n".join(processedTemplate)
 
+    def generateBasicFunction(self, functionNode: Dict) -> str:
+        # Get function name from node data
+        function_name = functionNode['data'].get('name', 'unnamed_function')
+        
+        # Get parameters from node data
+        parameters = functionNode['data'].get('parameters', [])
+        param_str = "self: @ContractState"  # Always include self parameter
+        if parameters:
+            param_str += ", " + ", ".join(f"{param['name']}: {param['type']}" for param in parameters)
+            
+        # Get return type if present
+        return_type = functionNode['data'].get('returnType', '')
+        return_str = f" -> {return_type}" if return_type else ""
+        
+        # Get connected code node for function body
+        edges = self.getNodeEdges(functionNode['id'])
+        code_content = "// No code implementation provided"
+        
+        for connectedNodeId in edges['connectedNodes']:
+            codeNode = next(
+                (node for node in self.jsonData['nodeData'] 
+                 if node['id'] == connectedNodeId and node['data']['type'] == 'CODE'),
+                None
+            )
+            if codeNode:
+                code_content = codeNode['data'].get('code', code_content)
+                break
+        
+        # Build function template
+        template = [
+            f"fn {function_name}({param_str}){return_str} {{",
+            f"    {code_content}",
+            "}"
+        ]
+        
+        functionData = {'template': template}
+        self.addFunction(functionData)
+        return "\n".join(template)
+
     def generateFunctions(self, languageJson):
+        # Process standard function nodes (GET, SET, etc.)
         functionNodes = self.getNodesByType('FUNCTION')
         eventNodes = self.getNodesByType('EVENT')
         
+        # Process basic function nodes
+        basicFunctionNodes = [
+            node for node in self.jsonData.get('nodeData', [])
+            if node.get('data', {}).get('type') == 'BASIC_FUNCTION'
+        ]
+        
+        # Generate standard functions
         for functionNode in functionNodes:
             identifier = functionNode.get('data', {}).get('identifier')
             function_name = functionNode.get('data', {}).get('name', 'unnamed_function')
@@ -503,10 +550,15 @@ class ContractBuilder:
                     storageNode,
                     amount
                 )
+                
+        # Generate basic functions
+        for functionNode in basicFunctionNodes:
+            self.generateBasicFunction(functionNode)
+                
         # Generate event emission functions
         for eventNode in eventNodes:
             self.generateEmitEventFunction(eventNode)
-                
+
     def generateStorageVars(self):
         storageNodes = self.getNodesByType('STORAGE_VAR')
         for node in storageNodes:
@@ -570,7 +622,7 @@ class ContractBuilder:
 if __name__ == "__main__":
     # Create an empty dictionary as initial jsonData
     builder = ContractBuilder({})
-    builder.jsonData = builder.loadJson('sample6.json')
+    builder.jsonData = builder.loadJson('sample7.json')
     
     # You can change this to any contract name you want
     builder.invoke("MyContract")
