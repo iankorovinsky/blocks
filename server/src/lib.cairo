@@ -1,29 +1,34 @@
 #[starknet::interface]
 trait IMyContract<TContractState> {
-	fn get(self: @TContractState) -> u64;
-	fn increment_value(ref self: TContractState, amount: u64);
-	fn decrement_value(ref self: TContractState, amount: u64);
+	fn emit_ball(ref self: TContractState, meow: bytes31, wolf: bool);
 }
 
+
+
 #[starknet::contract]
-mod TEST {
-	use core::starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
+mod MyContract {
 
 	#[storage]
 	struct Storage {
-		value: u64,
+	}
+
+	#[derive(Drop, starknet::Event)]
+	pub struct ball {
+		meow: bytes31,
+		wolf: bool,
+	}
+
+	#[event]
+	#[derive(Drop, starknet::Event)]
+	pub enum Event {
+		ball: ball,
 	}
 
 	#[abi(embed_v0)]
 	impl MyContract of super::IMyContract<ContractState> {
-		fn get(self: @ContractState) -> u64 {
-			self.value.read()
-		}
-		fn increment_value(ref self: ContractState, amount: u64) {
-			self.value.write(self.value.read() + 1);
-		}
-		fn decrement_value(ref self: ContractState, amount: u64) {
-			self.value.write(self.value.read() - 1);
+		fn emit_ball(ref self: ContractState, meow: bytes31, wolf: bool)
+		{
+			self.emit(Event::ball(ball { meow, wolf }));
 		}
 	}
 }

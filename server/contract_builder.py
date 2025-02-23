@@ -38,14 +38,52 @@ class ContractBuilder:
             f"trait {interfaceName}<TContractState> {{",
         ]
         
+
+        # This is suspicious TODO 
         for func in self.functions:
             template = func['template']
-            if template:
-                signature = template[0].strip()
-                signature = signature.replace("ContractState", "TContractState")
-                signature = signature.rstrip(" {")
-                signature = f"\t{signature};"
-                interfaceBlock.append(signature)
+            if not template:
+                continue
+                
+            # Get all lines that aren't just a brace or empty
+            code_lines = [line.strip() for line in template if line.strip() and line.strip() not in ['{', '}']]
+            if not code_lines:
+                continue
+                
+            # Get the function signature line
+            signature_line = code_lines[0]
+            
+            # Extract function name and parameters
+            fn_start = signature_line.find('fn ')
+            params_start = signature_line.find('(', fn_start)
+            params_end = signature_line.find(')', params_start)
+            
+            if fn_start < 0 or params_start < 0 or params_end < 0:
+                continue
+                
+            # Get the function name
+            fn_name = signature_line[fn_start:params_start].strip()
+            
+            # Get and process parameters
+            params = signature_line[params_start+1:params_end].strip()
+            param_list = [p.strip() for p in params.split(',') if p.strip()]
+            
+            # Replace ContractState with TContractState in self parameter
+            if param_list and 'self' in param_list[0]:
+                param_list[0] = param_list[0].replace('ContractState', 'TContractState')
+            
+            # Reconstruct the function signature
+            params = ', '.join(param_list)
+            
+            # Check if there's a return type
+            return_type = ""
+            if " -> " in signature_line:
+                return_type = " -> " + signature_line.split(" -> ")[1].strip().rstrip('{').strip()
+            
+            signature = f"\t{fn_name}({params}){return_type};"
+            interfaceBlock.append(signature)
+
+            ## Until here
         
         interfaceBlock.append("}")
         
@@ -76,6 +114,20 @@ class ContractBuilder:
         indentedStorage = "\t" + storageBlock.replace("\n", "\n\t")
         contractParts.append(indentedStorage)
         contractParts.append("")
+        
+        # Add struct definitions if any exist
+        structs = self.buildStructs()
+        if structs:
+            indentedStructs = "\t" + structs.replace("\n", "\n\t")
+            contractParts.append(indentedStructs)
+            contractParts.append("")
+
+        # Add event enum if any events exist
+        events = self.buildEventEnum()
+        if events:
+            indentedEvents = "\t" + events.replace("\n", "\n\t")
+            contractParts.append(indentedEvents)
+            contractParts.append("")
         
         implBlock = self.buildImplementationBlock()
         contractParts.append(implBlock)
@@ -118,20 +170,31 @@ class ContractBuilder:
         fields = []
         
         for connectedNodeId in edges['connectedNodes']:
-            connectedNode = next(
+            # First find the TypedVariable node
+            typedVarNode = next(
                 (node for node in self.jsonData['nodeData'] if node['id'] == connectedNodeId), 
                 None
             )
             
-            if not connectedNode:
+            if not typedVarNode or typedVarNode['data']['type'] != 'TYPED_VAR':
                 continue
-
-            # NEED TO CHANGE THIS TO TYPED VARIABLE    
-            if connectedNode['data']['type'] == 'PRIM_TYPE':
-                fields.append({
-                    'name': connectedNode['data'].get('name', f'field_{len(fields)}'),
-                    'type': self.getPrimitiveType(connectedNode)
-                })
+            
+            # Get the edges of the TypedVariable node to find its connected primitive type
+            typedVarEdges = self.getNodeEdges(typedVarNode['id'])
+            
+            for primitiveNodeId in typedVarEdges['connectedNodes']:
+                primitiveNode = next(
+                    (node for node in self.jsonData['nodeData'] if node['id'] == primitiveNodeId), 
+                    None
+                )
+                
+                if primitiveNode and primitiveNode['data']['type'] == 'PRIM_TYPE':
+                    fields.append({
+                        'name': typedVarNode['data'].get('label', f'field_{len(fields)}'),
+                        'type': self.getPrimitiveType(primitiveNode),
+                        'is_key': typedVarNode['data'].get('is_key', False) # NOT SUPPORTED YET NEED TO UPDATE FE
+                    })
+                    break  # Found the primitive type for this typed variable
                 
         return fields
     
@@ -141,34 +204,74 @@ class ContractBuilder:
             return ""
             
         enumBlock = [
+            "#[event]",
             "#[derive(Drop, starknet::Event)]",
-            "enum Event {",
+            "pub enum Event {",
         ]
         
         for node in eventNodes:
-            eventName = node['data'].get('name', 'UnnamedEvent')
             structName = self.getConnectedStructName(node['id'])
             if structName:
-                enumBlock.append(f"\t{eventName}: {structName},")
+                # Use the struct name as the event name
+                enumBlock.append(f"\t{structName}: {structName},")
         
         enumBlock.append("}")
         return "\n".join(enumBlock)
+    
+    def getConnectedStructName(self, nodeId: str) -> str:
+        edges = self.getNodeEdges(nodeId)
+        for connectedNodeId in edges['connectedNodes']:
+            node = next(
+                (node for node in self.jsonData['nodeData'] if node['id'] == connectedNodeId), 
+                None
+            )
+            if node and node['data']['type'] == 'STRUCT':
+                return node['data'].get('name', 'UnnamedStruct')
+        return ""
+    
+    def generateEmitEventFunction(self, eventNode: Dict) -> str:
+        structName = self.getConnectedStructName(eventNode['id'])
+        
+        if not structName:
+            raise ValueError(f"Event must be connected to a struct")
+            
+        # Get the struct node to access its fields - TODO very inefficient
+        structNode = next(
+            (node for node in self.jsonData['nodeData'] 
+             if node['data']['type'] == 'STRUCT' and node['data'].get('name') == structName),
+            None
+        )
+        
+        if not structNode:
+            raise ValueError(f"Could not find struct {structName}")
+            
+        fields = self.getStructFields(structNode)
+        
+        # Create parameters from struct fields
+        params = [f"{field['name']}: {field['type']}" for field in fields]
+        params_str = ", ".join(params)
+            
+        template = [
+            f"fn emit_{structName.lower()}(ref self: ContractState, {params_str})",
+            "{",
+            f"\tself.emit(Event::{structName}({structName} {{ {', '.join(field['name'] for field in fields)} }}));",
+            "}"
+        ]
+        
+        functionData = {'template': template}
+        self.addFunction(functionData)
+        return "\n".join(template)
 
 
     def build(self):
         # Combine all components into a complete contract
         contract_parts = []
 
-        # Add struct definitions if any exist
-        structs = self.buildStructs()
-        if structs:
-            contract_parts.append(structs)
-            contract_parts.append("")  # Add blank line for separation
-
         # Add the interface block
         contract_parts.append(self.buildInterfaceBlock())
+        contract_parts.append("")  # Add blank line for separation
         
-        # Add the contract block (includes storage block and implementation block)
+        # Add the contract block (includes storage block, structs, events, and implementation block)
         contract_parts.append(self.buildContractBlock())
         return "\n\n".join(contract_parts)
 
@@ -343,6 +446,7 @@ class ContractBuilder:
 
     def generateFunctions(self, languageJson):
         functionNodes = self.getNodesByType('FUNCTION')
+        eventNodes = self.getNodesByType('EVENT')
         
         for functionNode in functionNodes:
             identifier = functionNode.get('data', {}).get('identifier')
@@ -399,6 +503,9 @@ class ContractBuilder:
                     storageNode,
                     amount
                 )
+        # Generate event emission functions
+        for eventNode in eventNodes:
+            self.generateEmitEventFunction(eventNode)
                 
     def generateStorageVars(self):
         storageNodes = self.getNodesByType('STORAGE_VAR')
@@ -432,10 +539,38 @@ class ContractBuilder:
         
         # print(finalContract)
 
+    def buildStructs(self) -> str:
+        structNodes = self.getNodesByType('STRUCT')
+        if not structNodes:
+            return ""
+        
+        structBlocks = []
+        for structNode in structNodes:
+            structName = structNode['data'].get('name', 'UnnamedStruct')
+            fields = self.getStructFields(structNode)
+            
+            # Build the struct definition
+            structDef = [
+                "#[derive(Drop, starknet::Event)]",
+                f"pub struct {structName} {{",
+            ]
+            
+            # Add fields with their types
+            for field in fields:
+                structDef.append(f"\t{field['name']}: {field['type']},")
+            
+            structDef.append("}")
+            
+            # Add this struct to our collection
+            structBlocks.append("\n".join(structDef))
+        
+        # Return all structs joined with double newlines
+        return "\n\n".join(structBlocks)
+
 if __name__ == "__main__":
     # Create an empty dictionary as initial jsonData
     builder = ContractBuilder({})
-    builder.jsonData = builder.loadJson('sample4.json')
+    builder.jsonData = builder.loadJson('sample6.json')
     
     # You can change this to any contract name you want
     builder.invoke("MyContract")

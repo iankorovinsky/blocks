@@ -1,0 +1,182 @@
+{
+    "nodeData": [
+      {
+        "id": "eventNode_1740278229054",
+        "type": "eventNode",
+        "position": {
+          "x": -34.9348886664273,
+          "y": 279.8328038997127
+        },
+        "data": {
+          "label": "Event",
+          "type": "EVENT",
+          "identifier": ""
+        },
+        "measured": {
+          "width": 280,
+          "height": 223
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "struct_1740278232392",
+        "type": "struct",
+        "position": {
+          "x": 364.7888288653294,
+          "y": 307.4332025961932
+        },
+        "data": {
+          "label": "Struct",
+          "type": "STRUCT",
+          "identifier": "",
+          "name": "ball"
+        },
+        "measured": {
+          "width": 280,
+          "height": 223
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "typedVariable_1740278245616",
+        "type": "typedVariable",
+        "position": {
+          "x": 753.0459818771466,
+          "y": -8.462880923539615
+        },
+        "data": {
+          "label": "meow",
+          "type": "TYPED_VAR",
+          "identifier": ""
+        },
+        "measured": {
+          "width": 280,
+          "height": 223
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "primitive_1740278252484",
+        "type": "primitive",
+        "position": {
+          "x": 1166.0838402605275,
+          "y": 497.0119118290839
+        },
+        "data": {
+          "label": "Primitive",
+          "type": "PRIM_TYPE",
+          "identifier": "bool"
+        },
+        "measured": {
+          "width": 280,
+          "height": 147
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "primitive_1740278259604",
+        "type": "primitive",
+        "position": {
+          "x": 1109.7750776062587,
+          "y": 5.456730690946351
+        },
+        "data": {
+          "label": "Primitive",
+          "type": "PRIM_TYPE",
+          "identifier": "bytes31"
+        },
+        "measured": {
+          "width": 280,
+          "height": 147
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "typedVariable_1740278283598",
+        "type": "typedVariable",
+        "position": {
+          "x": 776.2346838655122,
+          "y": 463.87230819147806
+        },
+        "data": {
+          "label": "wolf",
+          "type": "TYPED_VAR",
+          "identifier": ""
+        },
+        "measured": {
+          "width": 280,
+          "height": 223
+        },
+        "selected": false,
+        "dragging": false
+      }
+    ],
+    "edgeData": [
+      {
+        "type": "custom",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 15,
+          "height": 15,
+          "color": "#94a3b8"
+        },
+        "source": "struct_1740278232392",
+        "target": "eventNode_1740278229054",
+        "id": "xy-edge__struct_1740278232392-eventNode_1740278229054"
+      },
+      {
+        "type": "custom",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 15,
+          "height": 15,
+          "color": "#94a3b8"
+        },
+        "source": "typedVariable_1740278245616",
+        "target": "struct_1740278232392",
+        "id": "xy-edge__typedVariable_1740278245616-struct_1740278232392"
+      },
+      {
+        "type": "custom",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 15,
+          "height": 15,
+          "color": "#94a3b8"
+        },
+        "source": "primitive_1740278259604",
+        "target": "typedVariable_1740278245616",
+        "id": "xy-edge__primitive_1740278259604-typedVariable_1740278245616"
+      },
+      {
+        "type": "custom",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 15,
+          "height": 15,
+          "color": "#94a3b8"
+        },
+        "source": "typedVariable_1740278283598",
+        "target": "struct_1740278232392",
+        "id": "xy-edge__typedVariable_1740278283598-struct_1740278232392"
+      },
+      {
+        "type": "custom",
+        "markerEnd": {
+          "type": "arrowclosed",
+          "width": 15,
+          "height": 15,
+          "color": "#94a3b8"
+        },
+        "source": "primitive_1740278252484",
+        "target": "typedVariable_1740278283598",
+        "id": "xy-edge__primitive_1740278252484-typedVariable_1740278283598"
+      }
+    ],
+    "contractName": ""
+  }

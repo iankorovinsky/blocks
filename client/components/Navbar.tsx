@@ -38,7 +38,7 @@ export function Navbar() {
         const hash = response.data.hash;
         console.log("Deployment hash: ", hash);
         if (network === "testnet") {
-          window.open(`https://sepolia.starkscan.co/contract/${hash}`, "_blank");
+        window.open(`https://sepolia.starkscan.co/contract/${hash}`, "_blank");
         } else {
           window.open(`https://starkscan.co/contract/${hash}`, "_blank");
         }
