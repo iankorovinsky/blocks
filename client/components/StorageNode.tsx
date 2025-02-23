@@ -134,13 +134,13 @@ const StorageNode = ({ id, data }: Props) => {
 
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Left}
         className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
         id="b"
       />
       <Handle
         type="target"
-        position={Position.Bottom}
+        position={Position.Left}
         className="w-3 h-3 !bg-blue-400 border-2 border-[#1a1a1a]"
         id="b"
       />

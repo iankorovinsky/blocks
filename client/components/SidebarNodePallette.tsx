@@ -16,6 +16,7 @@ import {
   BookOpen,
   Boxes,
   Code,
+  Code2,
   Database,
   FileEdit,
   FileSearch,
@@ -49,6 +50,7 @@ export interface NodeTemplate {
     param1?: string;
     param2?: string;
     paramType?: string;
+    code?: string;
   };
   label: string;
   icon: React.ElementType;
@@ -57,6 +59,14 @@ export interface NodeTemplate {
 }
 
 const nodeTemplates: NodeTemplate[] = [
+  {
+    type: "constructor",
+    label: "Constructor",
+    data: { label: "Constructor", type: "FUNCTION", identifier: "CONSTRUCTOR" },
+    icon: Code,
+    color: "bg-pink-500",
+    description: "Constructor function node"
+  },
   {
     type: "storage",
     label: "Storage",
@@ -67,48 +77,16 @@ const nodeTemplates: NodeTemplate[] = [
       storage_variable: "",
     },
     icon: Database,
-    color: "bg-purple-500",
+    color: "bg-blue-500",
     description: "Storage variable node",
-  },
-  {
-    type: "getFunction",
-    data: { label: "Get", type: "FUNCTION", identifier: "GET", name: "" },
-    label: "Get",
-    icon: FileSearch,
-    color: "bg-green-500", 
-    description: "Get function node",
-  },
-  {
-    type: "setFunction",
-    data: { label: "Set", type: "FUNCTION", identifier: "SET", name: "" },
-    label: "Set",
-    icon: FileEdit,
-    color: "bg-indigo-500",
-    description: "Set function node",
   },
   {
     type: "primitive",
     label: "Primitive",
     data: { label: "Primitive", type: "PRIM_TYPE", identifier: "" },
     icon: Variable,
-    color: "bg-orange-500",
+    color: "bg-purple-500",
     description: "Primitive type node",
-  },
-  {
-    type: "compound",
-    label: "Compound",
-    data: { label: "Compound", type: "COMPOUND_TYPE", identifier: "" },
-    icon: Boxes,
-    color: "bg-red-500",
-    description: "Compound type node",
-  },
-  {
-    type: "readFunction",
-    label: "Read",
-    data: { label: "Read", type: "READ", identifier: "" },
-    icon: BookOpen,
-    color: "bg-yellow-500",
-    description: "Read function node",
   },
   {
     type: "typedVariable",
@@ -120,144 +98,8 @@ const nodeTemplates: NodeTemplate[] = [
       varType: "" 
     },
     icon: Variable,
-    color: "bg-blue-500",
+    color: "bg-green-500",
     description: "Typed variable node",
-  },
-  {
-    type: "write",
-    label: "Write",
-    data: { 
-      label: "Write", 
-      type: "WRITE",
-      storageVar: "",
-      param1: "",
-      param2: "" 
-    },
-    icon: FileEdit,
-    color: "bg-purple-500",
-    description: "Write function node",
-  },
-  {
-    type: "readWithParam",
-    label: "Read With Param",
-    data: { 
-      label: "Read With Param", 
-      type: "READ_PARAM",
-      storageVar: "",
-      paramType: "" 
-    },
-    icon: BookOpen,
-    color: "bg-green-500",
-    description: "Parameterized read node",
-  },
-  {
-    type: "incrementFunction",
-    label: "Increment",
-    data: { label: "Increment", type: "FUNCTION", identifier: "INCREMENT" },
-    icon: PlusSquare,
-    color: "bg-indigo-500",
-    description: "Increment function node",
-  },
-  {
-    type: "decrementFunction",
-    label: "Decrement",
-    data: { label: "Decrement", type: "FUNCTION", identifier: "DECREMENT" },
-    icon: MinusSquare,
-    color: "bg-orange-500",
-    description: "Decrement function node",
-  },
-  {
-    type: "assert",
-    label: "Assert",
-    data: { label: "Assert", type: "CONDITION", identifier: "" },
-    icon: AlertTriangle,
-    color: "bg-red-500",
-    description: "Assert condition",
-  },
-  {
-    type: "isNotZeroCondition",
-    label: "Is Not Zero?",
-    data: { label: "is_not_zero", type: "CONDITION", identifier: "" },
-    icon: Ban,
-    color: "bg-yellow-500",
-    description: "Is Not Zero Condition",
-  },
-  {
-    type: "functionCall",
-    label: "Function Call",
-    data: { label: "function_call", type: "FUNCTION", identifier: "" },
-    icon: Play,
-    color: "bg-blue-500",
-    description: "Calls a function and is a parameter",
-  },
-  {
-    type: "getCallerAddress",
-    label: "Get Caller Address",
-    data: { label: "get_caller_address", type: "FUNCTION", identifier: "" },
-    icon: UserCircle,
-    color: "bg-purple-500",
-    description: "Gets the address of the caller",
-  },
-  {
-    type: "additionNode",
-    label: "Addition",
-    data: { label: "Addition", type: "FUNCTION", identifier: "" },
-    icon: Plus,
-    color: "bg-green-500",
-    description: "Adds two values together",
-  },
-  {
-    type: "subtractionNode",
-    label: "Subtraction",
-    data: { label: "Subtraction", type: "FUNCTION", identifier: "" },
-    icon: Minus,
-    color: "bg-indigo-500",
-    description: "Subtracts two values together",
-  },
-  {
-    type: "eventNode",
-    label: "Event",
-    data: { label: "Event", type: "EVENT", identifier: "" },
-    icon: SendHorizonal,
-    color: "bg-orange-500",
-    description: "Emits an event"
-  },
-  {
-    type: "defineEventNode",
-    label: "Define Event",
-    data: { label: "DefineEvent", type: "EVENT", identifier: "" },
-    icon: SendHorizonal,
-    color: "bg-orange-500",
-    description: "Defines an event"
-  },
-  {
-    type: "legacyMap",
-    label: "LegacyMap",
-    data: { label: "LegacyMap", type: "TYPE", identifier: "" },
-    icon: Map,
-    color: "bg-red-500",
-    description: "Dictionary type"
-  },
-  {
-    type: "basicFunction",
-    label: "Function",
-    data: { label: "Function", type: "FUNCTION", identifier: "" },
-    icon: Code,
-    color: "bg-yellow-500",
-    description: "Defines the start of a function"
-  },
-  {
-    type: "enum",
-    label: "Enum",
-    data: {
-      label: "Enum",
-      type: "TYPE",
-      name: "",
-      variables: []
-    },
-    icon: List,
-    color: "bg-blue-500",
-    description: "Enum definition node"
   },
   {
     type: "struct",
@@ -269,36 +111,213 @@ const nodeTemplates: NodeTemplate[] = [
       variables: []
     },
     icon: FolderTree,
-    color: "bg-purple-500",
+    color: "bg-blue-500",
     description: "Struct definition node"
   },
   {
-    type: "writeWithParams",
-    label: "Write With Parameters",
-    data: {
-      label: "Write With Parameters",
-      type: "FUNCTION",
-      storageVar: "",
-      param1: "",
-      param2: ""
-    },
-    icon: FileEdit,
-    color: "bg-green-500",
-    description: "Write with parameters node"
+    type: "basicFunction",
+    label: "Function",
+    data: { label: "Function", type: "FUNCTION", identifier: "FUNCTION" },
+    icon: Code,
+    color: "bg-pink-500",
+    description: "Defines the start of a function"
   },
   {
-    type: "readWithParams",
-    label: "Read With Parameters",
-    data: {
-      label: "Read With Parameters",
-      type: "FUNCTION",
-      storageVar: "",
-      paramType: ""
-    },
-    icon: BookOpen,
-    color: "bg-indigo-500",
-    description: "Read with parameters node"
-  }
+    type: "eventNode",
+    label: "Event",
+    data: { label: "Event", type: "EVENT", identifier: "" },
+    icon: SendHorizonal,
+    color: "bg-pink-500",
+    description: "Emits an event"
+  },
+  {
+    type: "code",
+    label: "Code",
+    data: { label: "Code", type: "CODE", code: "" },
+    icon: Code,
+    color: "bg-pink-500",
+    description: "Code editor node"
+  },
+  {
+    type: "getFunction",
+    data: { label: "Get", type: "FUNCTION", identifier: "GET", name: "" },
+    label: "Get",
+    icon: FileSearch,
+    color: "bg-orange-500", 
+    description: "Get function node",
+  },
+  {
+    type: "setFunction",
+    data: { label: "Set", type: "FUNCTION", identifier: "SET", name: "" },
+    label: "Set",
+    icon: FileEdit,
+    color: "bg-orange-500",
+    description: "Set function node",
+  },
+  
+  // {
+  //   type: "compound",
+  //   label: "Compound",
+  //   data: { label: "Compound", type: "COMPOUND_TYPE", identifier: "" },
+  //   icon: Boxes,
+  //   color: "bg-red-500",
+  //   description: "Compound type node",
+  // },
+  // {
+  //   type: "readFunction",
+  //   label: "Read",
+  //   data: { label: "Read", type: "READ", identifier: "" },
+  //   icon: BookOpen,
+  //   color: "bg-yellow-500",
+  //   description: "Read function node",
+  // },
+  // {
+  //   type: "write",
+  //   label: "Write",
+  //   data: { 
+  //     label: "Write", 
+  //     type: "WRITE",
+  //     storageVar: "",
+  //     param1: "",
+  //     param2: "" 
+  //   },
+  //   icon: FileEdit,
+  //   color: "bg-purple-500",
+  //   description: "Write function node",
+  // },
+  // {
+  //   type: "readWithParam",
+  //   label: "Read With Param",
+  //   data: { 
+  //     label: "Read With Param", 
+  //     type: "READ_PARAM",
+  //     storageVar: "",
+  //     paramType: "" 
+  //   },
+  //   icon: BookOpen,
+  //   color: "bg-green-500",
+  //   description: "Parameterized read node",
+  // },
+  {
+    type: "incrementFunction",
+    label: "Increment",
+    data: { label: "Increment", type: "FUNCTION", identifier: "INCREMENT" },
+    icon: PlusSquare,
+    color: "bg-orange-500",
+    description: "Increment function node",
+  },
+  {
+    type: "decrementFunction",
+    label: "Decrement",
+    data: { label: "Decrement", type: "FUNCTION", identifier: "DECREMENT" },
+    icon: MinusSquare,
+    color: "bg-orange-500",
+    description: "Decrement function node",
+  },
+  // {
+  //   type: "assert",
+  //   label: "Assert",
+  //   data: { label: "Assert", type: "CONDITION", identifier: "" },
+  //   icon: AlertTriangle,
+  //   color: "bg-red-500",
+  //   description: "Assert condition",
+  // },
+  // {
+  //   type: "isNotZeroCondition",
+  //   label: "Is Not Zero?",
+  //   data: { label: "is_not_zero", type: "CONDITION", identifier: "" },
+  //   icon: Ban,
+  //   color: "bg-yellow-500",
+  //   description: "Is Not Zero Condition",
+  // },
+  // {
+  //   type: "functionCall",
+  //   label: "Function Call",
+  //   data: { label: "function_call", type: "FUNCTION", identifier: "" },
+  //   icon: Play,
+  //   color: "bg-blue-500",
+  //   description: "Calls a function and is a parameter",
+  // },
+  // {
+  //   type: "getCallerAddress",
+  //   label: "Get Caller Address",
+  //   data: { label: "get_caller_address", type: "FUNCTION", identifier: "" },
+  //   icon: UserCircle,
+  //   color: "bg-purple-500",
+  //   description: "Gets the address of the caller",
+  // },
+  // {
+  //   type: "additionNode",
+  //   label: "Addition",
+  //   data: { label: "Addition", type: "FUNCTION", identifier: "" },
+  //   icon: Plus,
+  //   color: "bg-green-500",
+  //   description: "Adds two values together",
+  // },
+  // {
+  //   type: "subtractionNode",
+  //   label: "Subtraction",
+  //   data: { label: "Subtraction", type: "FUNCTION", identifier: "" },
+  //   icon: Minus,
+  //   color: "bg-indigo-500",
+  //   description: "Subtracts two values together",
+  // },
+  // {
+  //   type: "defineEventNode",
+  //   label: "Define Event",
+  //   data: { label: "DefineEvent", type: "EVENT", identifier: "" },
+  //   icon: SendHorizonal,
+  //   color: "bg-orange-500",
+  //   description: "Defines an event"
+  // },
+  // {
+  //   type: "legacyMap",
+  //   label: "LegacyMap",
+  //   data: { label: "LegacyMap", type: "TYPE", identifier: "" },
+  //   icon: Map,
+  //   color: "bg-red-500",
+  //   description: "Dictionary type"
+  // },
+  // {
+  //   type: "enum",
+  //   label: "Enum",
+  //   data: {
+  //     label: "Enum",
+  //     type: "TYPE",
+  //     name: "",
+  //     variables: []
+  //   },
+  //   icon: List,
+  //   color: "bg-blue-500",
+  //   description: "Enum definition node"
+  // },
+  // {
+  //   type: "writeWithParams",
+  //   label: "Write With Parameters",
+  //   data: {
+  //     label: "Write With Parameters",
+  //     type: "FUNCTION",
+  //     storageVar: "",
+  //     param1: "",
+  //     param2: ""
+  //   },
+  //   icon: FileEdit,
+  //   color: "bg-green-500",
+  //   description: "Write with parameters node"
+  // },
+  // {
+  //   type: "readWithParams",
+  //   label: "Read With Parameters",
+  //   data: {
+  //     label: "Read With Parameters",
+  //     type: "FUNCTION",
+  //     storageVar: "",
+  //     paramType: ""
+  //   },
+  //   icon: BookOpen,
+  //   color: "bg-indigo-500",
+  //   description: "Read with parameters node"
+  // }
 ];
 
 export function NodePalette() {

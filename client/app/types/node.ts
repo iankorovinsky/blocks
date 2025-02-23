@@ -20,6 +20,8 @@ import TypedVariableNode from "@/components/TypedVariableNode";
 import WriteWithParamsNode from "@/components/WriteWithParamsNode";
 import ReadWithParamsNode from "@/components/ReadWithParamsNode";
 import StructNode from "@/components/StructNode";
+import ConstructorNode from "@/components/ConstructorNode";
+import CodeNode from "@/components/CodeNode";
 
 
 export const nodeTypes = {
@@ -45,4 +47,6 @@ export const nodeTypes = {
   typedVariable: TypedVariableNode,
   writeWithParams: WriteWithParamsNode,
   readWithParams: ReadWithParamsNode,
+  constructor: ConstructorNode,
+  code: CodeNode,
 };

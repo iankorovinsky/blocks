@@ -57,10 +57,11 @@ export function StructNode({ data, id }: StructNodeProps) {
         .filter((edge) => edge.target === id)
         .map((edge) => edge.source);
 
-      const typedVarCount = nodes.filter(
+      const connectedNodes = nodes.filter(
         (node) => connectedNodeIds.includes(node.id) && node.type === "typedVariable"
-      ).length;
+      );
 
+      const typedVarCount = connectedNodes.length;
       setConnectedVars(typedVarCount);
     }, 1000);
 
@@ -78,7 +79,7 @@ export function StructNode({ data, id }: StructNodeProps) {
       <div
         className="absolute -top-px -right-px w-0 h-0 
         border-t-[30px] border-l-[30px] 
-        border-t-yellow-500 border-l-transparent
+        border-t-blue-500 border-l-transparent
         overflow-visible rounded"
       >
         <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">
@@ -113,18 +114,12 @@ export function StructNode({ data, id }: StructNodeProps) {
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Typed Variables</label>
           </div>
-          {storageVariable ? (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
-              {storageVariable}
-            </div>
-          ) : (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              {connectedVars > 0 
-                ? `${connectedVars} typed variable${connectedVars > 1 ? 's' : ''} connected`
-                : 'Connect to add typed variables'
-              }
-            </div>
-          )}
+          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${connectedVars > 0 ? 'border-blue-700 text-white-400' : 'border-gray-800 text-gray-500'}`}>
+            {connectedVars > 0 
+              ? `${connectedVars} typed variable${connectedVars > 1 ? 's' : ''} connected`
+              : 'Connect to add typed variables'
+            }
+          </div>
 
           <Handle
             type="target"

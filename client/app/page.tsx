@@ -108,12 +108,6 @@ function FlowContent() {
         edgeTypes={edgeTypes}
         defaultEdgeOptions={{
           type: 'custom',
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            width: 15,
-            height: 15,
-            color: '#94a3b8',
-          },
         }}
       >
         <Background color="#FFFFFF" variant={BackgroundVariant.Dots} />

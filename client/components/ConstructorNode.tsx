@@ -1,4 +1,4 @@
-import { Handle, Position, useReactFlow, Node } from "@xyflow/react";
+import { Handle, Position, useReactFlow } from "@xyflow/react";
 import { Settings2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -7,10 +7,9 @@ type Props = {
   id: string;
 };
 
-const BasicFunctionNode = ({ data, id }: Props) => {
+const ConstructorNode = ({ data, id }: Props) => {
   const [inputValue, setInputValue] = useState("");
   const [connectedVars, setConnectedVars] = useState(0);
-  const [returnType, setReturnType] = useState("");
   const [hasCodeNode, setHasCodeNode] = useState(false);
   const { getNodes, getEdges } = useReactFlow();
 
@@ -19,32 +18,22 @@ const BasicFunctionNode = ({ data, id }: Props) => {
       const edges = getEdges();
       const nodes = getNodes();
       
-      // Check input parameters
-      const inputEdges = edges.filter((edge) => edge.target === id);
-      const connectedNodeIds = inputEdges.map((edge) => edge.source);
+      const connectedNodeIds = edges
+        .filter((edge) => edge.target === id)
+        .map((edge) => edge.source);
+
       const connectedNodes = nodes.filter(
         (node) => connectedNodeIds.includes(node.id) && node.type === "typedVariable"
       );
-      setConnectedVars(connectedNodes.length);
+      
+      const typedVarCount = connectedNodes.length;
+      setConnectedVars(typedVarCount);
 
       // Check for connected code nodes
       const codeNodes = nodes.filter(
         (node) => connectedNodeIds.includes(node.id) && node.type === "code"
       );
       setHasCodeNode(codeNodes.length > 0);
-
-      // Check return type
-      const returnEdge = edges.find((edge) => edge.target === id);
-      if (returnEdge) {
-        const returnNode = nodes.find((node) => node.id === returnEdge.source) as Node<{ identifier: string }>;
-        if (returnNode?.type === "primitive" && returnNode.data?.identifier) {
-          setReturnType(returnNode.data.identifier);
-        } else {
-          setReturnType("");
-        }
-      } else {
-        setReturnType("");
-      }
     }, 1000);
 
     return () => clearInterval(interval);
@@ -57,17 +46,16 @@ const BasicFunctionNode = ({ data, id }: Props) => {
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
       <Handle
-        type="target"
+        type="source"
         position={Position.Right}
-        className="!absolute right-[-12px] top-1/2 -translate-y-1/2 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
+        className="!absolute right-[-12px] top-1/2 -translate-y-1/2 w-6 h-6 !bg-pink-400 border-2 border-[#1a1a1a]"
       />
       <Handle
-        type="source"
-        position={Position.Left}
-        className="!absolute left-[-12px] top-1/2 -translate-y-1/2 w-6 h-6 !bg-blue-400 border-2 border-[#1a1a1a]"
+        type="target"
+        position={Position.Right}
+        className="!absolute right-[-12px] top-1/2 translate-y-4 w-6 h-6 !bg-pink-400 border-2 border-[#1a1a1a]"
       />
-
-      {/* Triangle with F label */}
+      {/* Triangle with C label */}
       <div
         className="absolute -top-px -right-px w-0 h-0 
         border-t-[30px] border-l-[30px] 
@@ -75,13 +63,13 @@ const BasicFunctionNode = ({ data, id }: Props) => {
         overflow-visible rounded"
       >
         <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">
-          F
+          C
         </span>
       </div>
 
       <div className="p-3 border-b border-gray-800">
         <div className="flex items-center gap-2">
-          <Settings2 className="w-4 h-4 text-blue-400" />
+          <Settings2 className="w-4 h-4 text-pink-400" />
           <span className="font-medium">{data.label}</span>
         </div>
       </div>
@@ -96,7 +84,7 @@ const BasicFunctionNode = ({ data, id }: Props) => {
             type="text"
             value={inputValue}
             onChange={handleInputChange}
-            className="nodrag w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700 focus:outline-none focus:border-blue-500 transition-colors"
+            className="nodrag w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700 focus:outline-none focus:border-pink-500 transition-colors"
             placeholder="Enter value..."
           />
         </div>
@@ -106,23 +94,11 @@ const BasicFunctionNode = ({ data, id }: Props) => {
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Parameters</label>
           </div>
-          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${connectedVars > 0 ? 'border-blue-700 text-white-500' : 'border-gray-800 text-gray-500'}`}>
+          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${connectedVars > 0 ? 'border-pink-700 text-white-500' : 'border-gray-800 text-gray-500'}`}>
             {connectedVars > 0 
               ? `${connectedVars} parameter${connectedVars > 1 ? 's' : ''} connected`
               : 'Connect to add parameters'
             }
-          </div>
-        </div>
-
-        <div className="space-y-2 relative">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-blue-400" />
-            <label className="text-sm text-gray-400">Return Type</label>
-          </div>
-          <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-            <span className={returnType ? "text-white" : ""}>
-              {returnType ? `Returns ${returnType}` : 'Connect to add return type'}
-            </span>
           </div>
         </div>
 
@@ -140,4 +116,4 @@ const BasicFunctionNode = ({ data, id }: Props) => {
   );
 };
 
-export default BasicFunctionNode;
+export default ConstructorNode; 
