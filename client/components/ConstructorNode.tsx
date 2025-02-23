@@ -10,6 +10,7 @@ type Props = {
 const ConstructorNode = ({ data, id }: Props) => {
   const [inputValue, setInputValue] = useState("");
   const [connectedVars, setConnectedVars] = useState(0);
+  const [hasCodeNode, setHasCodeNode] = useState(false);
   const { getNodes, getEdges } = useReactFlow();
 
   useEffect(() => {
@@ -24,9 +25,15 @@ const ConstructorNode = ({ data, id }: Props) => {
       const connectedNodes = nodes.filter(
         (node) => connectedNodeIds.includes(node.id) && node.type === "typedVariable"
       );
-
+      
       const typedVarCount = connectedNodes.length;
       setConnectedVars(typedVarCount);
+
+      // Check for connected code nodes
+      const codeNodes = nodes.filter(
+        (node) => connectedNodeIds.includes(node.id) && node.type === "code"
+      );
+      setHasCodeNode(codeNodes.length > 0);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -100,8 +107,8 @@ const ConstructorNode = ({ data, id }: Props) => {
             <div className="w-2 h-2 rounded-full bg-pink-400" />
             <label className="text-sm text-gray-400">Logic</label>
           </div>
-          <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-            Connect to add logic
+          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${hasCodeNode ? 'border-pink-700 text-white' : 'border-gray-800 text-gray-500'}`}>
+            {hasCodeNode ? 'Code implementation connected' : 'Connect to add logic'}
           </div>
         </div>
       </div>
