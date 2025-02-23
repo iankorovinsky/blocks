@@ -1,34 +1,28 @@
 #[starknet::interface]
-trait IMyContract<TContractState> {
-	fn emit_ball(ref self: TContractState, meow: bytes31, wolf: bool);
+trait ISimpleStorage<TContractState> {
+    fn set(ref self: TContractState, x: u128);
+    fn get(self: @TContractState) -> u128;
 }
 
 
 
 #[starknet::contract]
-mod MyContract {
+mod SimpleStorage {
+    use core::starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
 
-	#[storage]
-	struct Storage {
-	}
+    #[storage]
+    struct Storage {
+        stored_data: u128,
+    }
 
-	#[derive(Drop, starknet::Event)]
-	pub struct ball {
-		meow: bytes31,
-		wolf: bool,
-	}
+    #[abi(embed_v0)]
+    impl SimpleStorage of super::ISimpleStorage<ContractState> {
+        fn set(ref self: ContractState, x: u128) {
+            self.stored_data.write(x);
+        }
 
-	#[event]
-	#[derive(Drop, starknet::Event)]
-	pub enum Event {
-		ball: ball,
-	}
-
-	#[abi(embed_v0)]
-	impl MyContract of super::IMyContract<ContractState> {
-		fn emit_ball(ref self: ContractState, meow: bytes31, wolf: bool)
-		{
-			self.emit(Event::ball(ball { meow, wolf }));
-		}
-	}
+        fn get(self: @ContractState) -> u128 {
+            self.stored_data.read()
+        }
+    }
 }

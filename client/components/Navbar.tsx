@@ -12,17 +12,20 @@ import {
 import { useNavbar } from "@/contexts/NavbarContext";
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
-import { useState } from "react";
-import { CollaborativeEditor } from "./CollaborativeEditor";
+import { useState, useRef } from "react";
+import { CollaborativeEditor, EditorRef } from "./CollaborativeEditor";
 import { useFlow } from "@/contexts/FlowContext";
 import Image from "next/image";
+import { useToast } from "@/components/ui/use-toast";
 
 export function Navbar() {
+  const { toast } = useToast();
   const { contractName, setContractName, network, setNetwork } = useNavbar();
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
   const { localNodes: nodes, localEdges: edges } = useFlow();
   const [showEditor, setShowEditor] = useState(false);
   const [compiledCode, setCompiledCode] = useState("");
+  const editorRef = useRef<EditorRef>(null);
 
   const handleDeploy = () => {
     const deploymentData = {
@@ -30,21 +33,44 @@ export function Navbar() {
       edgeData: edges,
       contractName,
       network,
+      code: editorRef.current?.getContent() || "",
     };
     console.log("Deploying contract with data: " + JSON.stringify(deploymentData, null, 2));
 
     axios.post("http://127.0.0.1:5000/deploy", deploymentData)
       .then(response => {
         const hash = response.data.hash;
-        console.log("Deployment hash: ", hash);
+        console.log("Deployment hash: ", hash, "     ", hash.length);
+        
+        if (hash === "error") {
+          toast({
+            variant: "destructive",
+            title: "Deployment Failed",
+            description: "There was an error deploying your contract. Please check the console for details.",
+          });
+          return;
+        }
+        
+        console.log("Deploying a happy toast");
+
+        toast({
+          title: "Contract Deployed",
+          description: "Your contract has been successfully deployed!",
+        });
         if (network === "testnet") {
         window.open(`https://sepolia.starkscan.co/contract/${hash}`, "_blank");
         } else {
           window.open(`https://starkscan.co/contract/${hash}`, "_blank");
         }
+
       })
       .catch(error => {
         console.error("Error deploying contract: ", error);
+        toast({
+          variant: "destructive",
+          title: "Deployment Error",
+          description: "Failed to deploy contract. Please try again.",
+        });
       });
   };
 
@@ -55,17 +81,26 @@ export function Navbar() {
       contractName,
     };
 
-    console.log("Deploying contract with data: " + JSON.stringify(compilationData, null, 2));
+    console.log("Compiling contract with data: " + JSON.stringify(compilationData, null, 2));
     axios.post("http://127.0.0.1:5000/compile", compilationData)
       .then(response => {
         const code = response.data.code;
         setCompiledCode(code);
         setShowEditor(true);
+        toast({
+          title: "Compilation Successful",
+          description: "Your contract has been compiled successfully.",
+        });
       })
       .catch(error => {
         console.error("Error compiling contract: ", error);
         setCompiledCode("// Error compiling contract");
         setShowEditor(true);
+        toast({
+          variant: "destructive",
+          title: "Compilation Error",
+          description: "Failed to compile contract. Please check your code and try again.",
+        });
       });
   };
 
@@ -112,7 +147,6 @@ export function Navbar() {
               ) : (
                 <Button onClick={() => loginWithRedirect()}>Login</Button>
               )}
-              <Button onClick={handleDeploy}>Deploy</Button>
               <Button onClick={handleCompile}>
                 Compile
               </Button>
@@ -126,12 +160,19 @@ export function Navbar() {
           <div className="bg-white rounded-lg w-[80vw] h-[80vh] flex flex-col">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-xl font-semibold">Contract Code</h2>
-              <Button variant="ghost" onClick={() => setShowEditor(false)}>
-                Close
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button onClick={handleDeploy}>Deploy</Button>
+                <Button variant="ghost" onClick={() => setShowEditor(false)}>
+                  Close
+                </Button>
+              </div>
             </div>
             <div className="flex-1">
-              <CollaborativeEditor initialValue={compiledCode} />
+              <CollaborativeEditor 
+                ref={editorRef}
+                initialValue={compiledCode} 
+                onClose={() => setShowEditor(false)} 
+              />
             </div>
           </div>
         </div>

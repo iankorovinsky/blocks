@@ -3,7 +3,7 @@ from flask_cors import CORS
 from agent import invoke
 from flask import request
 
-from deployer import handle_deploy_request
+from deployer import handle_deploy_request, save_code_to_file
 import os
 from flask import request
 from contract_builder import ContractBuilder
@@ -31,25 +31,19 @@ def deploy():
     data = request.get_json(force=True)
     print(data)
     network = data.get('network')
-    contract_name = data.get('contract_name')
-    contract_builder = ContractBuilder(data)
+    contract_name = data.get('contractName')
+    code = data.get('code')
     try:
-        # contract_builder.jsonData = data
-        contract_path = contract_builder.invoke(contract_name)
-        print("Done invoking contract builder")
-        result = handle_deploy_request(network, contract_name, contract_path)
+        if code == "":
+            raise ValueError("No code provided")
+        print("Attempting to deploy contract")
+        save_code_to_file(code)
+        result = handle_deploy_request(network, contract_name)
+        print("Deployment result: ", result)
         return {"hash": result}
     except Exception as e:
-        contract_name = "SimpleContract"
-        data = 'sample4.json'
-        contract_builder = ContractBuilder({})
-        contract_builder.jsonData = contract_builder.loadJson(data)
-        print(f"HIIIIIII: {contract_name}")
-        contract_path = contract_builder.invoke(contract_name)
-        print("Done invoking contract builder")
-        result = handle_deploy_request(network, contract_name, contract_path)
-        print("TRIGGERED EXCEPTION")
-        return {"hash": result}
+        print(f"Error during deployment: {str(e)}")
+        return {"hash": "error"}
         
 
 @app.route('/populate', methods=['POST'])
