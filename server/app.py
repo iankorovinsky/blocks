@@ -71,6 +71,7 @@ def compile():
         contract_builder.invoke(contract_name)
         print("Compilation successful")
     except Exception as e:
+        print("RETURNING COMPILATION FAILURE")
         print(f"Error during compilation: {str(e)}")
         success = False
 
