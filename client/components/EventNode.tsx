@@ -59,7 +59,7 @@ const EventNode = ({ data, id }: Props) => {
         overflow-visible rounded"
       >
         <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">
-          C
+          E
         </span>
       </div>
 

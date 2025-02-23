@@ -47,7 +47,7 @@ const BasicFunctionNode = ({ data, id }: Props) => {
       <div
         className="absolute -top-px -right-px w-0 h-0 
         border-t-[30px] border-l-[30px] 
-        border-t-orange-500 border-l-transparent
+        border-t-pink-500 border-l-transparent
         overflow-visible rounded"
       >
         <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">

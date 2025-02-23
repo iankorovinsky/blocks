@@ -78,7 +78,7 @@ export function StructNode({ data, id }: StructNodeProps) {
       <div
         className="absolute -top-px -right-px w-0 h-0 
         border-t-[30px] border-l-[30px] 
-        border-t-yellow-500 border-l-transparent
+        border-t-blue-500 border-l-transparent
         overflow-visible rounded"
       >
         <span className="absolute -top-[27px] -left-[12px] text-[11px] font-sm text-white">

@@ -58,6 +58,14 @@ export interface NodeTemplate {
 
 const nodeTemplates: NodeTemplate[] = [
   {
+    type: "constructor",
+    label: "Constructor",
+    data: { label: "Constructor", type: "FUNCTION", identifier: "CONSTRUCTOR" },
+    icon: Code,
+    color: "bg-pink-500",
+    description: "Constructor function node"
+  },
+  {
     type: "storage",
     label: "Storage",
     data: {
@@ -67,15 +75,65 @@ const nodeTemplates: NodeTemplate[] = [
       storage_variable: "",
     },
     icon: Database,
-    color: "bg-purple-500",
+    color: "bg-blue-500",
     description: "Storage variable node",
+  },
+  {
+    type: "primitive",
+    label: "Primitive",
+    data: { label: "Primitive", type: "PRIM_TYPE", identifier: "" },
+    icon: Variable,
+    color: "bg-purple-500",
+    description: "Primitive type node",
+  },
+  {
+    type: "typedVariable",
+    label: "Typed Variable",
+    data: { 
+      label: "Typed Variable", 
+      type: "TYPED_VAR",
+      name: "",
+      varType: "" 
+    },
+    icon: Variable,
+    color: "bg-green-500",
+    description: "Typed variable node",
+  },
+  {
+    type: "struct",
+    label: "Struct",
+    data: {
+      label: "Struct",
+      type: "TYPE",
+      name: "",
+      variables: []
+    },
+    icon: FolderTree,
+    color: "bg-blue-500",
+    description: "Struct definition node"
+  },
+  {
+    type: "basicFunction",
+    label: "Function",
+    data: { label: "Function", type: "FUNCTION", identifier: "FUNCTION" },
+    icon: Code,
+    color: "bg-pink-500",
+    description: "Defines the start of a function"
+  },
+  {
+    type: "eventNode",
+    label: "Event",
+    data: { label: "Event", type: "EVENT", identifier: "" },
+    icon: SendHorizonal,
+    color: "bg-pink-500",
+    description: "Emits an event"
   },
   {
     type: "getFunction",
     data: { label: "Get", type: "FUNCTION", identifier: "GET", name: "" },
     label: "Get",
     icon: FileSearch,
-    color: "bg-green-500", 
+    color: "bg-orange-500", 
     description: "Get function node",
   },
   {
@@ -83,17 +141,10 @@ const nodeTemplates: NodeTemplate[] = [
     data: { label: "Set", type: "FUNCTION", identifier: "SET", name: "" },
     label: "Set",
     icon: FileEdit,
-    color: "bg-indigo-500",
+    color: "bg-orange-500",
     description: "Set function node",
   },
-  {
-    type: "primitive",
-    label: "Primitive",
-    data: { label: "Primitive", type: "PRIM_TYPE", identifier: "" },
-    icon: Variable,
-    color: "bg-orange-500",
-    description: "Primitive type node",
-  },
+  
   // {
   //   type: "compound",
   //   label: "Compound",
@@ -110,19 +161,6 @@ const nodeTemplates: NodeTemplate[] = [
   //   color: "bg-yellow-500",
   //   description: "Read function node",
   // },
-  {
-    type: "typedVariable",
-    label: "Typed Variable",
-    data: { 
-      label: "Typed Variable", 
-      type: "TYPED_VAR",
-      name: "",
-      varType: "" 
-    },
-    icon: Variable,
-    color: "bg-blue-500",
-    description: "Typed variable node",
-  },
   // {
   //   type: "write",
   //   label: "Write",
@@ -155,7 +193,7 @@ const nodeTemplates: NodeTemplate[] = [
     label: "Increment",
     data: { label: "Increment", type: "FUNCTION", identifier: "INCREMENT" },
     icon: PlusSquare,
-    color: "bg-indigo-500",
+    color: "bg-orange-500",
     description: "Increment function node",
   },
   {
@@ -214,14 +252,6 @@ const nodeTemplates: NodeTemplate[] = [
   //   color: "bg-indigo-500",
   //   description: "Subtracts two values together",
   // },
-  {
-    type: "eventNode",
-    label: "Event",
-    data: { label: "Event", type: "EVENT", identifier: "" },
-    icon: SendHorizonal,
-    color: "bg-orange-500",
-    description: "Emits an event"
-  },
   // {
   //   type: "defineEventNode",
   //   label: "Define Event",
@@ -238,14 +268,6 @@ const nodeTemplates: NodeTemplate[] = [
   //   color: "bg-red-500",
   //   description: "Dictionary type"
   // },
-  {
-    type: "basicFunction",
-    label: "Function",
-    data: { label: "Function", type: "FUNCTION", identifier: "" },
-    icon: Code,
-    color: "bg-yellow-500",
-    description: "Defines the start of a function"
-  },
   // {
   //   type: "enum",
   //   label: "Enum",
@@ -259,27 +281,6 @@ const nodeTemplates: NodeTemplate[] = [
   //   color: "bg-blue-500",
   //   description: "Enum definition node"
   // },
-  {
-    type: "struct",
-    label: "Struct",
-    data: {
-      label: "Struct",
-      type: "TYPE",
-      name: "",
-      variables: []
-    },
-    icon: FolderTree,
-    color: "bg-purple-500",
-    description: "Struct definition node"
-  },
-  {
-    type: "constructor",
-    label: "Constructor",
-    data: { label: "Constructor", type: "FUNCTION", identifier: "CONSTRUCTOR" },
-    icon: Code,
-    color: "bg-pink-500",
-    description: "Constructor function node"
-  },
   // {
   //   type: "writeWithParams",
   //   label: "Write With Parameters",
