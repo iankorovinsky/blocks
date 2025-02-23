@@ -3,7 +3,6 @@
 import { Editor } from "@monaco-editor/react";
 import { editor } from "monaco-editor";
 import { useCallback, useState, forwardRef, useImperativeHandle, useEffect } from "react";
-import * as monaco from 'monaco-editor-core/esm/vs/editor/editor.api';
 import { registerCairoLanguageSupport } from '../utils/cairoLanguage';
 
 
