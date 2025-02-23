@@ -87,7 +87,7 @@ const ConstructorNode = ({ data, id }: Props) => {
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Parameters</label>
           </div>
-          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${connectedVars > 0 ? 'border-pink-700 text-pink-500' : 'border-gray-800 text-gray-500'}`}>
+          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${connectedVars > 0 ? 'border-pink-700 text-blue-500' : 'border-gray-800 text-gray-500'}`}>
             {connectedVars > 0 
               ? `${connectedVars} parameter${connectedVars > 1 ? 's' : ''} connected`
               : 'Connect to add parameters'
