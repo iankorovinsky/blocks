@@ -39,10 +39,19 @@ export function Navbar() {
 
     axios.post("http://127.0.0.1:5000/deploy", deploymentData)
       .then(response => {
+        console.log("Full deployment response:", response.data);
         const hash = response.data.hash;
-        console.log("Deployment hash: ", hash, "     ", hash.length);
         
-        if (hash === "error") {
+        if (!hash) {
+          toast({
+            variant: "destructive",
+            title: "Deployment Failed",
+            description: "No deployment hash received.",
+          });
+          return;
+        }
+
+        if (hash === "error" || typeof hash !== 'string') {
           toast({
             variant: "destructive",
             title: "Deployment Failed",
@@ -51,11 +60,10 @@ export function Navbar() {
           return;
         }
         
-        console.log("Deploying a happy toast");
-
         toast({
-          title: "Contract Deployed",
-          description: "Your contract has been successfully deployed!",
+          variant: "success",
+          title: "🎉 Contract Deployed Successfully!",
+          description: "Your contract is now live on the blockchain! 🚀",
         });
         if (network === "testnet") {
           window.open(`https://sepolia.starkscan.co/contract/${hash}`, "_blank");
@@ -87,17 +95,27 @@ export function Navbar() {
         const code = response.data.code;
         setCompiledCode(code);
         setShowEditor(true);
-        toast({
-          title: "Compilation Successful",
-          description: "Your contract has been compiled successfully.",
-        });
+        console.log("Compilation success: ", response.data.success);
+        if (response.data.success === true) {
+          toast({
+            variant: "success",
+            title: "Compilation Successful",
+            description: "Your contract has been compiled successfully.",
+          });
+        } else {
+          toast({
+            variant: "warning",
+            title: "Compilation Warning",
+            description: "Failed to compile contract. We've given our best estimate at the contract you were trying to compile.",
+          });
+        }
       })
       .catch(error => {
         console.error("Error compiling contract: ", error);
         setCompiledCode("// Error compiling contract");
         setShowEditor(true);
         toast({
-          variant: "destructive",
+          variant: "warning",
           title: "Compilation Error",
           description: "Failed to compile contract. Please check your code and try again.",
         });
