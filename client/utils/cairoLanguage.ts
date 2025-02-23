@@ -1,5 +1,3 @@
-import * as MonacoEditor from 'monaco-editor-core/esm/vs/editor/editor.api'
-
 export function registerCairoLanguageSupport(_monaco: any) {
   if (!_monaco.languages) return;
   

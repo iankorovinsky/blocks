@@ -13,9 +13,9 @@ mod MyContract {
 	}
 
 	#[abi(embed_v0)]
+
 	impl MyContract of super::IMyContract<ContractState> {
 		fn test(self: @ContractState, sheep: bool){
 		    
 		}
-	}
 }

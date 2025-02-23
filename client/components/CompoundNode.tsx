@@ -49,6 +49,7 @@ const CompoundNode = ({ data, id }: Props) => {
         .filter(field => field.type); // Only include fields with valid types
 
       if (JSON.stringify(fields) !== JSON.stringify(connectedPrimitives)) {
+        // @ts-ignore
         setFields(connectedPrimitives);
       }
     }, 500);
