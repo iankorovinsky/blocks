@@ -56,20 +56,22 @@ def populate():
 @app.route('/compile', methods=['POST'])
 def compile():
     data = request.get_json(force=True)
+    print("\n=== Compilation Data ===")
     print(data)
-    contract_name = data.get('contract_name')
-    contract_builder = ContractBuilder(data)
+    
+    contract_name = data.get('contractName')
+    print(f"Contract name: {contract_name}")
     
     # Ensure the src directory exists
     os.makedirs('src', exist_ok=True)
     success = True
+    
     try:
+        contract_builder = ContractBuilder(data)
         contract_builder.invoke(contract_name)
-        print("Invoke works")
-        print("RETURNING COMPILATION SUCCESS")
+        print("Compilation successful")
     except Exception as e:
         print(f"Error during compilation: {str(e)}")
-        print("RETURNING COMPILATION FAILURE")
         success = False
 
     # Always try to read the file, regardless of whether compilation succeeded
@@ -79,7 +81,7 @@ def compile():
         return {"code": contract_code, "success": success}
     except Exception as file_error:
         print(f"Error reading file: {str(file_error)}")
-        return {"code": "womp womp", "success": success}
+        return {"code": "// Error reading contract file", "success": success}
 
 if __name__ == '__main__':
     app.run(debug=True) 
