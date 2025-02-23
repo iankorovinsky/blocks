@@ -8,9 +8,9 @@ type Props = {
 };
 
 const TypedVariableNode = ({ data, id }: Props) => {
-  const [inputValue, setInputValue] = useState("");
-  const [storageVariable, setStorageVariable] = useState<string>("");
   const { getNodes, getEdges } = useReactFlow();
+  const [inputValue, setInputValue] = useState(data.label || "");
+  const [storageVariable, setStorageVariable] = useState<string>("");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -36,7 +36,9 @@ const TypedVariableNode = ({ data, id }: Props) => {
   }, [getNodes, getEdges, id]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
+    const newValue = event.target.value;
+    setInputValue(newValue);
+    data.label = newValue;
   };
 
   return (

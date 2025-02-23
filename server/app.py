@@ -79,7 +79,7 @@ def compile():
         return {"code": contract_code, "success": success}
     except Exception as file_error:
         print(f"Error reading file: {str(file_error)}")
-        return {"code": "// Error: Could not read contract file", "success": success}
+        return {"code": "womp womp", "success": success}
 
 if __name__ == '__main__':
     app.run(debug=True) 

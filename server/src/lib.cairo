@@ -4,6 +4,8 @@ trait ISimpleStorage<TContractState> {
     fn get(self: @TContractState) -> u128;
 }
 
+
+
 #[starknet::contract]
 mod SimpleStorage {
     use core::starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};

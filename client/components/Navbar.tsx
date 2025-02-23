@@ -66,7 +66,7 @@ export function Navbar() {
           description: "Your contract is now live on the blockchain! 🚀",
         });
         if (network === "testnet") {
-          window.open(`https://sepolia.starkscan.co/contract/${hash}`, "_blank");
+        window.open(`https://sepolia.starkscan.co/contract/${hash}`, "_blank");
         } else {
           window.open(`https://starkscan.co/contract/${hash}`, "_blank");
         }
