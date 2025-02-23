@@ -57,10 +57,11 @@ export function StructNode({ data, id }: StructNodeProps) {
         .filter((edge) => edge.target === id)
         .map((edge) => edge.source);
 
-      const typedVarCount = nodes.filter(
+      const connectedNodes = nodes.filter(
         (node) => connectedNodeIds.includes(node.id) && node.type === "typedVariable"
-      ).length;
+      );
 
+      const typedVarCount = connectedNodes.length;
       setConnectedVars(typedVarCount);
     }, 1000);
 
@@ -113,18 +114,12 @@ export function StructNode({ data, id }: StructNodeProps) {
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Typed Variables</label>
           </div>
-          {storageVariable ? (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
-              {storageVariable}
-            </div>
-          ) : (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              {connectedVars > 0 
-                ? `${connectedVars} typed variable${connectedVars > 1 ? 's' : ''} connected`
-                : 'Connect to add typed variables'
-              }
-            </div>
-          )}
+          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${connectedVars > 0 ? 'border-blue-700 text-blue-400' : 'border-gray-800 text-gray-500'}`}>
+            {connectedVars > 0 
+              ? `${connectedVars} typed variable${connectedVars > 1 ? 's' : ''} connected`
+              : 'Connect to add typed variables'
+            }
+          </div>
 
           <Handle
             type="target"

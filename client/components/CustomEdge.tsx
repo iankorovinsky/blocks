@@ -18,7 +18,6 @@ const CustomEdge = ({
   return (
     <BaseEdge
       path={edgePath}
-      markerEnd={markerEnd}
       className="edge-path"
       style={{
         strokeWidth: 2,

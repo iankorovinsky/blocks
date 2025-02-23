@@ -9,29 +9,28 @@ type Props = {
 
 const ConstructorNode = ({ data, id }: Props) => {
   const [inputValue, setInputValue] = useState("");
-  const [storageVariable, setStorageVariable] = useState<string | undefined>("");
+  const [connectedVars, setConnectedVars] = useState(0);
   const { getNodes, getEdges } = useReactFlow();
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const nodes = getNodes();
       const edges = getEdges();
-
+      const nodes = getNodes();
+      
       const connectedNodeIds = edges
-        .filter((edge) => edge.source === id || edge.target === id)
-        .map((edge) => (edge.source === id ? edge.target : edge.source));
+        .filter((edge) => edge.target === id)
+        .map((edge) => edge.source);
 
-      const connectedNode = nodes.find((node) =>
-        connectedNodeIds.includes(node.id),
+      const connectedNodes = nodes.filter(
+        (node) => connectedNodeIds.includes(node.id) && node.type === "typedVariable"
       );
 
-      if (connectedNode) {
-        setStorageVariable(connectedNode.data?.target as string);
-      }
+      const typedVarCount = connectedNodes.length;
+      setConnectedVars(typedVarCount);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [getNodes, getEdges, id, storageVariable]);
+  }, [getNodes, getEdges, id]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -39,6 +38,16 @@ const ConstructorNode = ({ data, id }: Props) => {
 
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="!absolute right-[-12px] top-1/2 -translate-y-1/2 w-6 h-6 !bg-pink-400 border-2 border-[#1a1a1a]"
+      />
+      <Handle
+        type="target"
+        position={Position.Right}
+        className="!absolute right-[-12px] top-1/2 translate-y-4 w-6 h-6 !bg-pink-400 border-2 border-[#1a1a1a]"
+      />
       {/* Triangle with C label */}
       <div
         className="absolute -top-px -right-px w-0 h-0 
@@ -78,21 +87,12 @@ const ConstructorNode = ({ data, id }: Props) => {
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Parameters</label>
           </div>
-          {storageVariable ? (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
-              {storageVariable}
-            </div>
-          ) : (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect to add parameters
-            </div>
-          )}
-
-          <Handle
-            type="source"
-            position={Position.Right}
-            className="top-12 w-6 h-6 !bg-pink-400 border-2 border-[#1a1a1a]"
-          />
+          <div className={`w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border ${connectedVars > 0 ? 'border-pink-700 text-pink-500' : 'border-gray-800 text-gray-500'}`}>
+            {connectedVars > 0 
+              ? `${connectedVars} parameter${connectedVars > 1 ? 's' : ''} connected`
+              : 'Connect to add parameters'
+            }
+          </div>
         </div>
 
         <div className="space-y-2 relative">
@@ -100,26 +100,9 @@ const ConstructorNode = ({ data, id }: Props) => {
             <div className="w-2 h-2 rounded-full bg-pink-400" />
             <label className="text-sm text-gray-400">Logic</label>
           </div>
-          {storageVariable ? (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
-              {storageVariable}
-            </div>
-          ) : (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect to add logic
-            </div>
-          )}
-
-          <Handle
-            type="source"
-            position={Position.Right}
-            className="top-12 w-6 h-6 !bg-pink-400 border-2 border-[#1a1a1a]"
-          />
-          <Handle
-            type="target"
-            position={Position.Right}
-            className="top-12 w-6 h-6 !bg-pink-400 border-2 border-[#1a1a1a]"
-          />
+          <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
+            Connect to add logic
+          </div>
         </div>
       </div>
     </div>
