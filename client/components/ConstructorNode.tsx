@@ -3,12 +3,15 @@ import { Settings2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 type Props = {
-  data: { label: string; storage_variable: string };
+  data: { 
+    label: string; 
+    storage_variable: string;
+    // Add any other data fields needed for the JSON output
+  };
   id: string;
 };
 
 const ConstructorNode = ({ data, id }: Props) => {
-  const [inputValue, setInputValue] = useState("");
   const [connectedVars, setConnectedVars] = useState(0);
   const [hasCodeNode, setHasCodeNode] = useState(false);
   const { getNodes, getEdges } = useReactFlow();
@@ -38,10 +41,6 @@ const ConstructorNode = ({ data, id }: Props) => {
 
     return () => clearInterval(interval);
   }, [getNodes, getEdges, id]);
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
-  };
 
   return (
     <div className="bg-[#1a1a1a] rounded-xl shadow-lg w-[280px] text-white border border-gray-800 relative">
@@ -75,20 +74,6 @@ const ConstructorNode = ({ data, id }: Props) => {
       </div>
 
       <div className="p-4 space-y-4">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-400" />
-            <label className="text-sm text-gray-400">Name</label>
-          </div>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            className="nodrag w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700 focus:outline-none focus:border-pink-500 transition-colors"
-            placeholder="Enter value..."
-          />
-        </div>
-
         <div className="space-y-2 relative">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-orange-400" />
