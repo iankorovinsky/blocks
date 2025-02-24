@@ -32,6 +32,7 @@ export function Navbar() {
   const [lastSavedCode, setLastSavedCode] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
   const [operationStatus, setOperationStatus] = useState<'none' | 'success' | 'error'>('none');
+  const [description, setDescription] = useState("");
 
   const checkForChanges = () => {
     const currentCode = editorRef.current?.getContent() || "";
@@ -215,6 +216,16 @@ export function Navbar() {
     }));
   };
 
+  const handleSave = (newDescription: string) => {
+    setDescription(newDescription);
+    // Here you can add any additional logic to save the description
+    toast({
+      variant: "success",
+      title: "Saved",
+      description: "Your changes have been saved successfully.",
+    });
+  };
+
   return (
     <>
       <nav className="bg-background border-b h-[7vh] flex items-center">
@@ -311,6 +322,8 @@ export function Navbar() {
                 ref={editorRef}
                 initialValue={compiledCode} 
                 onClose={() => setShowEditor(false)}
+                name={contractName}
+                onSave={handleSave}
               />
               {nodes.some(node => node.type === 'constructor') && (
                 <div className="absolute bottom-0 left-0 right-0 bg-white border-t shadow-lg transform translate-y-[95%] hover:translate-y-0 transition-transform duration-200 z-50 rounded-b-lg">

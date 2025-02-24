@@ -23,9 +23,21 @@ import { NodeTemplate } from "@/components/SidebarNodePallette";
 import { useFlow } from "@/contexts/FlowContext";
 import { MarkerType } from '@xyflow/react';
 import "@xyflow/react/dist/style.css";
-import React, { useCallback, useRef, useEffect } from "react";
+import React, { useCallback, useRef, useEffect, useState } from "react";
 import { nodeTypes } from "./types/node";
 import { SidePanel } from "@/components/SidePanel";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useNavbar } from "@/contexts/NavbarContext";
 
 const edgeTypes = {
   custom: CustomEdge,
@@ -35,9 +47,30 @@ function FlowContent() {
   const flowRef = useRef<HTMLDivElement>(null);
   const { getViewport } = useReactFlow();
   const { setLocalNodes, setLocalEdges } = useFlow();
+  const { contractName } = useNavbar();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [description, setDescription] = useState("");
+  const [name, setName] = useState("");
 
   const [nodes, setNodes] = useNodesState<any>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<any>([]);
+
+  useEffect(() => {
+    console.log("Setting up keyboard listener in Flow");
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      console.log("Key pressed in Flow:", e.key, "Ctrl:", e.ctrlKey, "Shift:", e.shiftKey);
+      
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
+        console.log("Ctrl+Shift+S detected in Flow!");
+        e.preventDefault();
+        setIsModalOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Update context whenever nodes/edges change
   useEffect(() => {
@@ -138,6 +171,41 @@ function FlowContent() {
       >
         <Background color="#FFFFFF" variant={BackgroundVariant.Dots} />
       </ReactFlow>
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Details</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={contractName || "SampleContract"}
+                disabled
+                className="bg-gray-100"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter a description..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => {
+              // Handle save
+              console.log("Saving flow with description:", description);
+              setIsModalOpen(false);
+            }}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AISearch />
     </div>
