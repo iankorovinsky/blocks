@@ -271,11 +271,7 @@ export function Navbar() {
               {isAuthenticated ? (
                 <div className="flex items-center gap-3">
                   <span className="text-sm">{user?.email}</span>
-                  <Button variant="outline" onClick={() => logout({ 
-                    logoutParams: { 
-                      returnTo: window.location.origin 
-                    }
-                  })}>
+                  <Button variant="outline" onClick={() => logout()}>
                     Logout
                   </Button>
                 </div>
