@@ -217,7 +217,12 @@ def search_collections (
         return {"error": str(e)}
 
 def cairo_rag():
-    file_path = "blocks/server/documents/cairo_programming_language.pdf"
+    # Get the absolute path to the script's directory
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(script_dir, "documents", "cairo_programming_language.pdf")
+    db_path = os.path.join(script_dir, "vectorstore", "db_chroma")
+    
+    print(f"Looking for PDF at: {file_path}")
     
     if not os.path.exists(file_path):
         raise Exception(f"Cairo documentation PDF not found at {file_path}")
@@ -238,17 +243,22 @@ def cairo_rag():
         print("document split into chunks")
         return chunks
 
-    def store_into_vectorstore(chunks : None):
+    def store_into_vectorstore(chunks=None):
         embedding_function = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        db_path = 'blocks/server/vectorstore/db_chroma'
 
-        # create a new DB from the documents or take the existing DB from local
-        if os.path.exists(db_path):
+        # If vectorstore exists and no new chunks, load existing
+        if os.path.exists(db_path) and chunks is None:
             vectordb = Chroma(persist_directory=db_path, embedding_function=embedding_function)
             print("vectorstore loaded from local")
         else:
+            # If no vectorstore or new chunks provided, create new one
+            if chunks is None:
+                print("Creating new vectorstore from PDF...")
+                documents = document_ingestion(file_path)
+                chunks = text_splitting(documents)
             vectordb = Chroma.from_documents(documents=chunks, embedding=embedding_function, persist_directory=db_path)
-            print("vectorstore saved to local")
+            print("vectorstore created and saved to local")
+            vectordb.persist()
 
         return vectordb
     
@@ -299,17 +309,11 @@ def cairo_rag():
         question_answer_chain = create_stuff_documents_chain(model, qa_prompt)
         rag_chain = create_retrieval_chain(basic_retriever, question_answer_chain)
         return rag_chain
-    
-    if os.path.exists(file_path):
-        vectorstore = store_into_vectorstore(chunks=None)
-        chain = conversation_chain(vectorstore)
-        return chain
-    else:
-        documents = document_ingestion(file_path)
-        chunks = text_splitting(documents)
-        vectorstore = store_into_vectorstore(chunks=chunks)
-        chain = conversation_chain(vectorstore)
-        return chain
+
+    # Main execution
+    vectorstore = store_into_vectorstore()
+    chain = conversation_chain(vectorstore)
+    return chain
 
 
 def cairo_rag_tool(query: str):
@@ -412,13 +416,35 @@ Be direct and specific in your answers. DO NOT GIVE LISTS, give short paragraphs
 
     return response.content
 
-def handle_agent_request():
-
-    return "Agent endpoint reached" 
-
 if __name__ == "__main__":
-    response = invoke(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"], "what are the best ways to make smart contracts in Cairo?")
-    print(response)
+
+    # response = invoke(["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"], "what are the best ways to make smart contracts in Cairo?")
+    # print(response)
+
+    print("Testing Cairo RAG system...")
+    
+    # Test the Cairo documentation RAG system directly
+    test_query = "How do I make a storage variable in Cairo?"
+    print(f"\nQuery: {test_query}")
+    print("\nSearching Cairo documentation...")
+    
+    try:
+        rag_chain = cairo_rag()
+        response = rag_chain.invoke({"input": test_query})
+        
+        print("\nContext from RAG system:")
+        for i, doc in enumerate(response["context"]):
+            print(f"\nDocument {i+1}:")
+            print(doc.page_content)
+            print("-" * 80)
+            
+        print("\nFinal Answer:")
+        print(response["answer"])
+        
+    except Exception as e:
+        print(f"\nError occurred during testing: {e}")
+        import traceback
+        traceback.print_exc()
 
     
     

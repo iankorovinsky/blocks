@@ -17,7 +17,7 @@ import { CollaborativeEditor, EditorRef } from "./CollaborativeEditor";
 import { useFlow } from "@/contexts/FlowContext";
 import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Plus, Minus } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 const PRIMITIVES = [
   "u8", "u16", "u32", "u64", "u128", "u256", "usize", 
@@ -28,12 +28,7 @@ export function Navbar() {
   const { toast } = useToast();
   const { contractName, setContractName, network, setNetwork } = useNavbar();
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
-  const { 
-    localNodes: flowNodes, 
-    localEdges: flowEdges, 
-    setLocalNodes: setFlowNodes,
-    setLocalEdges: setFlowEdges 
-  } = useFlow();
+  const { localNodes: nodes, localEdges: edges } = useFlow();
   const [showEditor, setShowEditor] = useState(false);
   const [compiledCode, setCompiledCode] = useState("");
   const editorRef = useRef<EditorRef>(null);
@@ -42,8 +37,6 @@ export function Navbar() {
   const [lastSavedCode, setLastSavedCode] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
   const [operationStatus, setOperationStatus] = useState<'none' | 'success' | 'error'>('none');
-  const [description, setDescription] = useState("");
-  const [isConstructorOpen, setIsConstructorOpen] = useState(false);
   const [constructorParams, setConstructorParams] = useState<Record<string, string>>({});
 
   const checkForChanges = () => {
@@ -86,8 +79,8 @@ export function Navbar() {
     console.log("Constructor arguments:", formattedParams);
 
     const deploymentData = {
-      nodeData: flowNodes,
-      edgeData: flowEdges,
+      nodeData: nodes,
+      edgeData: edges,
       contractName,
       network,
       code: currentCode,
@@ -149,10 +142,10 @@ export function Navbar() {
       return;
     }
 
-    const hasConstructor = flowNodes.some(node => node.type === 'constructor');
+    const hasConstructor = nodes.some(node => node.type === 'constructor');
     const compilationData = {
-      nodeData: flowNodes,
-      edgeData: flowEdges,
+      nodeData: nodes,
+      edgeData: edges,
       contractName,
     };
 
@@ -208,8 +201,8 @@ export function Navbar() {
     setLastSavedCode(currentCode);
     setHasChanges(false);
     const verificationData = {
-      nodeData: flowNodes,
-      edgeData: flowEdges,
+      nodeData: nodes,
+      edgeData: edges,
       contractName,
       code: currentCode,
     };
@@ -223,7 +216,7 @@ export function Navbar() {
           setOperationStatus('success');
           toast({
             variant: "success",
-            title: "🎯 Verification Successful",
+            title: "🎯 Compilation Successful",
             description: "Your contract has been compiled successfully! ✨",
           });
         } else {
@@ -254,16 +247,6 @@ export function Navbar() {
       ...prev,
       [paramId]: value
     }));
-  };
-
-  const handleSave = (newDescription: string) => {
-    setDescription(newDescription);
-    // Here you can add any additional logic to save the description
-    toast({
-      variant: "success",
-      title: "Saved",
-      description: "Your changes have been saved successfully.",
-    });
   };
 
   return (
@@ -362,148 +345,43 @@ export function Navbar() {
                 ref={editorRef}
                 initialValue={compiledCode} 
                 onClose={() => setShowEditor(false)}
-                name={contractName}
-                onSave={handleSave}
               />
-              {flowNodes.some(node => node.type === 'constructor') && (
-                <div className="absolute top-0 right-0 h-full bg-white border-l shadow-lg z-50">
-                  <div 
-                    className="flex items-center justify-center w-8 h-16 absolute top-1/2 -left-8 bg-white border border-r-0 rounded-l-xl cursor-pointer hover:bg-pink-50 transition-colors group"
-                    onClick={() => setIsConstructorOpen(!isConstructorOpen)}
-                  >
-                    <div className={`transform transition-all duration-300 text-pink-500 group-hover:text-pink-600 group-hover:scale-110 ${isConstructorOpen ? 'rotate-0' : 'rotate-180'}`}>
-                      {isConstructorOpen ? '📖' : '📘'}
-                    </div>
+              {nodes.some(node => node.type === 'constructor') && (
+                <div className="absolute bottom-0 left-0 right-0 bg-white border-t shadow-lg transform translate-y-[95%] hover:translate-y-0 transition-transform duration-200 z-50 rounded-b-lg">
+                  <div className="flex justify-center p-2 border-b">
+                    <div className="w-12 h-1 bg-gray-300 rounded-full" />
                   </div>
-                  <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isConstructorOpen ? 'w-[400px]' : 'w-0'}`}>
-                    <div className="p-4 overflow-y-auto h-full w-[400px] relative">
-                      <h3 className="text-lg font-semibold mb-2">Constructor Parameters</h3>
-                      <div className="space-y-3 pr-4 pb-16">
-                        {flowNodes
-                          .filter(node => node.type === 'typedVariable' && 
-                            flowEdges.some(edge => 
-                              edge.target === flowNodes.find(n => n.type === 'constructor')?.id && 
-                              edge.source === node.id
-                            )
+                  <div className="p-4 max-h-[60vh] overflow-y-auto">
+                    <h3 className="text-lg font-semibold mb-2">Constructor Parameters</h3>
+                    <div className="space-y-2 pr-4 pb-6">
+                      {nodes
+                        .filter(node => node.type === 'typedVariable' && 
+                          edges.some(edge => 
+                            edge.target === nodes.find(n => n.type === 'constructor')?.id && 
+                            edge.source === node.id
                           )
-                          .map(node => {
-                            const paramType = flowEdges
-                              .filter(edge => edge.target === node.id)
-                              .map(edge => 
-                                flowNodes.find(n => n.id === edge.source)?.data?.identifier as string
-                              )[0] || '';
+                        )
+                        .map(node => {
+                          const paramType = edges
+                            .filter(edge => edge.target === node.id)
+                            .map(edge => 
+                              nodes.find(n => n.id === edge.source)?.data?.identifier
+                            )[0] || '';
 
-                            return (
-                              <div key={node.id} className="space-y-1 group">
-                                <div className="text-xs text-gray-500 flex justify-between items-center">
-                                  <button
-                                    onClick={() => {
-                                      const updatedNodes = flowNodes.filter(n => n.id !== node.id);
-                                      const updatedEdges = flowEdges.filter(e => e.source !== node.id && e.target !== node.id);
-                                      setFlowNodes(updatedNodes);
-                                      setFlowEdges(updatedEdges);
-                                    }}
-                                    className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-600 transition-opacity"
-                                  >
-                                    <Minus size={14} />
-                                  </button>
-                                </div>
-                                <div className="flex gap-2">
-                                  <Select
-                                    value={paramType}
-                                    onValueChange={(value) => {
-                                      const typeNode = flowNodes.find(n => 
-                                        flowEdges.some(e => e.target === node.id && e.source === n.id)
-                                      );
-                                      if (typeNode) {
-                                        const updatedNodes = flowNodes.map(n => 
-                                          n.id === typeNode.id 
-                                            ? { ...n, data: { ...n.data, identifier: value } }
-                                            : n
-                                        );
-                                        setFlowNodes(updatedNodes);
-                                      }
-                                    }}
-                                  >
-                                    <SelectTrigger className="flex-1 h-8 text-sm">
-                                      <SelectValue placeholder="Select type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {PRIMITIVES.map(type => (
-                                        <SelectItem key={type} value={type}>
-                                          {type}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                  <Input
-                                    placeholder={`Enter value`}
-                                    value={constructorParams[node.id] || ''}
-                                    onChange={(e) => handleParamChange(node.id, e.target.value)}
-                                    className="flex-1 h-8 px-2 py-1 text-sm"
-                                  />
-                                </div>
-                              </div>
-                            );
-                          })
-                        }
-                      </div>
-                      <div className="absolute bottom-4 right-4 flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 w-8 p-0 rounded-full"
-                          onClick={() => {
-                            // Add type node first
-                            const typeNodeId = `type-node-${Date.now()}`;
-                            const typeNode = {
-                              id: typeNodeId,
-                              type: 'primitive',
-                              data: {
-                                label: 'Type',
-                                type: 'PRIMITIVE',
-                                identifier: PRIMITIVES[0] // Set default type
-                              },
-                              position: { x: 0, y: 0 }
-                            };
-
-                            // Add parameter node
-                            const paramNodeId = `typed-var-${Date.now()}`;
-                            const paramNode = {
-                              id: paramNodeId,
-                              type: 'typedVariable',
-                              data: {
-                                label: 'New Parameter',
-                                type: 'TYPED_VAR'
-                              },
-                              position: { x: 0, y: 0 }
-                            };
-
-                            // Create edges
-                            const typeToParamEdge = {
-                              id: `edge-type-${Date.now()}`,
-                              source: typeNodeId,
-                              target: paramNodeId
-                            };
-
-                            // Find constructor node
-                            const constructorNode = flowNodes.find(n => n.type === 'constructor');
-                            
-                            if (constructorNode) {
-                              const paramToConstructorEdge = {
-                                id: `edge-constructor-${Date.now()}`,
-                                source: paramNodeId,
-                                target: constructorNode.id
-                              };
-
-                              setFlowNodes([...flowNodes, typeNode, paramNode]);
-                              setFlowEdges([...flowEdges, typeToParamEdge, paramToConstructorEdge]);
-                            }
-                          }}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
+                          return (
+                            <div key={node.id} className="flex flex-col gap-2">
+                              {/* @ts-ignore */}
+                              <span className="font-medium text-sm">{node.data.label}</span>
+                              <Input
+                                placeholder={`Enter ${paramType}`}
+                                value={constructorParams[node.id] || ''}
+                                onChange={(e) => handleParamChange(node.id, e.target.value)}
+                                className="w-1/4 h-8 px-2 py-1"
+                              />
+                            </div>
+                          );
+                        })
+                      }
                     </div>
                   </div>
                 </div>
