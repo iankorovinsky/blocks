@@ -6,10 +6,38 @@ import { Button } from './ui/button'
 import { Card, CardContent } from './ui/card'
 import { ScrollArea } from './ui/scroll-area'
 import { cn } from '@/lib/utils'
+import ReactMarkdown, { Components } from 'react-markdown'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
+}
+
+const components: Components = {
+  code: ({node, inline, className, children, ...props}: {
+    node?: any;
+    inline?: boolean;
+    className?: string;
+    children: React.ReactNode;
+  }) => {
+    const match = /language-(\w+)/.exec(className || '')
+    return !inline && match ? (
+      <SyntaxHighlighter
+        style={oneDark}
+        language={match[1]}
+        PreTag="div"
+        className="rounded-md my-2"
+      >
+        {String(children).replace(/\n$/, '')}
+      </SyntaxHighlighter>
+    ) : (
+      <code {...props} className="bg-muted px-1.5 py-0.5 rounded-md font-mono text-sm">
+        {children}
+      </code>
+    )
+  }
 }
 
 export function ChatBot() {
@@ -56,7 +84,6 @@ export function ChatBot() {
         throw new Error(data.error || 'Unknown error occurred')
       }
 
-      // Add the assistant's response to messages
       setMessages(prev => [...prev, { 
         role: 'assistant', 
         content: data.answer 
@@ -92,7 +119,15 @@ export function ChatBot() {
                   <Bot className="w-6 h-6 mt-1" />
                 )}
                 <div className="flex-1">
-                  <p className="text-sm">{message.content}</p>
+                  {message.role === 'assistant' ? (
+                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                      <ReactMarkdown components={components}>
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p className="text-sm">{message.content}</p>
+                  )}
                 </div>
               </div>
             ))}
