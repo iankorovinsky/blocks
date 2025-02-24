@@ -336,6 +336,7 @@ export function Navbar() {
 
                           return (
                             <div key={node.id} className="flex flex-col gap-2">
+                              {/* @ts-ignore */}
                               <span className="font-medium text-sm">{node.data.label}</span>
                               <Input
                                 placeholder={`Enter ${paramType}`}
