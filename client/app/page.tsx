@@ -48,6 +48,32 @@ function FlowContent() {
     setLocalEdges(edges);
   }, [edges, setLocalEdges]);
 
+  // Add event listener for clearing the editor
+  useEffect(() => {
+    const handleClearEditor = () => {
+      setNodes([]);
+      setEdges([]);
+      setLocalNodes([]);
+      setLocalEdges([]);
+    };
+
+    const handleLoadExample = (event: CustomEvent) => {
+      const { nodes: exampleNodes, edges: exampleEdges } = event.detail;
+      setNodes(exampleNodes);
+      setEdges(exampleEdges);
+      setLocalNodes(exampleNodes);
+      setLocalEdges(exampleEdges);
+    };
+
+    window.addEventListener('clearEditor', handleClearEditor);
+    window.addEventListener('loadExample', handleLoadExample as EventListener);
+    
+    return () => {
+      window.removeEventListener('clearEditor', handleClearEditor);
+      window.removeEventListener('loadExample', handleLoadExample as EventListener);
+    };
+  }, [setNodes, setEdges, setLocalNodes, setLocalEdges]);
+
   const onNodesChange = useCallback((changes: NodeChange[]) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
   }, [setNodes]);

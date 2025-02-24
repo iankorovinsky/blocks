@@ -9,6 +9,7 @@ import { Bot, ChevronLeft, ChevronRight, Code, History, BookOpen, X } from "luci
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
+import { ExamplesLoader } from "./ExamplesLoader"
 
 export function SidePanel() {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -96,8 +97,7 @@ export function SidePanel() {
               </TabsContent>
               <TabsContent value="examples" className="flex-1 mt-0">
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-4">Examples</h3>
-                  {/* Examples content will go here */}
+                  <ExamplesLoader isActive={activeTab === 'examples'} />
                 </div>
               </TabsContent>
             </div>
