@@ -108,6 +108,15 @@ export function Navbar() {
   };
 
   const handleCompile = () => {
+    if (!contractName || contractName.trim() === '') {
+      toast({
+        variant: "warning",
+        title: "Contract Name Required",
+        description: "Please enter a contract name before compiling.",
+      });
+      return;
+    }
+
     const hasConstructor = nodes.some(node => node.type === 'constructor');
     const compilationData = {
       nodeData: nodes,
