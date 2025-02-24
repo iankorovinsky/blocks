@@ -39,7 +39,7 @@ import { cn } from "@/lib/utils";
 export enum NodeCategory {
   VARIABLES = "Variables",
   FUNCTIONS = "Functions",
-  CUSTOM = "Custom"
+  ADVANCED = "Advanced"
 }
 
 export interface NodeTemplate {
@@ -74,7 +74,7 @@ const nodeTemplates: NodeTemplate[] = [
     icon: Code,
     color: "bg-pink-500",
     description: "Constructor function node",
-    category: NodeCategory.CUSTOM
+    category: NodeCategory.ADVANCED
   },
   {
     type: "storage",
@@ -134,7 +134,7 @@ const nodeTemplates: NodeTemplate[] = [
     icon: Code,
     color: "bg-pink-500",
     description: "Defines the start of a function",
-    category: NodeCategory.CUSTOM
+    category: NodeCategory.ADVANCED
   },
   {
     type: "eventNode",
@@ -143,7 +143,7 @@ const nodeTemplates: NodeTemplate[] = [
     icon: SendHorizonal,
     color: "bg-pink-500",
     description: "Emits an event",
-    category: NodeCategory.FUNCTIONS
+    category: NodeCategory.ADVANCED
   },
   {
     type: "code",
@@ -152,7 +152,7 @@ const nodeTemplates: NodeTemplate[] = [
     icon: Code,
     color: "bg-pink-500",
     description: "Code editor node",
-    category: NodeCategory.CUSTOM
+    category: NodeCategory.ADVANCED
   },
   {
     type: "getFunction",
