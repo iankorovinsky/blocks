@@ -63,7 +63,7 @@ def populate():
 def compile():
     data = request.get_json(force=True)
     print(data)
-    contract_name = data.get('contract_name')
+    contract_name = data.get('contractName')
     contract_builder = ContractBuilder(data)
     
     # Ensure the src directory exists

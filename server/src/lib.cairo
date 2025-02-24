@@ -1,19 +1,17 @@
 #[starknet::interface]
-trait IMyContract<TContractState> {
-	fn test(self: @TContractState, sheep: bool);
+trait IBasicStorage<TContractState> {
 }
 
+
+
 #[starknet::contract]
-mod MyContract {
+mod BasicStorage {
 
 	#[storage]
 	struct Storage {
 	}
 
 	#[abi(embed_v0)]
-
-	impl MyContract of super::IMyContract<ContractState> {
-		fn test(self: @ContractState, sheep: bool){
-		    
-		}
+	impl BasicStorage of super::IBasicStorage<ContractState> {
+	}
 }
