@@ -8,7 +8,7 @@ from deployer import handle_deploy_request, save_code_to_file, handle_verify_req
 import os
 from flask import request
 from contract_builder import ContractBuilder
-
+from block_builder_agent import get_block_structure
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], "allow_headers": "*"}})
 
@@ -68,6 +68,37 @@ def deploy():
         print(f"Error during deployment: {str(e)}")
         return {"hash": "error"}
         
+@app.route('/generate-blocks', methods=['POST'])
+def generate_blocks():
+    data = request.get_json(force=True)
+    prompt = data.get('prompt')
+    
+    if not prompt:
+        return {
+            "success": False,
+            "error": "No prompt provided"
+        }
+        
+    try:
+        print(f"Attempting to generate block structure for prompt: {prompt}")
+        result = get_block_structure(prompt)
+        
+        if isinstance(result, dict) and 'error' in result:
+            return {
+                "success": False,
+                "error": result['error']
+            }
+            
+        return {
+            "success": True,
+            "structure": result
+        }
+    except Exception as e:
+        print(f"Error in generate_blocks endpoint: {str(e)}")
+        return {
+            "success": False, 
+            "error": f"Failed to generate block structure: {str(e)}"
+        }
 
 @app.route('/populate', methods=['POST'])
 def populate():
