@@ -98,8 +98,17 @@ class ContractBuilder:
             f"mod {self.contractName} {{",
         ]
 
-        hasRead = any(func.get('template', [None])[0].strip().startswith('fn get') for func in self.functions)
-        hasWrite = any(func.get('template', [None])[0].strip().startswith(('fn set', 'fn increment', 'fn decrement')) for func in self.functions)
+        hasRead = any(
+            node.get('data', {}).get('identifier') == 'GET'
+            for node in self.jsonData.get('nodeData', [])
+            if node.get('data', {}).get('type') == 'FUNCTION'
+        )
+        
+        hasWrite = any(
+            node.get('data', {}).get('identifier') in ['SET', 'INCREMENT', 'DECREMENT']
+            for node in self.jsonData.get('nodeData', [])
+            if node.get('data', {}).get('type') == 'FUNCTION'
+        )
 
         if hasRead or hasWrite:
             storageTraits = []
@@ -108,8 +117,8 @@ class ContractBuilder:
             if hasWrite:
                 storageTraits.append("StoragePointerWriteAccess")
             contractParts.append(f"\tuse core::starknet::storage::{{{', '.join(storageTraits)}}};")
+            contractParts.append("")
 
-        contractParts.append("")
         storageBlock = self.buildStorageBlock()
         indentedStorage = "\t" + storageBlock.replace("\n", "\n\t")
         contractParts.append(indentedStorage)
@@ -358,6 +367,14 @@ class ContractBuilder:
 
     def getNodesByType(self, nodeType: str) -> List[Dict]:
         nodes = self.parseNodes()
+        if nodeType == 'FUNCTION':
+            # For functions, match either the node type (for setFunction, getFunction etc)
+            # or the data type for other function types
+            return [
+                node for node in nodes 
+                if (node['type'] in ['setFunction', 'getFunction', 'basicFunction'] or 
+                    node['data']['type'] == nodeType)
+            ]
         return [node for node in nodes if node['data']['type'] == nodeType]
 
     def getNodeEdges(self, nodeId: str) -> Dict[str, List[Dict]]:
@@ -392,8 +409,10 @@ class ContractBuilder:
         if not storageVar:
             raise ValueError("Storage variable name is required")
         
+        # Clean the name to ensure it's a valid identifier
         cleanName = ''.join(c for c in storageVar if c.isalnum() or c == '_')
         
+        # If it starts with a digit, prefix it
         if cleanName[0].isdigit():
             cleanName = 'var_' + cleanName
             
@@ -423,6 +442,7 @@ class ContractBuilder:
     
     
     def generateFunctionWithReturn(self, languageJson, functionName, storageNode, params):
+
         template = languageJson["type"]["FUNCTION"].get('GET', {})
         if not template:
             raise ValueError(f"No template found for function: {functionName}")
@@ -462,7 +482,7 @@ class ContractBuilder:
         for line in template['template']:
             line = line.replace("{functionName}", functionName)
             line = line.replace("{storageVarName}", storageVarName)
-            line = line.replace("{storageVarRype}", storageVarType)
+            line = line.replace("{storageVarType}", storageVarType)
             
             if params:
                 for key, value in params.items():
@@ -560,9 +580,17 @@ class ContractBuilder:
         return "\n".join(template)
 
     def generateFunctions(self, languageJson):
-
         # Process standard function nodes (GET, SET, etc.)
         functionNodes = self.getNodesByType('FUNCTION')
+        print("Found function nodes:", [
+            {
+                'id': node['id'], 
+                'type': node['type'],
+                'name': node['data'].get('name'),
+                'identifier': node['data'].get('identifier')
+            } 
+            for node in functionNodes
+        ])
         eventNodes = self.getNodesByType('EVENT')
         
         # Process basic function nodes
@@ -606,7 +634,6 @@ class ContractBuilder:
                     paramName = paramNode['data'].get('name', 'param')
                     paramType = self.getPrimitiveType(paramNode)
                     params[paramName] = paramType
-            
             if identifier == 'SET':
                 self.generateFunction(languageJson, function_name, storageNode, params)
             elif identifier == 'GET':
@@ -696,7 +723,7 @@ class ContractBuilder:
 if __name__ == "__main__":
     # Create an empty dictionary as initial jsonData
     builder = ContractBuilder({})
-    builder.jsonData = builder.loadJson('sample8.json')
+    builder.jsonData = builder.loadJson('sample9.json')
     
     # You can change this to any contract name you want
     builder.invoke("MyContract")

@@ -22,18 +22,27 @@ const StorageNode = ({ id, data }: Props) => {
     setNodes((nds) =>
       nds.map((node) => {
         if (node.id === id) {
-          node.data = { ...node.data, storage_variable: newName };
+          return {
+            ...node,
+            data: { ...node.data, storage_variable: newName }
+          };
         }
         if (node.type === "setFunction" || node.type === "getFunction") {
           const connectedEdge = getEdges().find(
             (edge) => edge.target === node.id,
           );
           if (connectedEdge && connectedEdge.source === id) {
-            node.data = { ...node.data, storage_variable: newName };
+            return {
+              ...node,
+              data: { 
+                ...node.data, 
+                storage_variable: newName
+              }
+            };
           }
         }
         return node;
-      }),
+      })
     );
   };
 

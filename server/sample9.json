@@ -1,0 +1,81 @@
+{
+    "nodeData": [
+      {
+        "id": "storage_1740372986443",
+        "type": "storage",
+        "position": {
+          "x": 342,
+          "y": 212.7109375
+        },
+        "data": {
+          "label": "Storage",
+          "type": "STORAGE_VAR",
+          "identifier": "",
+          "storage_variable": "sheep"
+        },
+        "measured": {
+          "width": 280,
+          "height": 223
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "setFunction_1740372989699",
+        "type": "setFunction",
+        "position": {
+          "x": -9,
+          "y": 206.7109375
+        },
+        "data": {
+          "label": "Set",
+          "type": "FUNCTION",
+          "identifier": "SET",
+          "storage_variable": "sheep",
+          "name": "fcnname"
+        },
+        "measured": {
+          "width": 280,
+          "height": 243
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "primitive_1740373016206",
+        "type": "primitive",
+        "position": {
+          "x": 743.1869390172603,
+          "y": 231.30777529360998
+        },
+        "data": {
+          "label": "Primitive",
+          "type": "PRIM_TYPE",
+          "identifier": "u256"
+        },
+        "measured": {
+          "width": 280,
+          "height": 147
+        },
+        "selected": true,
+        "dragging": false
+      }
+    ],
+    "edgeData": [
+      {
+        "type": "custom",
+        "source": "storage_1740372986443",
+        "sourceHandle": "b",
+        "target": "setFunction_1740372989699",
+        "id": "xy-edge__storage_1740372986443b-setFunction_1740372989699"
+      },
+      {
+        "type": "custom",
+        "source": "primitive_1740373016206",
+        "target": "storage_1740372986443",
+        "targetHandle": "a",
+        "id": "xy-edge__primitive_1740373016206-storage_1740372986443a"
+      }
+    ],
+    "contractName": ""
+  }
