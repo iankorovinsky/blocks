@@ -1,23 +1,21 @@
 #[starknet::interface]
-trait Imeepmeep<TContractState> {
+trait Itest_name<TContractState> {
 }
 
 
 
 #[starknet::contract]
-mod meepmeep {
-
+mod test_name {
 	#[storage]
 	struct Storage {
-		amount: ,
 	}
 
 	#[constructor]
-	fn constructor(ref self: ContractState) {
-		self.amount.write(amount);	
+	fn constructor(ref self: ContractState, pumpkin: u256, squash: u32, melon: u8) {
+			
 	}
 
 	#[abi(embed_v0)]
-	impl meepmeep of super::Imeepmeep<ContractState> {
+	impl test_name of super::Itest_name<ContractState> {
 	}
 }

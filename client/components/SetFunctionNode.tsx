@@ -1,45 +1,62 @@
 import { Handle, Position, useReactFlow } from "@xyflow/react";
-import React, { useEffect, useState } from "react";
 import { Settings2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
 type Props = {
-  data: { label: string; storage_variable: string };
+  data: { 
+    label: string;
+    type: string;
+    identifier: string;
+    name?: string;
+  };
   id: string;
 };
 
 const SetFunctionNode = ({ data, id }: Props) => {
-  const [inputValue, setInputValue] = useState("");
-  const [storageVariable, setStorageVariable] = useState<string | undefined>(
-    "",
-  );
-  const { getNodes, getEdges } = useReactFlow();
+  const [inputValue, setInputValue] = useState(data.name || "");
+  const { getNodes, getEdges, setNodes } = useReactFlow();
 
+  // Initialize node data with correct structure
   useEffect(() => {
-    const interval = setInterval(() => {
-      const nodes = getNodes();
-      const edges = getEdges();
-
-      const connectedNodeIds = edges
-        .filter((edge) => edge.source === id || edge.target === id)
-        .map((edge) => (edge.source === id ? edge.target : edge.source));
-
-      const connectedNode = nodes.find((node) =>
-        connectedNodeIds.includes(node.id),
-      );
-
-      if (
-        connectedNode &&
-        connectedNode.data?.storage_variable !== storageVariable
-      ) {
-        setStorageVariable(connectedNode.data?.storage_variable as string);
-      }
-    }, 1000); // Check every 500ms
-
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, [getNodes, getEdges, id, storageVariable]);
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === id) {
+          return {
+            ...node,
+            type: "setFunction",
+            data: {
+              ...node.data,
+              label: "Set",
+              type: "FUNCTION",
+              identifier: "SET",
+              name: inputValue || ""
+            }
+          };
+        }
+        return node;
+      })
+    );
+  }, []);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
+    const newName = event.target.value;
+    setInputValue(newName);
+    
+    // Update the node data with the new name
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === id) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              name: newName
+            }
+          };
+        }
+        return node;
+      })
+    );
   };
 
   return (
@@ -83,15 +100,9 @@ const SetFunctionNode = ({ data, id }: Props) => {
             <div className="w-2 h-2 rounded-full bg-orange-400" />
             <label className="text-sm text-gray-400">Storage Variable</label>
           </div>
-          {storageVariable ? (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-700">
-              {storageVariable}
-            </div>
-          ) : (
-            <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
-              Connect to display storage variable
-            </div>
-          )}
+          <div className="w-full bg-[#2a2a2a] rounded-md px-3 py-1.5 text-sm border border-gray-800 text-gray-500">
+            Connect to display storage variable
+          </div>
 
           <Handle
             type="source"
