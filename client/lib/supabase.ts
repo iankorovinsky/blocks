@@ -166,4 +166,21 @@ export async function saveContract(name: string, description: string | undefined
     console.error('Failed to save contract:', error)
     throw error
   }
+}
+
+export async function deleteUserContract(contractId: number): Promise<void> {
+  try {
+    const { error } = await supabase
+      .from('user_contracts')
+      .delete()
+      .eq('id', contractId)
+    
+    if (error) {
+      console.error('Error deleting contract:', error)
+      throw error
+    }
+  } catch (error) {
+    console.error('Failed to delete contract:', error)
+    throw error
+  }
 } 

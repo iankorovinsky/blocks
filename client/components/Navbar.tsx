@@ -192,8 +192,8 @@ export function Navbar() {
           setOperationStatus('success');
           toast({
             variant: "success",
-            title: "🎯 Compilation Successful",
-            description: "Your contract has been compiled successfully! ✨",
+            title: "🎯 Verification Successful",
+            description: "Your contract has been verified successfully! ✨",
           });
         } else {
           setOperationStatus('error');
