@@ -10,11 +10,14 @@ import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
 import { ExamplesLoader } from "./ExamplesLoader"
+import { UserContractsLoader } from "./UserContractsLoader"
+import { useAuth0 } from '@auth0/auth0-react'
 
 export function SidePanel() {
   const [isExpanded, setIsExpanded] = useState(false)
   const [activeTab, setActiveTab] = useState('chatbot')
   const { codeContent, isEditorVisible, setEditorVisible } = useEditorStore()
+  const { user } = useAuth0()
 
   useEffect(() => {
     if (isEditorVisible) {
@@ -38,34 +41,19 @@ export function SidePanel() {
   }
 
   return (
-    <div className="fixed top-20 right-4 z-50">
-      <Card className="w-[380px] h-[600px] flex flex-col shadow-xl transition-all duration-200">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-primary text-primary-foreground p-4">
-          <div className="flex items-center gap-2">
-            <Bot className="w-5 h-5" />
-            <span className="font-semibold">Cairo Assistant</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setIsExpanded(false)}
-              className="h-8 w-8 hover:bg-primary/80"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => {
-                setEditorVisible(false)
-                setIsExpanded(false)
-              }}
-              className="h-8 w-8 hover:bg-primary/80"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+    <div className="fixed top-20 right-4 bottom-4 w-96 z-50">
+      <Card className="h-full flex flex-col">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+          <span className="font-semibold">Toolbox</span>
+          <Button
+            onClick={() => setIsExpanded(false)}
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8"
+          >
+            <ChevronRight className="h-4 w-4" />
+            <span className="sr-only">Close panel</span>
+          </Button>
         </CardHeader>
         <CardContent className="flex-1 p-0 relative overflow-hidden">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
@@ -91,8 +79,7 @@ export function SidePanel() {
               </TabsContent>
               <TabsContent value="history" className="flex-1 mt-0">
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-4">History</h3>
-                  {/* History content will go here */}
+                  <UserContractsLoader isActive={activeTab === 'history'} userEmail={user?.email || ''} />
                 </div>
               </TabsContent>
               <TabsContent value="examples" className="flex-1 mt-0">

@@ -1,27 +1,21 @@
 #[starknet::interface]
-trait ItestConstructor<TContractState> {
-	fn deposit(ref self: TContractState, amount: u16);
-	fn withdraw(ref self: TContractState, amount: u16);
+trait Iweeeee<TContractState> {
 }
 
 
 
 #[starknet::contract]
-mod testConstructor {
-	use core::starknet::storage::{StoragePointerWriteAccess};
-
+mod weeeee {
 	#[storage]
 	struct Storage {
-		balance: u16,
+	}
+
+	#[constructor]
+	fn constructor(ref self: ContractState, hahaha: u16, Typed Variable: ByteArray) {
+			
 	}
 
 	#[abi(embed_v0)]
-	impl testConstructor of super::ItestConstructor<ContractState> {
-		fn deposit(ref self: ContractState, amount: u16) {
-			self.balance.write(self.balance.read() + 100);
-		}
-		fn withdraw(ref self: ContractState, amount: u16) {
-			self.balance.write(self.balance.read() - 50);
-		}
+	impl weeeee of super::Iweeeee<ContractState> {
 	}
 }
