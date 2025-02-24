@@ -2,8 +2,8 @@
 
 # Check if both arguments are provided
 if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
-    echo "Error: Contract name, password, network, and rpc endpoint arguments are required"
-    echo "Usage: ./deployer.sh <contract_name> <password> <network> <rpc_endpoint>"
+    echo "Error: Contract name, password, network, rpc endpoint, and constructor args arguments are required"
+    echo "Usage: ./deployer.sh <contract_name> <password> <network> <rpc_endpoint> <constructor_args>"
     exit 1
 fi
 
@@ -11,6 +11,7 @@ CONTRACT_NAME="$1"
 PASSWORD="$2"
 DEPLOYED_NETWORK="$3"
 RPC_ENDPOINT="$4"
+CONSTRUCTOR_ARGS="$5"
 
 echo "Deleting everything in target/dev"
 
@@ -69,7 +70,7 @@ echo "Successfully declared class hash: $class_hash"
 # Create deploy expect script with proper quoting
 cat << EOF > deploy.exp
 #!/usr/bin/expect -f
-spawn starkli deploy "$class_hash" --rpc ${RPC_ENDPOINT} --account account_${DEPLOYED_NETWORK}_ian_account.json --keystore account_${DEPLOYED_NETWORK}_ian_keystore.json
+spawn starkli deploy "$class_hash" ${CONSTRUCTOR_ARGS} --rpc ${RPC_ENDPOINT} --account account_${DEPLOYED_NETWORK}_ian_account.json --keystore account_${DEPLOYED_NETWORK}_ian_keystore.json 
 expect "Enter keystore password:"
 send "${PASSWORD}\r"
 expect eof

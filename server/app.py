@@ -7,6 +7,7 @@ from deployer import handle_deploy_request, save_code_to_file, handle_verify_req
 import os
 from flask import request
 from contract_builder import ContractBuilder
+from utils import extract_constructor_args
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], "allow_headers": "*"}})
@@ -32,6 +33,8 @@ def deploy():
     print(data)
     network = data.get('network')
     code = data.get('code')
+    args = extract_constructor_args(data.get("constructor_args", []))
+    print(f"Args: {args}")
     # Extract contract name from code by finding "mod {name}"
     contract_name = code.split("mod ")[1].split(" ")[0] if "mod " in code else "-error-"
     contract_name = contract_name.strip()
@@ -44,7 +47,7 @@ def deploy():
             raise ValueError("No code provided")
         print("Attempting to deploy contract")
         save_code_to_file(code)
-        result = handle_deploy_request(network, contract_name)
+        result = handle_deploy_request(network, contract_name, args)
         print("Deployment result: ", result)
         return {"hash": result}
     except Exception as e:
@@ -104,4 +107,4 @@ def verify():
         return {"success": False}
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(host="0.0.0.0", port=5000, debug=True)

@@ -19,6 +19,11 @@ import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Plus, Minus } from "lucide-react";
 
+const PRIMITIVES = [
+  "u8", "u16", "u32", "u64", "u128", "u256", "usize", 
+  "bool", "felt252", "bytes31", "ByteArray", "ContractAddress"
+];
+
 export function Navbar() {
   const { toast } = useToast();
   const { contractName, setContractName, network, setNetwork } = useNavbar();
@@ -39,6 +44,7 @@ export function Navbar() {
   const [operationStatus, setOperationStatus] = useState<'none' | 'success' | 'error'>('none');
   const [description, setDescription] = useState("");
   const [isConstructorOpen, setIsConstructorOpen] = useState(false);
+  const [constructorParams, setConstructorParams] = useState<Record<string, string>>({});
 
   const checkForChanges = () => {
     const currentCode = editorRef.current?.getContent() || "";
@@ -53,20 +59,39 @@ export function Navbar() {
     const interval = setInterval(checkForChanges, 1000);
     return () => clearInterval(interval);
   }, [lastSavedCode]);
-  const [constructorParams, setConstructorParams] = useState<Record<string, string>>({});
 
   const handleDeploy = () => {
     setIsDeploying(true);
     const currentCode = editorRef.current?.getContent() || "";
     setLastSavedCode(currentCode);
     setHasChanges(false);
+    
+    // Format constructor args for backend
+    const formattedParams = Object.entries(constructorParams).reduce((acc, [nodeId, value]) => {
+      const node = flowNodes.find(n => n.id === nodeId);
+      const paramType = flowEdges
+        .filter(edge => edge.target === node?.id)
+        .map(edge => flowNodes.find(n => n.id === edge.source)?.data?.identifier as string)[0] || '';
+      
+      if (node?.data?.label) {
+        acc.push({
+          name: node.data.label,
+          type: paramType,
+          value: value
+        });
+      }
+      return acc;
+    }, [] as Array<{name: string, type: string, value: string}>);
+    
+    console.log("Constructor arguments:", formattedParams);
+
     const deploymentData = {
       nodeData: flowNodes,
       edgeData: flowEdges,
       contractName,
       network,
       code: currentCode,
-      constructorParams,
+      constructor_args: formattedParams, // Changed to constructor_args for backend
     };
     console.log("Deploying contract with data: " + JSON.stringify(deploymentData, null, 2));
 
@@ -350,8 +375,8 @@ export function Navbar() {
                       {isConstructorOpen ? '📖' : '📘'}
                     </div>
                   </div>
-                  <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isConstructorOpen ? 'w-[300px]' : 'w-0'}`}>
-                    <div className="p-4 overflow-y-auto h-full w-[300px] relative">
+                  <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isConstructorOpen ? 'w-[400px]' : 'w-0'}`}>
+                    <div className="p-4 overflow-y-auto h-full w-[400px] relative">
                       <h3 className="text-lg font-semibold mb-2">Constructor Parameters</h3>
                       <div className="space-y-3 pr-4 pb-16">
                         {flowNodes
@@ -371,7 +396,6 @@ export function Navbar() {
                             return (
                               <div key={node.id} className="space-y-1 group">
                                 <div className="text-xs text-gray-500 flex justify-between items-center">
-                                  <span>{paramType}</span>
                                   <button
                                     onClick={() => {
                                       const updatedNodes = flowNodes.filter(n => n.id !== node.id);
@@ -385,19 +409,33 @@ export function Navbar() {
                                   </button>
                                 </div>
                                 <div className="flex gap-2">
-                                  <Input
-                                    placeholder="Parameter name"
-                                    defaultValue={String(node.data?.label || '')}
-                                    onChange={(e) => {
-                                      const updatedNodes = flowNodes.map(n => 
-                                        n.id === node.id 
-                                          ? { ...n, data: { ...n.data, label: e.target.value } }
-                                          : n
+                                  <Select
+                                    value={paramType}
+                                    onValueChange={(value) => {
+                                      const typeNode = flowNodes.find(n => 
+                                        flowEdges.some(e => e.target === node.id && e.source === n.id)
                                       );
-                                      setFlowNodes(updatedNodes);
+                                      if (typeNode) {
+                                        const updatedNodes = flowNodes.map(n => 
+                                          n.id === typeNode.id 
+                                            ? { ...n, data: { ...n.data, identifier: value } }
+                                            : n
+                                        );
+                                        setFlowNodes(updatedNodes);
+                                      }
                                     }}
-                                    className="flex-1 h-8 px-2 py-1 text-sm"
-                                  />
+                                  >
+                                    <SelectTrigger className="flex-1 h-8 text-sm">
+                                      <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {PRIMITIVES.map(type => (
+                                        <SelectItem key={type} value={type}>
+                                          {type}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
                                   <Input
                                     placeholder={`Enter value`}
                                     value={constructorParams[node.id] || ''}
@@ -416,9 +454,23 @@ export function Navbar() {
                           variant="outline"
                           className="h-8 w-8 p-0 rounded-full"
                           onClick={() => {
-                            // Add new constructor parameter node
-                            const newNode = {
-                              id: `typed-var-${Date.now()}`,
+                            // Add type node first
+                            const typeNodeId = `type-node-${Date.now()}`;
+                            const typeNode = {
+                              id: typeNodeId,
+                              type: 'primitive',
+                              data: {
+                                label: 'Type',
+                                type: 'PRIMITIVE',
+                                identifier: PRIMITIVES[0] // Set default type
+                              },
+                              position: { x: 0, y: 0 }
+                            };
+
+                            // Add parameter node
+                            const paramNodeId = `typed-var-${Date.now()}`;
+                            const paramNode = {
+                              id: paramNodeId,
                               type: 'typedVariable',
                               data: {
                                 label: 'New Parameter',
@@ -426,20 +478,26 @@ export function Navbar() {
                               },
                               position: { x: 0, y: 0 }
                             };
-                            
+
+                            // Create edges
+                            const typeToParamEdge = {
+                              id: `edge-type-${Date.now()}`,
+                              source: typeNodeId,
+                              target: paramNodeId
+                            };
+
                             // Find constructor node
                             const constructorNode = flowNodes.find(n => n.type === 'constructor');
                             
                             if (constructorNode) {
-                              // Create edge from new node to constructor
-                              const newEdge = {
-                                id: `edge-${Date.now()}`,
-                                source: newNode.id,
+                              const paramToConstructorEdge = {
+                                id: `edge-constructor-${Date.now()}`,
+                                source: paramNodeId,
                                 target: constructorNode.id
                               };
-                              
-                              setFlowNodes([...flowNodes, newNode]);
-                              setFlowEdges([...flowEdges, newEdge]);
+
+                              setFlowNodes([...flowNodes, typeNode, paramNode]);
+                              setFlowEdges([...flowEdges, typeToParamEdge, paramToConstructorEdge]);
                             }
                           }}
                         >
