@@ -2,8 +2,6 @@
 trait Isimple<TContractState> {
 }
 
-
-
 #[starknet::contract]
 mod simple {
 

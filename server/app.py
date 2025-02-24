@@ -3,7 +3,7 @@ from flask_cors import CORS
 from agent import invoke
 from flask import request
 
-from deployer import handle_deploy_request, save_code_to_file
+from deployer import handle_deploy_request, save_code_to_file, handle_verify_request
 import os
 from flask import request
 from contract_builder import ContractBuilder
@@ -31,8 +31,14 @@ def deploy():
     data = request.get_json(force=True)
     print(data)
     network = data.get('network')
-    contract_name = data.get('contractName')
     code = data.get('code')
+    # Extract contract name from code by finding "mod {name}"
+    contract_name = code.split("mod ")[1].split(" ")[0] if "mod " in code else "-error-"
+    contract_name = contract_name.strip()
+    if contract_name == "-error-":
+        print("No contract name found")
+        return {"hash": "error"}
+    print("Contract name: \"",contract_name,"\"")
     try:
         if code == "":
             raise ValueError("No code provided")
@@ -56,23 +62,20 @@ def populate():
 @app.route('/compile', methods=['POST'])
 def compile():
     data = request.get_json(force=True)
-    print("\n=== Compilation Data ===")
     print(data)
-    
-    contract_name = data.get('contractName')
-    print(f"Contract name: {contract_name}")
+    contract_name = data.get('contract_name')
+    contract_builder = ContractBuilder(data)
     
     # Ensure the src directory exists
     os.makedirs('src', exist_ok=True)
     success = True
-    
     try:
-        contract_builder = ContractBuilder(data)
         contract_builder.invoke(contract_name)
-        print("Compilation successful")
+        print("Invoke works")
+        print("RETURNING COMPILATION SUCCESS")
     except Exception as e:
-        print("RETURNING COMPILATION FAILURE")
         print(f"Error during compilation: {str(e)}")
+        print("RETURNING COMPILATION FAILURE")
         success = False
 
     # Always try to read the file, regardless of whether compilation succeeded
@@ -82,7 +85,23 @@ def compile():
         return {"code": contract_code, "success": success}
     except Exception as file_error:
         print(f"Error reading file: {str(file_error)}")
-        return {"code": "// Error reading contract file", "success": success}
+        return {"code": "womp womp", "success": success}
+
+@app.route('/verify', methods=['POST'])
+def verify():
+    data = request.get_json(force=True)
+    code = data.get('code')
+    try:
+        if code == "":
+            raise ValueError("No code provided")
+        print("Attempting to verify contract")
+        save_code_to_file(code)
+        result = handle_verify_request()
+        print("Deployment result: ", result)
+        return {"success": result}
+    except Exception as e:
+        print(f"Error during deployment: {str(e)}")
+        return {"success": False}
 
 if __name__ == '__main__':
     app.run(debug=True) 

@@ -30,10 +30,17 @@ import {
   PlusSquare,
   SendHorizonal,
   UserCircle,
-  Variable
+  Variable,
+  Filter
 } from "lucide-react";
 import React from "react";
 import { cn } from "@/lib/utils";
+
+export enum NodeCategory {
+  VARIABLES = "Variables",
+  FUNCTIONS = "Functions",
+  ADVANCED = "Advanced"
+}
 
 export interface NodeTemplate {
   type: string;
@@ -56,6 +63,7 @@ export interface NodeTemplate {
   icon: React.ElementType;
   color: string;
   description: string;
+  category: NodeCategory;
 }
 
 const nodeTemplates: NodeTemplate[] = [
@@ -65,7 +73,8 @@ const nodeTemplates: NodeTemplate[] = [
     data: { label: "Constructor", type: "FUNCTION", identifier: "CONSTRUCTOR" },
     icon: Code,
     color: "bg-pink-500",
-    description: "Constructor function node"
+    description: "Constructor function node",
+    category: NodeCategory.ADVANCED
   },
   {
     type: "storage",
@@ -79,6 +88,7 @@ const nodeTemplates: NodeTemplate[] = [
     icon: Database,
     color: "bg-blue-500",
     description: "Storage variable node",
+    category: NodeCategory.VARIABLES
   },
   {
     type: "primitive",
@@ -87,6 +97,7 @@ const nodeTemplates: NodeTemplate[] = [
     icon: Variable,
     color: "bg-purple-500",
     description: "Primitive type node",
+    category: NodeCategory.VARIABLES
   },
   {
     type: "typedVariable",
@@ -100,6 +111,7 @@ const nodeTemplates: NodeTemplate[] = [
     icon: Variable,
     color: "bg-green-500",
     description: "Typed variable node",
+    category: NodeCategory.VARIABLES
   },
   {
     type: "struct",
@@ -112,7 +124,8 @@ const nodeTemplates: NodeTemplate[] = [
     },
     icon: FolderTree,
     color: "bg-blue-500",
-    description: "Struct definition node"
+    description: "Struct definition node",
+    category: NodeCategory.VARIABLES
   },
   {
     type: "basicFunction",
@@ -120,7 +133,8 @@ const nodeTemplates: NodeTemplate[] = [
     data: { label: "Function", type: "FUNCTION", identifier: "FUNCTION" },
     icon: Code,
     color: "bg-pink-500",
-    description: "Defines the start of a function"
+    description: "Defines the start of a function",
+    category: NodeCategory.ADVANCED
   },
   {
     type: "eventNode",
@@ -128,7 +142,8 @@ const nodeTemplates: NodeTemplate[] = [
     data: { label: "Event", type: "EVENT", identifier: "" },
     icon: SendHorizonal,
     color: "bg-pink-500",
-    description: "Emits an event"
+    description: "Emits an event",
+    category: NodeCategory.ADVANCED
   },
   {
     type: "code",
@@ -136,7 +151,8 @@ const nodeTemplates: NodeTemplate[] = [
     data: { label: "Code", type: "CODE", code: "" },
     icon: Code,
     color: "bg-pink-500",
-    description: "Code editor node"
+    description: "Code editor node",
+    category: NodeCategory.ADVANCED
   },
   {
     type: "getFunction",
@@ -145,6 +161,7 @@ const nodeTemplates: NodeTemplate[] = [
     icon: FileSearch,
     color: "bg-orange-500", 
     description: "Get function node",
+    category: NodeCategory.FUNCTIONS
   },
   {
     type: "setFunction",
@@ -153,6 +170,7 @@ const nodeTemplates: NodeTemplate[] = [
     icon: FileEdit,
     color: "bg-orange-500",
     description: "Set function node",
+    category: NodeCategory.FUNCTIONS
   },
   
   // {
@@ -162,6 +180,7 @@ const nodeTemplates: NodeTemplate[] = [
   //   icon: Boxes,
   //   color: "bg-red-500",
   //   description: "Compound type node",
+  //   category: NodeCategory.VARIABLES
   // },
   // {
   //   type: "readFunction",
@@ -170,6 +189,7 @@ const nodeTemplates: NodeTemplate[] = [
   //   icon: BookOpen,
   //   color: "bg-yellow-500",
   //   description: "Read function node",
+  //   category: NodeCategory.FUNCTIONS
   // },
   // {
   //   type: "write",
@@ -184,6 +204,7 @@ const nodeTemplates: NodeTemplate[] = [
   //   icon: FileEdit,
   //   color: "bg-purple-500",
   //   description: "Write function node",
+  //   category: NodeCategory.FUNCTIONS
   // },
   // {
   //   type: "readWithParam",
@@ -197,6 +218,7 @@ const nodeTemplates: NodeTemplate[] = [
   //   icon: BookOpen,
   //   color: "bg-green-500",
   //   description: "Parameterized read node",
+  //   category: NodeCategory.FUNCTIONS
   // },
   {
     type: "incrementFunction",
@@ -205,6 +227,7 @@ const nodeTemplates: NodeTemplate[] = [
     icon: PlusSquare,
     color: "bg-orange-500",
     description: "Increment function node",
+    category: NodeCategory.FUNCTIONS
   },
   {
     type: "decrementFunction",
@@ -213,6 +236,7 @@ const nodeTemplates: NodeTemplate[] = [
     icon: MinusSquare,
     color: "bg-orange-500",
     description: "Decrement function node",
+    category: NodeCategory.FUNCTIONS
   },
   // {
   //   type: "assert",
@@ -221,6 +245,7 @@ const nodeTemplates: NodeTemplate[] = [
   //   icon: AlertTriangle,
   //   color: "bg-red-500",
   //   description: "Assert condition",
+  //   category: NodeCategory.FUNCTIONS
   // },
   // {
   //   type: "isNotZeroCondition",
@@ -229,6 +254,7 @@ const nodeTemplates: NodeTemplate[] = [
   //   icon: Ban,
   //   color: "bg-yellow-500",
   //   description: "Is Not Zero Condition",
+  //   category: NodeCategory.FUNCTIONS
   // },
   // {
   //   type: "functionCall",
@@ -237,6 +263,7 @@ const nodeTemplates: NodeTemplate[] = [
   //   icon: Play,
   //   color: "bg-blue-500",
   //   description: "Calls a function and is a parameter",
+  //   category: NodeCategory.FUNCTIONS
   // },
   // {
   //   type: "getCallerAddress",
@@ -245,6 +272,7 @@ const nodeTemplates: NodeTemplate[] = [
   //   icon: UserCircle,
   //   color: "bg-purple-500",
   //   description: "Gets the address of the caller",
+  //   category: NodeCategory.FUNCTIONS
   // },
   // {
   //   type: "additionNode",
@@ -253,6 +281,7 @@ const nodeTemplates: NodeTemplate[] = [
   //   icon: Plus,
   //   color: "bg-green-500",
   //   description: "Adds two values together",
+  //   category: NodeCategory.FUNCTIONS
   // },
   // {
   //   type: "subtractionNode",
@@ -261,6 +290,7 @@ const nodeTemplates: NodeTemplate[] = [
   //   icon: Minus,
   //   color: "bg-indigo-500",
   //   description: "Subtracts two values together",
+  //   category: NodeCategory.FUNCTIONS
   // },
   // {
   //   type: "defineEventNode",
@@ -268,7 +298,8 @@ const nodeTemplates: NodeTemplate[] = [
   //   data: { label: "DefineEvent", type: "EVENT", identifier: "" },
   //   icon: SendHorizonal,
   //   color: "bg-orange-500",
-  //   description: "Defines an event"
+  //   description: "Defines an event",
+  //   category: NodeCategory.FUNCTIONS
   // },
   // {
   //   type: "legacyMap",
@@ -276,7 +307,8 @@ const nodeTemplates: NodeTemplate[] = [
   //   data: { label: "LegacyMap", type: "TYPE", identifier: "" },
   //   icon: Map,
   //   color: "bg-red-500",
-  //   description: "Dictionary type"
+  //   description: "Dictionary type",
+  //   category: NodeCategory.VARIABLES
   // },
   // {
   //   type: "enum",
@@ -289,7 +321,8 @@ const nodeTemplates: NodeTemplate[] = [
   //   },
   //   icon: List,
   //   color: "bg-blue-500",
-  //   description: "Enum definition node"
+  //   description: "Enum definition node",
+  //   category: NodeCategory.VARIABLES
   // },
   // {
   //   type: "writeWithParams",
@@ -303,7 +336,8 @@ const nodeTemplates: NodeTemplate[] = [
   //   },
   //   icon: FileEdit,
   //   color: "bg-green-500",
-  //   description: "Write with parameters node"
+  //   description: "Write with parameters node",
+  //   category: NodeCategory.FUNCTIONS
   // },
   // {
   //   type: "readWithParams",
@@ -316,12 +350,14 @@ const nodeTemplates: NodeTemplate[] = [
   //   },
   //   icon: BookOpen,
   //   color: "bg-indigo-500",
-  //   description: "Read with parameters node"
+  //   description: "Read with parameters node",
+  //   category: NodeCategory.FUNCTIONS
   // }
 ];
 
 export function NodePalette() {
   const { searchQuery, isSearchFocused } = useSidebar();
+  const [selectedCategory, setSelectedCategory] = React.useState<NodeCategory | "ALL">("ALL");
 
   const onDragStart = (
     event: React.DragEvent,
@@ -335,16 +371,26 @@ export function NodePalette() {
   };
 
   const filteredNodes = React.useMemo(() => {
-    if (!searchQuery.trim()) return nodeTemplates;
+    let nodes = nodeTemplates;
 
-    const query = searchQuery.toLowerCase();
-    return nodeTemplates.filter(
-      (node) =>
-        node.label.toLowerCase().includes(query) ||
-        node.description.toLowerCase().includes(query) ||
-        node.type.toLowerCase().includes(query)
-    );
-  }, [searchQuery]);
+    // Apply category filter
+    if (selectedCategory !== "ALL") {
+      nodes = nodes.filter((node) => node.category === selectedCategory);
+    }
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      nodes = nodes.filter(
+        (node) =>
+          node.label.toLowerCase().includes(query) ||
+          node.description.toLowerCase().includes(query) ||
+          node.type.toLowerCase().includes(query)
+      );
+    }
+
+    return nodes;
+  }, [searchQuery, selectedCategory]);
 
   return (
     <Sidebar className="w-64 border-r border-border">
@@ -353,6 +399,20 @@ export function NodePalette() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarSearch />
+        <div className="p-2 border-b">
+          <select 
+            className="w-full p-2 rounded-md bg-background border border-border"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value as NodeCategory | "ALL")}
+          >
+            <option value="ALL">All Categories</option>
+            {Object.values(NodeCategory).map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
         <SidebarGroup>
           <SidebarGroupLabel>Available Blocks</SidebarGroupLabel>
           <SidebarGroupContent>
