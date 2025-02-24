@@ -16,7 +16,6 @@ import {
 } from "@xyflow/react";
 
 import AISearch from "@/components/AIAgentSearchbar";
-import { ChatBot } from "@/components/Chatbot";
 import CustomEdge from "@/components/CustomEdge";
 import { FlowWrapper } from "@/components/FlowWrapper";
 import { Navbar } from "@/components/Navbar";
@@ -26,6 +25,7 @@ import { MarkerType } from '@xyflow/react';
 import "@xyflow/react/dist/style.css";
 import React, { useCallback, useRef, useEffect } from "react";
 import { nodeTypes } from "./types/node";
+import { SidePanel } from "@/components/SidePanel";
 
 const edgeTypes = {
   custom: CustomEdge,
@@ -47,6 +47,32 @@ function FlowContent() {
   useEffect(() => {
     setLocalEdges(edges);
   }, [edges, setLocalEdges]);
+
+  // Add event listener for clearing the editor
+  useEffect(() => {
+    const handleClearEditor = () => {
+      setNodes([]);
+      setEdges([]);
+      setLocalNodes([]);
+      setLocalEdges([]);
+    };
+
+    const handleLoadExample = (event: CustomEvent) => {
+      const { nodes: exampleNodes, edges: exampleEdges } = event.detail;
+      setNodes(exampleNodes);
+      setEdges(exampleEdges);
+      setLocalNodes(exampleNodes);
+      setLocalEdges(exampleEdges);
+    };
+
+    window.addEventListener('clearEditor', handleClearEditor);
+    window.addEventListener('loadExample', handleLoadExample as EventListener);
+    
+    return () => {
+      window.removeEventListener('clearEditor', handleClearEditor);
+      window.removeEventListener('loadExample', handleLoadExample as EventListener);
+    };
+  }, [setNodes, setEdges, setLocalNodes, setLocalEdges]);
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -114,7 +140,6 @@ function FlowContent() {
       </ReactFlow>
 
       <AISearch />
-      <ChatBot />
     </div>
   );
 }
@@ -128,6 +153,7 @@ export default function Home() {
           <FlowContent />
         </FlowWrapper>
       </div>
+      <SidePanel />
     </>
   );
 }

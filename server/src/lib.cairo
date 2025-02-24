@@ -1,23 +1,23 @@
 #[starknet::interface]
-trait IMyContract<TContractState> {
-	fn fcnname(ref self: TContractState, value: u256);
+trait Imeepmeep<TContractState> {
 }
 
 
 
 #[starknet::contract]
-mod MyContract {
-	use core::starknet::storage::{StoragePointerWriteAccess};
+mod meepmeep {
 
 	#[storage]
 	struct Storage {
-		sheep: u256,
+		amount: ,
+	}
+
+	#[constructor]
+	fn constructor(ref self: ContractState) {
+		self.amount.write(amount);	
 	}
 
 	#[abi(embed_v0)]
-	impl MyContract of super::IMyContract<ContractState> {
-		fn fcnname(ref self: ContractState, value: u256) {
-			self.sheep.write(value);
-		}
+	impl meepmeep of super::Imeepmeep<ContractState> {
 	}
 }
