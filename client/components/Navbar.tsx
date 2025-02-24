@@ -17,7 +17,7 @@ import { CollaborativeEditor, EditorRef } from "./CollaborativeEditor";
 import { useFlow } from "@/contexts/FlowContext";
 import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, Minus } from "lucide-react";
 
 const PRIMITIVES = [
   "u8", "u16", "u32", "u64", "u128", "u256", "usize", 
@@ -28,7 +28,12 @@ export function Navbar() {
   const { toast } = useToast();
   const { contractName, setContractName, network, setNetwork } = useNavbar();
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
-  const { localNodes: nodes, localEdges: edges } = useFlow();
+  const { 
+    localNodes: nodes, 
+    localEdges: edges,
+    setLocalNodes: setNodes,
+    setLocalEdges: setEdges
+  } = useFlow();
   const [showEditor, setShowEditor] = useState(false);
   const [compiledCode, setCompiledCode] = useState("");
   const editorRef = useRef<EditorRef>(null);
@@ -38,6 +43,7 @@ export function Navbar() {
   const [hasChanges, setHasChanges] = useState(false);
   const [operationStatus, setOperationStatus] = useState<'none' | 'success' | 'error'>('none');
   const [constructorParams, setConstructorParams] = useState<Record<string, string>>({});
+  const [isConstructorOpen, setIsConstructorOpen] = useState(false);
 
   const checkForChanges = () => {
     const currentCode = editorRef.current?.getContent() || "";
@@ -61,14 +67,14 @@ export function Navbar() {
     
     // Format constructor args for backend
     const formattedParams = Object.entries(constructorParams).reduce((acc, [nodeId, value]) => {
-      const node = flowNodes.find(n => n.id === nodeId);
-      const paramType = flowEdges
+      const node = nodes.find(n => n.id === nodeId);
+      const paramType = edges
         .filter(edge => edge.target === node?.id)
-        .map(edge => flowNodes.find(n => n.id === edge.source)?.data?.identifier as string)[0] || '';
+        .map(edge => nodes.find(n => n.id === edge.source)?.data?.identifier as string)[0] || '';
       
       if (node?.data?.label) {
         acc.push({
-          name: node.data.label,
+          name: node.data.label as string,
           type: paramType,
           value: value
         });
@@ -84,7 +90,7 @@ export function Navbar() {
       contractName,
       network,
       code: currentCode,
-      constructor_args: formattedParams, // Changed to constructor_args for backend
+      constructor_args: formattedParams,
     };
     console.log("Deploying contract with data: " + JSON.stringify(deploymentData, null, 2));
 
@@ -347,41 +353,140 @@ export function Navbar() {
                 onClose={() => setShowEditor(false)}
               />
               {nodes.some(node => node.type === 'constructor') && (
-                <div className="absolute bottom-0 left-0 right-0 bg-white border-t shadow-lg transform translate-y-[95%] hover:translate-y-0 transition-transform duration-200 z-50 rounded-b-lg">
-                  <div className="flex justify-center p-2 border-b">
-                    <div className="w-12 h-1 bg-gray-300 rounded-full" />
+                <div className="absolute top-0 right-0 h-full bg-white border-l shadow-lg z-50">
+                  <div 
+                    className="flex items-center justify-center w-8 h-16 absolute top-1/2 -left-8 bg-white border border-r-0 rounded-l-xl cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => setIsConstructorOpen(!isConstructorOpen)}
+                  >
+                    <div className={`transform transition-transform duration-300 ${isConstructorOpen ? 'rotate-0' : 'rotate-180'}`}>
+                      {isConstructorOpen ? '📖' : '📘'}
+                    </div>
                   </div>
-                  <div className="p-4 max-h-[60vh] overflow-y-auto">
-                    <h3 className="text-lg font-semibold mb-2">Constructor Parameters</h3>
-                    <div className="space-y-2 pr-4 pb-6">
-                      {nodes
-                        .filter(node => node.type === 'typedVariable' && 
-                          edges.some(edge => 
-                            edge.target === nodes.find(n => n.type === 'constructor')?.id && 
-                            edge.source === node.id
+                  <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isConstructorOpen ? 'w-[400px]' : 'w-0'}`}>
+                    <div className="p-4 overflow-y-auto h-full w-[400px] relative">
+                      <h3 className="text-lg font-semibold mb-4">Constructor Parameters</h3>
+                      <div className="space-y-4 pb-16">
+                        {nodes
+                          .filter(node => node.type === 'typedVariable' && 
+                            edges.some(edge => 
+                              edge.target === nodes.find(n => n.type === 'constructor')?.id && 
+                              edge.source === node.id
+                            )
                           )
-                        )
-                        .map(node => {
-                          const paramType = edges
-                            .filter(edge => edge.target === node.id)
-                            .map(edge => 
-                              nodes.find(n => n.id === edge.source)?.data?.identifier
-                            )[0] || '';
+                          .map(node => {
+                            const paramType = edges
+                              .filter(edge => edge.target === node.id)
+                              .map(edge => 
+                                nodes.find(n => n.id === edge.source)?.data?.identifier as string
+                              )[0] || '';
 
-                          return (
-                            <div key={node.id} className="flex flex-col gap-2">
-                              {/* @ts-ignore */}
-                              <span className="font-medium text-sm">{node.data.label}</span>
-                              <Input
-                                placeholder={`Enter ${paramType}`}
-                                value={constructorParams[node.id] || ''}
-                                onChange={(e) => handleParamChange(node.id, e.target.value)}
-                                className="w-1/4 h-8 px-2 py-1"
-                              />
-                            </div>
-                          );
-                        })
-                      }
+                            return (
+                              <div key={node.id} className="space-y-2 group">
+                                <div className="flex gap-2 items-center">
+                                  <Select
+                                    value={paramType}
+                                    onValueChange={(value) => {
+                                      const typeNode = nodes.find(n => 
+                                        edges.some(e => e.target === node.id && e.source === n.id)
+                                      );
+                                      if (typeNode) {
+                                        const updatedNodes = nodes.map(n => 
+                                          n.id === typeNode.id 
+                                            ? { ...n, data: { ...n.data, identifier: value } }
+                                            : n
+                                        );
+                                        setNodes(updatedNodes);
+                                      }
+                                    }}
+                                  >
+                                    <SelectTrigger className="flex-1 h-8">
+                                      <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {PRIMITIVES.map(type => (
+                                        <SelectItem key={type} value={type}>
+                                          {type}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <Input
+                                    placeholder="Enter value"
+                                    value={constructorParams[node.id] || ''}
+                                    onChange={(e) => handleParamChange(node.id, e.target.value)}
+                                    className="flex-1 h-8"
+                                  />
+                                  <button
+                                    onClick={() => {
+                                      const updatedNodes = nodes.filter(n => n.id !== node.id);
+                                      const updatedEdges = edges.filter(e => e.source !== node.id && e.target !== node.id);
+                                      setNodes(updatedNodes);
+                                      setEdges(updatedEdges);
+                                    }}
+                                    className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-600 transition-opacity p-1"
+                                  >
+                                    <Minus size={16} />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })
+                        }
+                      </div>
+                      <div className="absolute bottom-4 right-4">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 w-8 p-0 rounded-full"
+                          onClick={() => {
+                            // Add type node first
+                            const typeNodeId = `type-node-${Date.now()}`;
+                            const typeNode = {
+                              id: typeNodeId,
+                              type: 'primitive',
+                              data: {
+                                label: 'Type',
+                                type: 'PRIMITIVE',
+                                identifier: PRIMITIVES[0]
+                              },
+                              position: { x: 0, y: 0 }
+                            };
+
+                            // Add parameter node
+                            const paramNodeId = `typed-var-${Date.now()}`;
+                            const paramNode = {
+                              id: paramNodeId,
+                              type: 'typedVariable',
+                              data: {
+                                label: 'New Parameter',
+                                type: 'TYPED_VAR'
+                              },
+                              position: { x: 0, y: 0 }
+                            };
+
+                            // Create edges
+                            const typeToParamEdge = {
+                              id: `edge-type-${Date.now()}`,
+                              source: typeNodeId,
+                              target: paramNodeId
+                            };
+
+                            const constructorNode = nodes.find(n => n.type === 'constructor');
+                            if (constructorNode) {
+                              const paramToConstructorEdge = {
+                                id: `edge-constructor-${Date.now()}`,
+                                source: paramNodeId,
+                                target: constructorNode.id
+                              };
+
+                              setNodes([...nodes, typeNode, paramNode]);
+                              setEdges([...edges, typeToParamEdge, paramToConstructorEdge]);
+                            }
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
