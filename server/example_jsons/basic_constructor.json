@@ -1,0 +1,147 @@
+{
+    "edgeData": [
+      {
+        "id": "xy-edge__typedVariable_1740365530223-constructor_1740365518962",
+        "type": "custom",
+        "source": "typedVariable_1740365530223",
+        "target": "constructor_1740365518962"
+      },
+      {
+        "id": "xy-edge__code_1740365537275-constructor_1740365518962",
+        "type": "custom",
+        "source": "code_1740365537275",
+        "target": "constructor_1740365518962"
+      },
+      {
+        "id": "xy-edge__primitive_1740365552668-typedVariable_1740365530223",
+        "type": "custom",
+        "source": "primitive_1740365552668",
+        "target": "typedVariable_1740365530223"
+      },
+      {
+        "id": "xy-edge__primitive_1740365683146-storage_1740365677720a",
+        "type": "custom",
+        "source": "primitive_1740365683146",
+        "target": "storage_1740365677720",
+        "targetHandle": "a"
+      }
+    ],
+    "nodeData": [
+      {
+        "id": "constructor_1740365518962",
+        "data": {
+          "type": "FUNCTION",
+          "label": "Constructor",
+          "identifier": "CONSTRUCTOR"
+        },
+        "type": "constructor",
+        "dragging": false,
+        "measured": {
+          "width": 280,
+          "height": 222
+        },
+        "position": {
+          "x": 280.6750030517578,
+          "y": 86.21249771118164
+        },
+        "selected": false
+      },
+      {
+        "id": "typedVariable_1740365530223",
+        "data": {
+          "type": "TYPED_VAR",
+          "label": "amount",
+          "identifier": ""
+        },
+        "type": "typedVariable",
+        "dragging": false,
+        "measured": {
+          "width": 280,
+          "height": 222
+        },
+        "position": {
+          "x": 899.6750030517578,
+          "y": -39.78750228881836
+        },
+        "selected": false
+      },
+      {
+        "id": "code_1740365537275",
+        "data": {
+          "code": "self.amount.write(amount);",
+          "type": "CODE",
+          "label": "Code",
+          "identifier": ""
+        },
+        "type": "code",
+        "dragging": false,
+        "measured": {
+          "width": 400,
+          "height": 282
+        },
+        "position": {
+          "x": 797.6750030517578,
+          "y": 392.21249771118164
+        },
+        "selected": true
+      },
+      {
+        "id": "primitive_1740365552668",
+        "data": {
+          "type": "PRIM_TYPE",
+          "label": "Primitive",
+          "identifier": "u8"
+        },
+        "type": "primitive",
+        "dragging": false,
+        "measured": {
+          "width": 280,
+          "height": 146
+        },
+        "position": {
+          "x": 1349.6750030517578,
+          "y": -10.78750228881836
+        },
+        "selected": false
+      },
+      {
+        "id": "storage_1740365677720",
+        "data": {
+          "type": "STORAGE_VAR",
+          "label": "Storage",
+          "identifier": "",
+          "storage_variable": "amount"
+        },
+        "type": "storage",
+        "dragging": false,
+        "measured": {
+          "width": 280,
+          "height": 222
+        },
+        "position": {
+          "x": 236.475514970306,
+          "y": 700.9742202805586
+        },
+        "selected": false
+      },
+      {
+        "id": "primitive_1740365683146",
+        "data": {
+          "type": "PRIM_TYPE",
+          "label": "Primitive",
+          "identifier": "u256"
+        },
+        "type": "primitive",
+        "dragging": false,
+        "measured": {
+          "width": 280,
+          "height": 146
+        },
+        "position": {
+          "x": 702.2649442176623,
+          "y": 800.9021829178122
+        },
+        "selected": false
+      }
+    ]
+  }

@@ -1,0 +1,149 @@
+{
+    "nodeData": [
+      {
+        "id": "eventNode_1740364970378",
+        "type": "eventNode",
+        "position": {
+          "x": 145.6750030517578,
+          "y": 231.21249771118164
+        },
+        "data": {
+          "label": "Event",
+          "type": "EVENT",
+          "identifier": ""
+        },
+        "measured": {
+          "width": 280,
+          "height": 222
+        }
+      },
+      {
+        "id": "struct_1740364973915",
+        "type": "struct",
+        "position": {
+          "x": 625.8401487190325,
+          "y": 263.32838324798536
+        },
+        "data": {
+          "label": "Struct",
+          "type": "STRUCT",
+          "identifier": "",
+          "name": "Author"
+        },
+        "measured": {
+          "width": 280,
+          "height": 222
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "typedVariable_1740364995426",
+        "type": "typedVariable",
+        "position": {
+          "x": 1159.6750030517578,
+          "y": 87.21249771118164
+        },
+        "data": {
+          "label": "age",
+          "type": "TYPED_VAR",
+          "identifier": ""
+        },
+        "measured": {
+          "width": 280,
+          "height": 222
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "typedVariable_1740365017090",
+        "type": "typedVariable",
+        "position": {
+          "x": 1138.6750030517578,
+          "y": 549.2124977111816
+        },
+        "data": {
+          "label": "books_published",
+          "type": "TYPED_VAR",
+          "identifier": ""
+        },
+        "measured": {
+          "width": 280,
+          "height": 222
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "primitive_1740365032524",
+        "type": "primitive",
+        "position": {
+          "x": 1585.6750030517578,
+          "y": 199.21249771118164
+        },
+        "data": {
+          "label": "Primitive",
+          "type": "PRIM_TYPE",
+          "identifier": "u8"
+        },
+        "measured": {
+          "width": 280,
+          "height": 146
+        },
+        "selected": false,
+        "dragging": false
+      },
+      {
+        "id": "primitive_1740365051494",
+        "type": "primitive",
+        "position": {
+          "x": 1594.6816737177762,
+          "y": 650.4641653776862
+        },
+        "data": {
+          "label": "Primitive",
+          "type": "PRIM_TYPE",
+          "identifier": "u64"
+        },
+        "measured": {
+          "width": 280,
+          "height": 146
+        },
+        "selected": false,
+        "dragging": false
+      }
+    ],
+    "edgeData": [
+      {
+        "type": "custom",
+        "source": "struct_1740364973915",
+        "target": "eventNode_1740364970378",
+        "id": "xy-edge__struct_1740364973915-eventNode_1740364970378"
+      },
+      {
+        "type": "custom",
+        "source": "typedVariable_1740364995426",
+        "target": "struct_1740364973915",
+        "id": "xy-edge__typedVariable_1740364995426-struct_1740364973915"
+      },
+      {
+        "type": "custom",
+        "source": "typedVariable_1740365017090",
+        "target": "struct_1740364973915",
+        "id": "xy-edge__typedVariable_1740365017090-struct_1740364973915"
+      },
+      {
+        "type": "custom",
+        "source": "primitive_1740365032524",
+        "target": "typedVariable_1740364995426",
+        "id": "xy-edge__primitive_1740365032524-typedVariable_1740364995426"
+      },
+      {
+        "type": "custom",
+        "source": "primitive_1740365051494",
+        "target": "typedVariable_1740365017090",
+        "id": "xy-edge__primitive_1740365051494-typedVariable_1740365017090"
+      }
+    ]
+  }

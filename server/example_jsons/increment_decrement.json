@@ -1,0 +1,108 @@
+{
+    "edgeData": [
+      {
+        "id": "xy-edge__storage_1740365328482b-decrementFunction_1740365336007",
+        "type": "custom",
+        "source": "storage_1740365328482",
+        "target": "decrementFunction_1740365336007",
+        "sourceHandle": "b"
+      },
+      {
+        "id": "xy-edge__storage_1740365328482b-incrementFunction_1740365312499",
+        "type": "custom",
+        "source": "storage_1740365328482",
+        "target": "incrementFunction_1740365312499",
+        "sourceHandle": "b"
+      },
+      {
+        "id": "xy-edge__primitive_1740365367282-storage_1740365328482a",
+        "type": "custom",
+        "source": "primitive_1740365367282",
+        "target": "storage_1740365328482",
+        "targetHandle": "a"
+      }
+    ],
+    "nodeData": [
+      {
+        "id": "incrementFunction_1740365312499",
+        "data": {
+          "name": "deposit",
+          "type": "FUNCTION",
+          "label": "Increment",
+          "amount": "100",
+          "identifier": "INCREMENT"
+        },
+        "type": "incrementFunction",
+        "dragging": false,
+        "measured": {
+          "width": 280,
+          "height": 299
+        },
+        "position": {
+          "x": 251.6750030517578,
+          "y": -26.78750228881836
+        },
+        "selected": false
+      },
+      {
+        "id": "storage_1740365328482",
+        "data": {
+          "type": "STORAGE_VAR",
+          "label": "Storage",
+          "identifier": "",
+          "storage_variable": "balance"
+        },
+        "type": "storage",
+        "dragging": false,
+        "measured": {
+          "width": 280,
+          "height": 222
+        },
+        "position": {
+          "x": 817.2095308617035,
+          "y": 262.3565724366746
+        },
+        "selected": false
+      },
+      {
+        "id": "decrementFunction_1740365336007",
+        "data": {
+          "name": "withdraw",
+          "type": "FUNCTION",
+          "label": "Decrement",
+          "amount": "50",
+          "identifier": "DECREMENT"
+        },
+        "type": "decrementFunction",
+        "dragging": false,
+        "measured": {
+          "width": 280,
+          "height": 299
+        },
+        "position": {
+          "x": 252.522616322871,
+          "y": 506.20972704338374
+        },
+        "selected": false
+      },
+      {
+        "id": "primitive_1740365367282",
+        "data": {
+          "type": "PRIM_TYPE",
+          "label": "Primitive",
+          "identifier": "u256"
+        },
+        "type": "primitive",
+        "dragging": false,
+        "measured": {
+          "width": 280,
+          "height": 146
+        },
+        "position": {
+          "x": 1288.8216373699915,
+          "y": 368.33163642649316
+        },
+        "selected": false
+      }
+    ]
+  }

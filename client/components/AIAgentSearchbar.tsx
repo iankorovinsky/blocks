@@ -11,16 +11,45 @@ export default function AISearch() {
 
   async function handleSubmit(e?: React.FormEvent) {
     e?.preventDefault();
-    if (!input.trim() || isLoading) return;
+    console.log('Handling submit event', { input, isLoading });
 
     setIsLoading(true);
+    console.log('Sending request to generate blocks with prompt:', input);
+    
     try {
-      // Simulate API call - replace with your actual AI endpoint
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log("Submitted:", input);
+      const response = await fetch('http://127.0.0.1:5000/generate-blocks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: input }),
+      });
+      console.log('Response:', response);
+
+      const data = await response.json();
+      console.log('Received response:', data);
+      
+      if (data.success && data.structure) {
+        console.log('Successfully generated structure, clearing editor');
+        // First clear the editor
+        window.dispatchEvent(new CustomEvent('clearEditor'));
+        // Then load the generated structure
+        window.dispatchEvent(new CustomEvent('loadExample', {
+          detail: {
+            nodes: data.structure.nodeData,
+            edges: data.structure.edgeData
+          }
+        }));
+        
+      } else {
+        console.error('Failed to generate structure:', data.error);
+        throw new Error(data.error || 'Failed to generate block structure');
+      }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error generating blocks:", error);
+
     } finally {
+      console.log('Request completed, resetting loading state');
       setIsLoading(false);
     }
   }
@@ -28,6 +57,7 @@ export default function AISearch() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      console.log("Enter key triggered");
       handleSubmit();
     }
   };

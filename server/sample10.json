@@ -1,0 +1,159 @@
+{
+  "contractName": "PersonContract",
+  "nodeData": [
+    {
+      "id": "1",
+      "data": {
+        "type": "STORAGE_VAR",
+        "label": "name",
+        "identifier": "name",
+        "storage_variable": "felt252"
+      },
+      "type": "storage",
+      "position": {
+        "x": 100,
+        "y": 100
+      },
+      "measured": {
+        "width": 80,
+        "height": 20
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "2",
+      "data": {
+        "type": "STORAGE_VAR",
+        "label": "age",
+        "identifier": "age",
+        "storage_variable": "felt252"
+      },
+      "type": "storage",
+      "position": {
+        "x": 100,
+        "y": 140
+      },
+      "measured": {
+        "width": 80,
+        "height": 20
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "3",
+      "data": {
+        "type": "FUNCTION",
+        "label": "setName",
+        "identifier": "setName",
+        "code": "func setName(new_name: felt252) { name.write(new_name); }"
+      },
+      "type": "setFunction",
+      "position": {
+        "x": 300,
+        "y": 100
+      },
+      "measured": {
+        "width": 100,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "4",
+      "data": {
+        "type": "FUNCTION",
+        "label": "setAge",
+        "identifier": "setAge",
+        "code": "func setAge(new_age: felt252) { age.write(new_age); }"
+      },
+      "type": "setFunction",
+      "position": {
+        "x": 300,
+        "y": 140
+      },
+      "measured": {
+        "width": 100,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "5",
+      "data": {
+        "type": "FUNCTION",
+        "label": "getName",
+        "identifier": "getName",
+        "code": "func getName() -> felt252 { return name.read(); }"
+      },
+      "type": "getFunction",
+      "position": {
+        "x": 300,
+        "y": 180
+      },
+      "measured": {
+        "width": 100,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "6",
+      "data": {
+        "type": "FUNCTION",
+        "label": "getAge",
+        "identifier": "getAge",
+        "code": "func getAge() -> felt252 { return age.read(); }"
+      },
+      "type": "getFunction",
+      "position": {
+        "x": 300,
+        "y": 220
+      },
+      "measured": {
+        "width": 100,
+        "height": 40
+      },
+      "selected": false,
+      "dragging": false
+    }
+  ],
+  "edgeData": [
+    {
+      "id": "e1",
+      "type": "custom",
+      "source": "1",
+      "target": "3",
+      "sourceHandle": "right",
+      "targetHandle": "left"
+    },
+    {
+      "id": "e2",
+      "type": "custom",
+      "source": "2",
+      "target": "4",
+      "sourceHandle": "right",
+      "targetHandle": "left"
+    },
+    {
+      "id": "e3",
+      "type": "custom",
+      "source": "1",
+      "target": "5",
+      "sourceHandle": "right",
+      "targetHandle": "left"
+    },
+    {
+      "id": "e4",
+      "type": "custom",
+      "source": "2",
+      "target": "6",
+      "sourceHandle": "right",
+      "targetHandle": "left"
+    }
+  ]
+}

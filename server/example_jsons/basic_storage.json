@@ -1,0 +1,50 @@
+{
+    "nodeData": [
+      {
+        "id": "storage_1740364179322",
+        "data": {
+          "type": "STORAGE_VAR",
+          "label": "Storage",
+          "identifier": "",
+          "storage_variable": "uuid"
+        },
+        "type": "storage",
+        "measured": {
+          "width": 280,
+          "height": 222
+        },
+        "position": {
+          "x": 285,
+          "y": 233.21249771118164
+        },
+        "selected": false
+      },
+      {
+        "id": "primitive_1740364182069",
+        "data": {
+          "type": "PRIM_TYPE",
+          "label": "Primitive",
+          "identifier": "u32"
+        },
+        "type": "primitive",
+        "measured": {
+          "width": 280,
+          "height": 146
+        },
+        "position": {
+          "x": 869,
+          "y": 283.21249771118164
+        },
+        "selected": true
+      }
+    ],
+    "edgeData": [
+      {
+        "id": "xy-edge__primitive_1740364182069-storage_1740364179322a",
+        "type": "custom",
+        "source": "primitive_1740364182069",
+        "target": "storage_1740364179322",
+        "targetHandle": "a"
+      }
+    ]
+  }

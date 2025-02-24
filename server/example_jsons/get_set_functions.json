@@ -1,0 +1,109 @@
+{
+    "edgeData": [
+      {
+        "id": "xy-edge__primitive_1740364182069-storage_1740364179322a",
+        "type": "custom",
+        "source": "primitive_1740364182069",
+        "target": "storage_1740364179322",
+        "targetHandle": "a"
+      },
+      {
+        "id": "xy-edge__getFunction_1740364494514-getFunction_1740364494514",
+        "type": "custom",
+        "source": "getFunction_1740364494514",
+        "target": "getFunction_1740364494514"
+      },
+      {
+        "id": "xy-edge__storage_1740364179322b-getFunction_1740364494514",
+        "type": "custom",
+        "source": "storage_1740364179322",
+        "target": "getFunction_1740364494514",
+        "sourceHandle": "b"
+      },
+      {
+        "id": "xy-edge__storage_1740364179322b-setFunction_1740364519133",
+        "type": "custom",
+        "source": "storage_1740364179322",
+        "target": "setFunction_1740364519133",
+        "sourceHandle": "b"
+      }
+    ],
+    "nodeData": [
+      {
+        "id": "storage_1740364179322",
+        "data": {
+          "type": "STORAGE_VAR",
+          "label": "Storage",
+          "identifier": "",
+          "storage_variable": "uuid"
+        },
+        "type": "storage",
+        "measured": {
+          "width": 280,
+          "height": 222
+        },
+        "position": {
+          "x": 285,
+          "y": 233.21249771118164
+        },
+        "selected": false
+      },
+      {
+        "id": "primitive_1740364182069",
+        "data": {
+          "type": "PRIM_TYPE",
+          "label": "Primitive",
+          "identifier": "u64"
+        },
+        "type": "primitive",
+        "measured": {
+          "width": 280,
+          "height": 146
+        },
+        "position": {
+          "x": 869,
+          "y": 283.21249771118164
+        },
+        "selected": false
+      },
+      {
+        "id": "getFunction_1740364494514",
+        "data": {
+          "name": "get_uuid",
+          "type": "FUNCTION",
+          "label": "Get",
+          "identifier": "GET"
+        },
+        "type": "getFunction",
+        "dragging": false,
+        "measured": {
+          "width": 280,
+          "height": 222
+        },
+        "position": {
+          "x": -319.9658300622158,
+          "y": 174.32886575869523
+        },
+        "selected": false
+      },
+      {
+        "id": "setFunction_1740364519133",
+        "data": {
+          "type": "FUNCTION",
+          "label": "Set",
+          "identifier": "SET"
+        },
+        "type": "setFunction",
+        "dragging": false,
+        "measured": {
+          "width": 280,
+          "height": 222
+        },
+        "position": {
+          "x": -320.8998566788699,
+          "y": 488.3571888132233
+        },
+        "selected": false
+      }
+    ]
+  }
