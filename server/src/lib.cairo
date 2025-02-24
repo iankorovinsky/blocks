@@ -1,21 +1,22 @@
 #[starknet::interface]
-trait IMyContract<TContractState> {
-	fn test(self: @TContractState, sheep: bool);
+trait Isimple<TContractState> {
 }
 
 
 
 #[starknet::contract]
-mod MyContract {
+mod simple {
 
 	#[storage]
 	struct Storage {
 	}
 
-	#[abi(embed_v0)]
+	#[constructor]
+	fn constructor(ref self: ContractState, sheep: u256, cow: bool) {
+		test	
+	}
 
-	impl MyContract of super::IMyContract<ContractState> {
-		fn test(self: @ContractState, sheep: bool){
-		    
-		}
+	#[abi(embed_v0)]
+	impl simple of super::Isimple<ContractState> {
+	}
 }

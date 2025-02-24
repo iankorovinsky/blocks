@@ -122,6 +122,18 @@ class ContractBuilder:
             contractParts.append(indentedStructs)
             contractParts.append("")
 
+        # Find and add constructor if it exists
+        constructorNodes = [
+            node for node in self.jsonData.get('nodeData', [])
+            if node.get('data', {}).get('type') == 'FUNCTION' and 
+            node.get('data', {}).get('identifier') == 'CONSTRUCTOR'
+        ]
+        if constructorNodes:
+            constructor = self.generateConstructor(constructorNodes[0])
+            indentedConstructor = "\t" + constructor.replace("\n", "\n\t")
+            contractParts.append(indentedConstructor)
+            contractParts.append("")
+
         # Add event enum if any events exist
         events = self.buildEventEnum()
         if events:
@@ -159,7 +171,8 @@ class ContractBuilder:
         ]
         if self.functions:
             for func in self.functions:
-                implParts.extend(["\t\t" + line for line in func['template']])
+                if not func.get('is_constructor', False):  # Skip constructor in implementation block
+                    implParts.extend(["\t\t" + line for line in func['template']])
         
         implParts.append("\t}")
         
@@ -262,6 +275,69 @@ class ContractBuilder:
         self.addFunction(functionData)
         return "\n".join(template)
 
+    def generateConstructor(self, constructorNode: Dict) -> str:
+        # Get the edges to find connected typed variables
+        edges = self.getNodeEdges(constructorNode['id'])
+        parameters = []
+        
+        # Always include self parameter
+        parameters.append("ref self: ContractState")
+        
+        # Process each connected node
+        for connectedNodeId in edges['connectedNodes']:
+            # Find TypedVariable nodes
+            typedVarNode = next(
+                (node for node in self.jsonData['nodeData'] 
+                 if node['id'] == connectedNodeId and node['data']['type'] == 'TYPED_VAR'),
+                None
+            )
+            
+            if typedVarNode:
+                # Get the variable name
+                varName = typedVarNode['data'].get('label', 'unnamed')
+                
+                # Get the type from connected primitive node
+                varType = None
+                varEdges = self.getNodeEdges(typedVarNode['id'])
+                for typeNodeId in varEdges['connectedNodes']:
+                    typeNode = next(
+                        (node for node in self.jsonData['nodeData'] if node['id'] == typeNodeId),
+                        None
+                    )
+                    if typeNode and typeNode['data']['type'] == 'PRIM_TYPE':
+                        varType = self.getPrimitiveType(typeNode)
+                        break
+                
+                if varType:
+                    parameters.append(f"{varName}: {varType}")
+        
+        # Get code from connected code block
+        code_content = ""
+        for connectedNodeId in edges['connectedNodes']:
+            codeNode = next(
+                (node for node in self.jsonData['nodeData'] 
+                 if node['id'] == connectedNodeId and node['data']['type'] == 'CODE'),
+                None
+            )
+            if codeNode:
+                code_content = codeNode['data'].get('code', "").strip()
+                break
+        
+        # Build the constructor template
+        template = [
+            "#[constructor]",
+            f"fn constructor({', '.join(parameters)}) {{",
+            f"\t{code_content}"
+            "\t",
+            "}"
+        ]
+        
+        functionData = {
+            'template': template,
+            'is_constructor': True
+        }
+        self.addFunction(functionData)
+        return "\n".join(template)
 
     def build(self):
         # Combine all components into a complete contract
@@ -484,6 +560,7 @@ class ContractBuilder:
         return "\n".join(template)
 
     def generateFunctions(self, languageJson):
+
         # Process standard function nodes (GET, SET, etc.)
         functionNodes = self.getNodesByType('FUNCTION')
         eventNodes = self.getNodesByType('EVENT')
@@ -572,7 +649,6 @@ class ContractBuilder:
         self.setName(contractName)
         
         self.generateStorageVars()
-
         self.generateFunctions(languageMap)
 
         finalContract = self.build()
@@ -588,8 +664,6 @@ class ContractBuilder:
         print(f"Contract written to {outputFilePath}")
 
         return outputFilePath
-        
-        # print(finalContract)
 
     def buildStructs(self) -> str:
         structNodes = self.getNodesByType('STRUCT')
@@ -622,7 +696,7 @@ class ContractBuilder:
 if __name__ == "__main__":
     # Create an empty dictionary as initial jsonData
     builder = ContractBuilder({})
-    builder.jsonData = builder.loadJson('sample7.json')
+    builder.jsonData = builder.loadJson('sample8.json')
     
     # You can change this to any contract name you want
     builder.invoke("MyContract")

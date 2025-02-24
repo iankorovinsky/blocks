@@ -1,0 +1,152 @@
+{
+  "nodeData": [
+    {
+      "id": "typedVariable_1740353810039",
+      "type": "typedVariable",
+      "position": {
+        "x": 561.6538777577384,
+        "y": 94.61341007420702
+      },
+      "data": {
+        "label": "sheep",
+        "type": "TYPED_VAR",
+        "identifier": ""
+      },
+      "measured": {
+        "width": 280,
+        "height": 223
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "primitive_1740353813933",
+      "type": "primitive",
+      "position": {
+        "x": 939.7612957800056,
+        "y": 107.4383459399885
+      },
+      "data": {
+        "label": "Primitive",
+        "type": "PRIM_TYPE",
+        "identifier": "u256"
+      },
+      "measured": {
+        "width": 280,
+        "height": 147
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "typedVariable_1740353816763",
+      "type": "typedVariable",
+      "position": {
+        "x": 585.625,
+        "y": 408.7109375
+      },
+      "data": {
+        "label": "cow",
+        "type": "TYPED_VAR",
+        "identifier": ""
+      },
+      "measured": {
+        "width": 280,
+        "height": 223
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "primitive_1740353818909",
+      "type": "primitive",
+      "position": {
+        "x": 907.625,
+        "y": 455.7109375
+      },
+      "data": {
+        "label": "Primitive",
+        "type": "PRIM_TYPE",
+        "identifier": "bool"
+      },
+      "measured": {
+        "width": 280,
+        "height": 147
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "constructor_1740354562616",
+      "type": "constructor",
+      "position": {
+        "x": 145.86370421999425,
+        "y": 235.29375995591488
+      },
+      "data": {
+        "label": "Constructor",
+        "type": "FUNCTION",
+        "identifier": "CONSTRUCTOR"
+      },
+      "measured": {
+        "width": 280,
+        "height": 223
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "code_1740361002665",
+      "type": "code",
+      "position": {
+        "x": 635.3203125,
+        "y": 724.7109375
+      },
+      "data": {
+        "label": "Code",
+        "type": "CODE",
+        "identifier": "",
+        "code": "test"
+      },
+      "measured": {
+        "width": 400,
+        "height": 283
+      },
+      "selected": true,
+      "dragging": false
+    }
+  ],
+  "edgeData": [
+    {
+      "type": "custom",
+      "source": "primitive_1740353813933",
+      "target": "typedVariable_1740353810039",
+      "id": "xy-edge__primitive_1740353813933-typedVariable_1740353810039"
+    },
+    {
+      "type": "custom",
+      "source": "primitive_1740353818909",
+      "target": "typedVariable_1740353816763",
+      "id": "xy-edge__primitive_1740353818909-typedVariable_1740353816763"
+    },
+    {
+      "type": "custom",
+      "source": "typedVariable_1740353810039",
+      "target": "constructor_1740354562616",
+      "id": "xy-edge__typedVariable_1740353810039-constructor_1740354562616"
+    },
+    {
+      "type": "custom",
+      "source": "typedVariable_1740353816763",
+      "target": "constructor_1740354562616",
+      "id": "xy-edge__typedVariable_1740353816763-constructor_1740354562616"
+    },
+    {
+      "type": "custom",
+      "source": "code_1740361002665",
+      "target": "constructor_1740354562616",
+      "id": "xy-edge__code_1740361002665-constructor_1740354562616"
+    }
+  ],
+  "contractName": "test"
+}
