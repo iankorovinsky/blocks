@@ -27,6 +27,7 @@ export function ChatBot() {
   }, [messages, isLoading])
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('handleSubmit called')
     e.preventDefault()
     if (!input.trim() || isLoading) return
 
@@ -36,22 +37,37 @@ export function ChatBot() {
     setIsLoading(true)
 
     try {
+      console.log('Sending request to chatbot API...')
       const response = await fetch('http://127.0.0.1:5000/chatbot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tools: ["add", "starknet_id_data", "starknet_domain_data", "nft_uri", "nft by account", "search collections", "cairo documentation"],
-          prompt: userMessage
+          prompt: userMessage,
+          force_regenerate: false
         }),
       })
 
       const data = await response.json()
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response }])
+      console.log('Received response data:', data)
+
+      if (!data.success) {
+        throw new Error(data.error || 'Unknown error occurred')
+      }
+
+      // Add the assistant's response to messages
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: data.answer 
+      }])
+      
     } catch (error) {
-      console.error('Error:', error)
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, there was an error processing your request.' }])
+      console.error('Error in chatbot:', error)
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: error instanceof Error ? error.message : 'Sorry, there was an error processing your request.' 
+      }])
     } finally {
       setIsLoading(false)
     }

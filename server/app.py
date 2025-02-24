@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
-from agent import invoke
+# from agent import invoke
+from cairo_rag import query_cairo_docs
 from flask import request
 
 from deployer import handle_deploy_request, save_code_to_file, handle_verify_request
@@ -15,16 +16,32 @@ CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "
 def hello():
     return 'Hello World!'
 
-@app.route('/agent')
-def agent():
-    return handle_agent_request()
-
 @app.route('/chatbot', methods=['POST'])
 def chatbot():
     data = request.get_json(force=True)
-    tools = data.get('tools')
     prompt = data.get('prompt')
-    return {"response": invoke(tools, prompt)}
+    force_regenerate = data.get('force_regenerate', False)
+    print(f"Received request - Prompt: {prompt}")
+    
+    try:
+        result = query_cairo_docs(prompt, force_regenerate=force_regenerate)
+        response_data = {
+            "answer": result["answer"],
+            "context": [doc.page_content for doc in result["context"]],
+            "success": True
+        }
+        print(f"Sending response data: {response_data}")
+        print(f"Response data: {response_data['answer']}")
+        
+        return response_data
+    except Exception as e:
+        error_response = {
+            "response": f"Sorry, there was an error processing your request: {str(e)}",
+            "success": False,
+            "error": str(e)
+        }
+        print(f"Error in chatbot endpoint: {str(e)}")
+        return error_response
 
 @app.route('/deploy', methods=['POST'])
 def deploy():
