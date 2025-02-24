@@ -723,7 +723,7 @@ class ContractBuilder:
 if __name__ == "__main__":
     # Create an empty dictionary as initial jsonData
     builder = ContractBuilder({})
-    builder.jsonData = builder.loadJson('sample9.json')
+    builder.jsonData = builder.loadJson('sample10.json')
     
     # You can change this to any contract name you want
     builder.invoke("MyContract")
