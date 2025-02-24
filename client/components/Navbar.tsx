@@ -12,11 +12,12 @@ import {
 import { useNavbar } from "@/contexts/NavbarContext";
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { CollaborativeEditor, EditorRef } from "./CollaborativeEditor";
 import { useFlow } from "@/contexts/FlowContext";
 import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 export function Navbar() {
   const { toast } = useToast();
@@ -26,14 +27,37 @@ export function Navbar() {
   const [showEditor, setShowEditor] = useState(false);
   const [compiledCode, setCompiledCode] = useState("");
   const editorRef = useRef<EditorRef>(null);
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [lastSavedCode, setLastSavedCode] = useState("");
+  const [hasChanges, setHasChanges] = useState(false);
+  const [operationStatus, setOperationStatus] = useState<'none' | 'success' | 'error'>('none');
+
+  const checkForChanges = () => {
+    const currentCode = editorRef.current?.getContent() || "";
+    const codeChanged = currentCode !== lastSavedCode;
+    setHasChanges(codeChanged);
+    if (codeChanged) {
+      setOperationStatus('none');
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(checkForChanges, 1000);
+    return () => clearInterval(interval);
+  }, [lastSavedCode]);
 
   const handleDeploy = () => {
+    setIsDeploying(true);
+    const currentCode = editorRef.current?.getContent() || "";
+    setLastSavedCode(currentCode);
+    setHasChanges(false);
     const deploymentData = {
       nodeData: nodes,
       edgeData: edges,
       contractName,
       network,
-      code: editorRef.current?.getContent() || "",
+      code: currentCode,
     };
     console.log("Deploying contract with data: " + JSON.stringify(deploymentData, null, 2));
 
@@ -42,7 +66,8 @@ export function Navbar() {
         const hash = response.data.hash;
         console.log("Deployment hash: ", hash, "     ", hash.length);
         
-        if (hash === "error") {
+        if (hash === "error" || hash.length !== 66) {
+          setOperationStatus('error');
           toast({
             variant: "destructive",
             title: "Deployment Failed",
@@ -51,6 +76,7 @@ export function Navbar() {
           return;
         }
         
+        setOperationStatus('success');
         console.log("Deploying a happy toast");
 
         toast({
@@ -66,12 +92,16 @@ export function Navbar() {
 
       })
       .catch(error => {
+        setOperationStatus('error');
         console.error("Error deploying contract: ", error);
         toast({
           variant: "destructive",
           title: "Deployment Error",
           description: "Failed to deploy contract. Please try again.",
         });
+      })
+      .finally(() => {
+        setIsDeploying(false);
       });
   };
 
@@ -90,7 +120,10 @@ export function Navbar() {
         console.log("Compilation success: ", success);
         console.log("Compilation code: ", code);
         if (success === true) {
+          setOperationStatus('success');
           setCompiledCode(code);
+          setLastSavedCode(code);
+          setHasChanges(false);
           setShowEditor(true);
           toast({
             variant: "success",
@@ -98,7 +131,10 @@ export function Navbar() {
             description: "Your contract has been compiled successfully! ✨",
           });
         } else {
+          setOperationStatus('error');
           setCompiledCode(code);
+          setLastSavedCode(code);
+          setHasChanges(false);
           setShowEditor(true);
           toast({
             variant: "warning",
@@ -108,14 +144,64 @@ export function Navbar() {
         }
       })
       .catch(error => {
+        setOperationStatus('error');
         console.error("Error compiling contract: ", error);
         setCompiledCode("// Error compiling contract");
+        setLastSavedCode("// Error compiling contract");
+        setHasChanges(false);
         setShowEditor(true);
         toast({
           variant: "destructive",
           title: "Compilation Error",
           description: "Failed to compile contract. Please check your code and try again.",
         });
+      });
+  };
+
+  const handleVerify = () => {
+    setIsVerifying(true);
+    const currentCode = editorRef.current?.getContent() || "";
+    setLastSavedCode(currentCode);
+    setHasChanges(false);
+    const verificationData = {
+      nodeData: nodes,
+      edgeData: edges,
+      contractName,
+      code: currentCode,
+    };
+
+    console.log("Verifying contract with data: " + JSON.stringify(verificationData, null, 2));
+    axios.post("http://127.0.0.1:5000/verify", verificationData)
+      .then(response => {
+        const success = response.data.success;
+        console.log("Verification success: ", success);
+        if (success === true) {
+          setOperationStatus('success');
+          toast({
+            variant: "success",
+            title: "🎯 Compilation Successful",
+            description: "Your contract has been compiled successfully! ✨",
+          });
+        } else {
+          setOperationStatus('error');
+          toast({
+            variant: "warning",
+            title: "Verification Failed",
+            description: "We tried, but we couldn't verify your contract. Please check your code and try again.",
+          });
+        }
+      })
+      .catch(error => {
+        setOperationStatus('error');
+        console.error("Error verifying contract: ", error);
+        toast({
+          variant: "destructive",
+          title: "Verification Error",
+          description: "Failed to verify contract. Please check your code and try again.",
+        });
+      })
+      .finally(() => {
+        setIsVerifying(false);
       });
   };
 
@@ -176,7 +262,35 @@ export function Navbar() {
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-xl font-semibold">Contract Code</h2>
               <div className="flex items-center gap-2">
-                <Button onClick={handleDeploy}>Deploy</Button>
+                <div className="relative flex items-center">
+                  <span className={`w-2 h-2 rounded-full mr-4 animate-pulse ${
+                    hasChanges || isVerifying || isDeploying
+                      ? "bg-yellow-400 shadow-[0_0_8px_2px_rgba(250,204,21,0.6)]"
+                      : operationStatus === 'success' || operationStatus === 'none'
+                      ? "bg-green-500 shadow-[0_0_8px_2px_rgba(34,197,94,0.6)]"
+                      : "bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.6)]"
+                  }`} />
+                  <Button onClick={handleVerify} disabled={isVerifying}>
+                    {isVerifying ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Verifying
+                      </>
+                    ) : (
+                      "Verify"
+                    )}
+                  </Button>
+                </div>
+                <Button onClick={handleDeploy} disabled={isDeploying}>
+                  {isDeploying ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Deploying
+                    </>
+                  ) : (
+                    "Deploy"
+                  )}
+                </Button>
                 <Button variant="ghost" onClick={() => setShowEditor(false)}>
                   Close
                 </Button>
@@ -186,7 +300,7 @@ export function Navbar() {
               <CollaborativeEditor 
                 ref={editorRef}
                 initialValue={compiledCode} 
-                onClose={() => setShowEditor(false)} 
+                onClose={() => setShowEditor(false)}
               />
             </div>
           </div>

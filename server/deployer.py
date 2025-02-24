@@ -36,3 +36,20 @@ def handle_deploy_request(network: str, contract_name: str):
             
     except subprocess.CalledProcessError as e:
         return f"Deployment failed: {e.stderr}"
+
+def handle_verify_request():
+    try:
+        result = subprocess.run(['bash', './verifier.sh'], 
+                              capture_output=True, 
+                              text=True,
+                              check=True)
+        # Check if output starts with BUILD_ERROR
+        if result.stdout.startswith('BUILD_ERROR:'):
+            print(f"Verification failed!")
+            return False
+        else:
+            print(f"Verification successful!")
+            return True
+    except subprocess.CalledProcessError as e:
+        print(f"Verification failed!")
+        return False

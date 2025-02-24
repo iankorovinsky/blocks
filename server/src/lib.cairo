@@ -2,8 +2,6 @@
 trait ISample<TContractState> {
 }
 
-
-
 #[starknet::contract]
 mod Sample {
 
@@ -14,4 +12,5 @@ mod Sample {
 	#[abi(embed_v0)]
 	impl Sample of super::ISample<ContractState> {
 	}
+
 }
