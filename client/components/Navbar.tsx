@@ -193,7 +193,7 @@ export function Navbar() {
           toast({
             variant: "success",
             title: "🎯 Verification Successful",
-            description: "Your contract has been verified successfully! ✨",
+            description: "Your contract has been compiled successfully! ✨",
           });
         } else {
           setOperationStatus('error');
@@ -271,7 +271,11 @@ export function Navbar() {
               {isAuthenticated ? (
                 <div className="flex items-center gap-3">
                   <span className="text-sm">{user?.email}</span>
-                  <Button variant="outline" onClick={() => logout()}>
+                  <Button variant="outline" onClick={() => logout({ 
+                    logoutParams: { 
+                      returnTo: window.location.origin 
+                    }
+                  })}>
                     Logout
                   </Button>
                 </div>
