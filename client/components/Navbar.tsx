@@ -46,6 +46,7 @@ export function Navbar() {
     const interval = setInterval(checkForChanges, 1000);
     return () => clearInterval(interval);
   }, [lastSavedCode]);
+  const [constructorParams, setConstructorParams] = useState<Record<string, string>>({});
 
   const handleDeploy = () => {
     setIsDeploying(true);
@@ -58,6 +59,7 @@ export function Navbar() {
       contractName,
       network,
       code: currentCode,
+      constructorParams,
     };
     console.log("Deploying contract with data: " + JSON.stringify(deploymentData, null, 2));
 
@@ -106,6 +108,7 @@ export function Navbar() {
   };
 
   const handleCompile = () => {
+    const hasConstructor = nodes.some(node => node.type === 'constructor');
     const compilationData = {
       nodeData: nodes,
       edgeData: edges,
@@ -205,6 +208,13 @@ export function Navbar() {
       });
   };
 
+  const handleParamChange = (paramId: string, value: string) => {
+    setConstructorParams(prev => ({
+      ...prev,
+      [paramId]: value
+    }));
+  };
+
   return (
     <>
       <nav className="bg-background border-b h-[7vh] flex items-center">
@@ -296,12 +306,51 @@ export function Navbar() {
                 </Button>
               </div>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <CollaborativeEditor 
                 ref={editorRef}
                 initialValue={compiledCode} 
                 onClose={() => setShowEditor(false)}
               />
+              {nodes.some(node => node.type === 'constructor') && (
+                <div className="absolute bottom-0 left-0 right-0 bg-white border-t shadow-lg transform translate-y-[95%] hover:translate-y-0 transition-transform duration-200 z-50 rounded-b-lg">
+                  <div className="flex justify-center p-2 border-b">
+                    <div className="w-12 h-1 bg-gray-300 rounded-full" />
+                  </div>
+                  <div className="p-4 max-h-[60vh] overflow-y-auto">
+                    <h3 className="text-lg font-semibold mb-2">Constructor Parameters</h3>
+                    <div className="space-y-2 pr-4 pb-6">
+                      {nodes
+                        .filter(node => node.type === 'typedVariable' && 
+                          edges.some(edge => 
+                            edge.target === nodes.find(n => n.type === 'constructor')?.id && 
+                            edge.source === node.id
+                          )
+                        )
+                        .map(node => {
+                          const paramType = edges
+                            .filter(edge => edge.target === node.id)
+                            .map(edge => 
+                              nodes.find(n => n.id === edge.source)?.data?.identifier
+                            )[0] || '';
+
+                          return (
+                            <div key={node.id} className="flex flex-col gap-2">
+                              <span className="font-medium text-sm">{node.data.label}</span>
+                              <Input
+                                placeholder={`Enter ${paramType}`}
+                                value={constructorParams[node.id] || ''}
+                                onChange={(e) => handleParamChange(node.id, e.target.value)}
+                                className="w-1/4 h-8 px-2 py-1"
+                              />
+                            </div>
+                          );
+                        })
+                      }
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
