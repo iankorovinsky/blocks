@@ -1,21 +1,21 @@
 #[starknet::interface]
-trait Iweeeee<TContractState> {
+trait Ihhu<TContractState> {
 }
 
 
 
 #[starknet::contract]
-mod weeeee {
+mod hhu {
 	#[storage]
 	struct Storage {
 	}
 
 	#[constructor]
-	fn constructor(ref self: ContractState, hahaha: u16, Typed Variable: ByteArray) {
+	fn constructor(ref self: ContractState) {
 			
 	}
 
 	#[abi(embed_v0)]
-	impl weeeee of super::Iweeeee<ContractState> {
+	impl hhu of super::Ihhu<ContractState> {
 	}
 }

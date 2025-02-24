@@ -11,7 +11,7 @@ def save_code_to_file(code: str):
     with open('src/lib.cairo', 'w') as file:
         file.write(code)
 
-def handle_deploy_request(network: str, contract_name: str):
+def handle_deploy_request(network: str, contract_name: str, args: str):
     try:
         env = os.environ.copy()
         if network == 'testnet':
@@ -21,7 +21,7 @@ def handle_deploy_request(network: str, contract_name: str):
             env['DEPLOYED_NETWORK'] = 'mainnet'
             env['RPC_ENDPOINT'] = 'https://free-rpc.nethermind.io/mainnet-juno'
         print(f"Running deployer.sh with contract name {contract_name}")
-        result = subprocess.run(['bash', './deployer.sh', contract_name, env['KEYSTORE_PASSWORD'], env['DEPLOYED_NETWORK'], env['RPC_ENDPOINT']], 
+        result = subprocess.run(['bash', './deployer.sh', contract_name, env['KEYSTORE_PASSWORD'], env['DEPLOYED_NETWORK'], env['RPC_ENDPOINT'], args], 
                               capture_output=True, 
                               text=True,
                               check=True,
